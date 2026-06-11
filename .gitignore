@@ -1,0 +1,24 @@
+# IDE
+/.idea
+.vscode/
+
+# Dependencies
+/node_modules
+package-lock.json
+
+# Debug logs
+.pnpm-debug.log*
+*.log
+
+# Env files
+.env*
+!.env.example
+
+# Claude Code (machine-local, not shared)
+.claude/settings.local.json
+.playwright-mcp/
+
+# OS
+.DS_Store
+Thumbs.db
+*.stackdump
