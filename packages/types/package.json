@@ -7,12 +7,16 @@
     ".": "./src/index.ts"
   },
   "main": "./src/index.ts",
+  "prettier": "@ocr/prettier-config",
   "scripts": {
     "lint": "eslint .",
+    "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@ocr/eslint-config": "workspace:*",
+    "@ocr/prettier-config": "workspace:*",
+    "prettier": "^3.4.2",
     "@eslint/js": "^10.0.0",
     "eslint": "^10.0.0",
     "globals": "^17.0.0",

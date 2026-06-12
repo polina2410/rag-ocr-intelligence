@@ -8,5 +8,6 @@
     - Clear Goals and Notes sections (keep placeholder comments)
     - Add feature summary to the END of @context/features-history.md
 5. Commit the reset: `chore: reset current-feature.md after completing [feature]`
-6. Push main to origin ONCE (single push with all changes)
-7. If feature branch was previously pushed, delete it from origin
+6. If the loaded spec filename starts with `step-{N}-` (check `context/specs/`), find that step number in `context/PLAN.md` and add ✅ before it. Include this change in the reset commit.
+7. Push main to origin ONCE (single push with all changes)
+8. If feature branch was previously pushed, delete it from origin
