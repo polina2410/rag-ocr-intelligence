@@ -10,7 +10,7 @@ Manages the full lifecycle of a feature from spec to merge.
 
 ## Working File
 
-@context/features/current-feature.md
+@context/current-feature.md
 
 ### File Structure
 

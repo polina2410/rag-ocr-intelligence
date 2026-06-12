@@ -29,7 +29,7 @@ Write a plan for: $ARGUMENTS
 
 ## Process
 
-1. Understand the goal — read `context/features/current-feature.md` if a feature is active
+1. Understand the goal — read `context/current-feature.md` if a feature is active
 2. Identify affected files (read them before writing the plan)
 3. Break work into 5–10 sequential tasks
 4. Write the plan using the format below
@@ -53,9 +53,10 @@ Write a plan for: $ARGUMENTS
 
 ## Done When
 
-- [ ] `pnpm lint` passes
-- [ ] `pnpm test:run` passes
-- [ ] `pnpm build` passes
+- [ ] `pnpm --filter backend lint` passes
+- [ ] `pnpm --filter frontend lint` passes (if frontend changed)
+- [ ] `pnpm --filter backend test` passes
+- [ ] `pnpm --filter backend build` passes
 - [ ] {feature-specific check}
 
 ## Notes
