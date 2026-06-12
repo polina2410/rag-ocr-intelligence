@@ -1,7 +1,7 @@
 ---
 name: feature
 description: Manage current feature workflow - start, review, explain or complete
-argument-hint: load|start|review|explain|complete
+argument-hint: create-spec|load|start|review|explain|complete
 ---
 
 # Feature Workflow
@@ -28,6 +28,7 @@ Execute the requested action: $ARGUMENTS
 
 | Action | Description |
 |--------|-------------|
+| `create-spec` | Draft a spec file and save to context/specs/ |
 | `load` | Load a feature spec or inline description |
 | `start` | Begin implementation, create branch |
 | `review` | Check goals met, code quality |

@@ -10,7 +10,7 @@ Custom Claude Code subagents for this project. These files go in your project's 
 - `docs-writer.md` - Creates and updates technical documentation without modifying source code
 - `react-refactoring-expert.md` - Refactors and reduces complexity in React/TypeScript code without adding features
 - `devil.md` - Planning-phase devil's advocate that challenges requirements and architecture decisions
-- `ba.md` - Business analyst for requirements, user stories, and acceptance criteria before implementation
+- `business-analyst.md` - Business analyst for requirements, user stories, and acceptance criteria before implementation
 - `qa.md` - E2E and integration testing specialist using Playwright MCP; covers user journeys, visual regression, and accessibility
 - `devops.md` - CI/CD and deployment specialist; owns GitHub Actions workflows, environment variables, Vercel config, and secret hygiene
 - `performance.md` - Next.js performance auditor; bundle size, Core Web Vitals, server/client split, ISR caching, animation CLS risk

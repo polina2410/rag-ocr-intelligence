@@ -3,10 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "prettier": "@ocr/prettier-config",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "format": "prettier --write .",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -21,6 +23,8 @@
   },
   "devDependencies": {
     "@ocr/eslint-config": "workspace:*",
+    "@ocr/prettier-config": "workspace:*",
+    "prettier": "^3.4.2",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
