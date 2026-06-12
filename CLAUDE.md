@@ -6,8 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **ocr-intelligence** — pnpm monorepo with a React/Vite frontend and NestJS backend.
 
-- **Frontend** (`frontend/`): React 19, Vite, TypeScript, React Router DOM, TanStack Query, Axios, Framer Motion, Recharts
-- **Backend** (`backend/`): NestJS, TypeORM, PostgreSQL, Qdrant (vector DB), OpenAI SDK, Multer (file uploads), CSV parsing
+- **Frontend** (`apps/frontend/`): React 19, Vite, TypeScript, React Router DOM, TanStack Query, Axios, Framer Motion, Recharts
+- **Backend** (`apps/backend/`): NestJS, TypeORM, PostgreSQL, Qdrant (vector DB), OpenAI SDK, Multer (file uploads), CSV parsing
+- **Shared types** (`packages/types/`): `@ocr/types` — shared DTOs consumed by both apps
 - **Infrastructure**: Docker Compose — PostgreSQL on port 5433, Qdrant on port 6333
 
 ## Commands
@@ -54,25 +55,29 @@ pnpm --filter backend test:cov    # Run Jest with coverage
 ## Architecture
 
 ```
-frontend/src/
+apps/frontend/src/
   components/     # Reusable React components
   pages/          # Route-level page components
   hooks/          # Custom React hooks
   api/            # Axios API call functions
   types/          # TypeScript types/interfaces
 
-backend/src/
+apps/backend/src/
   <feature>/
     <feature>.module.ts
     <feature>.controller.ts
     <feature>.service.ts
     dto/
     entities/
+
+packages/types/src/
+  *.dto.ts        # Shared DTOs — import via @ocr/types
+  index.ts
 ```
 
 ## Testing
 
-- Backend tests live in `backend/src/` (`.spec.ts`) and `backend/test/` (e2e)
+- Backend tests live in `apps/backend/src/` (`.spec.ts`) and `apps/backend/test/` (e2e)
 - Uses Jest + `@nestjs/testing`
 - Always test happy path + at least one error case
 - Run `pnpm --filter backend test` before marking backend work complete

@@ -6,6 +6,11 @@
 /node_modules
 package-lock.json
 
+# Build outputs
+dist/
+.turbo/
+*.tsbuildinfo
+
 # Debug logs
 .pnpm-debug.log*
 *.log

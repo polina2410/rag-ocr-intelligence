@@ -2,29 +2,35 @@
 
 ## What to build
 
-Initialize a Turborepo monorepo with three packages: `apps/frontend` (Vite + React + TypeScript), `apps/backend` (NestJS), and `packages/types` (shared DTOs). This document is the specification — build what it describes. Do not summarize it back; produce the actual files.
+Wire the existing apps into a Turborepo monorepo with three packages: `apps/frontend` (Vite + React + TypeScript), `apps/backend` (NestJS), and `packages/types` (shared DTOs). This document is the specification — build what it describes. Do not summarize it back; produce the actual files.
+
+## Decision log
+
+- **Directory layout:** Apps live under `apps/` (not at root level). The existing `frontend/` and `backend/` directories must be moved to `apps/frontend/` and `apps/backend/` respectively.
+- **Do not re-scaffold apps.** `apps/frontend` and `apps/backend` already exist with working code and dependencies. Skip `pnpm create vite` and `@nestjs/cli new` entirely — just move the directories and update workspace config.
 
 ## Deliverables (definition of done)
 
 1. **Root `package.json`** — private, declares pnpm workspaces pointing at `apps/*` and `packages/*`, has `dev`, `build`, and `lint` scripts that delegate to Turbo.
-2. **`pnpm-workspace.yaml`** — declares `apps/*` and `packages/*` as workspace packages.
+2. **`pnpm-workspace.yaml`** — updated to declare `apps/*` and `packages/*` as workspace packages.
 3. **`turbo.json`** — pipeline config with `build`, `dev`, and `lint` tasks. `dev` runs persistently. `build` depends on upstream `^build`. `lint` has no dependencies.
-4. **`apps/frontend/`** — Vite + React + TypeScript app. Imports `@ocr/types` via workspace alias.
-5. **`apps/backend/`** — NestJS app scaffolded with the NestJS CLI. Imports `@ocr/types` via workspace alias.
+4. **`apps/frontend/`** — existing Vite + React + TypeScript app moved from `frontend/`. Imports `@ocr/types` via workspace alias.
+5. **`apps/backend/`** — existing NestJS app moved from `backend/`. Imports `@ocr/types` via workspace alias.
 6. **`packages/types/`** — shared types package. Exports `RaceDto` and `AthleteDto` as a starting point. Has its own `package.json` with name `@ocr/types` and a `tsconfig.json`.
-7. **Root `.gitignore`** — covers `node_modules`, `dist`, `.turbo`, `.env`, `*.tsbuildinfo`.
+7. **Root `tsconfig.json`** — base config with common options. Each app extends it and adds only what it needs (frontend adds `bundler` resolution, backend keeps its existing `nodenext` + decorator options).
+8. **Root `.gitignore`** — augment the existing file to also cover `dist`, `.turbo`, `*.tsbuildinfo` (do not replace existing entries).
 
-The task is complete when `pnpm install` runs cleanly from the root, `pnpm dev` starts both apps in parallel, and both `apps/frontend` and `apps/backend` can import from `@ocr/types` without TypeScript errors.
+The task is complete when `pnpm install` runs cleanly from the root, `pnpm dev` starts both apps in parallel via Turbo, and both `apps/frontend` and `apps/backend` can import from `@ocr/types` without TypeScript errors.
 
 ## Rules that must hold (read before implementing)
 
 - **Package name is `@ocr/types`**, not `@repo/types` or anything else. Both apps import from this exact name.
 - **Do not use `npm` or `yarn`**. This project uses pnpm exclusively. All commands and lockfiles must be pnpm.
-- **`packages/types` has no build step.** It exports raw TypeScript source directly via the `exports` field in `package.json` — no `tsc` compile, no `dist/` folder. Both apps consume it through TypeScript path resolution.
-- **Do not scaffold frontend from scratch.** Use `pnpm create vite` with the `react-ts` template. Do not hand-write the Vite config or `index.html`.
-- **Do not scaffold backend from scratch.** Use `pnpm dlx @nestjs/cli new` with `--package-manager pnpm --skip-git`. Do not hand-write the NestJS boilerplate.
+- **`packages/types` has no build step.** It exports raw TypeScript source directly via the `exports` field in `package.json`. The frontend (Vite/esbuild) resolves it at compile time. The backend resolves it via TypeScript path aliasing — do not rely on `nest build` picking it up via `rootDir`; use `paths` in the backend's `tsconfig.json` instead.
+- **Do not re-scaffold.** Do not run `pnpm create vite` or `@nestjs/cli new`. The apps already exist — move them.
+- **`turbo` must be a root devDependency.** Add `turbo` to the root `package.json` devDependencies so `pnpm dev` / `pnpm build` / `pnpm lint` resolve the binary without a global install.
 - **`turbo.json` must declare `dev` as persistent.** Without `"persistent": true` on the dev task, Turbo will not run long-running processes correctly.
-- **All packages extend from the root TypeScript config.** Root `tsconfig.json` sets the base `compilerOptions`. Each package extends it and adds only what it needs.
+- **Two TypeScript configs, not one universal base.** The root `tsconfig.json` sets only the common base (`target`, `strict`, `skipLibCheck`, `esModuleInterop`). The backend **must** keep its existing `moduleResolution: "nodenext"`, `emitDecoratorMetadata`, and `experimentalDecorators` in its own `tsconfig.json` — do not override these from root.
 
 ---
 
@@ -33,8 +39,8 @@ The task is complete when `pnpm install` runs cleanly from the root, `pnpm dev` 
 ```
 ocr-intelligence/
 ├── apps/
-│   ├── frontend/          # Vite + React + TS (from vite template)
-│   └── backend/           # NestJS (from @nestjs/cli)
+│   ├── frontend/          # moved from frontend/ — do not re-scaffold
+│   └── backend/           # moved from backend/ — do not re-scaffold
 ├── packages/
 │   └── types/
 │       ├── src/
@@ -43,10 +49,10 @@ ocr-intelligence/
 │       │   └── athlete.dto.ts
 │       ├── package.json
 │       └── tsconfig.json
-├── .gitignore
+├── .gitignore             # augment existing
 ├── package.json
 ├── pnpm-workspace.yaml
-├── tsconfig.json          # base config, extended by all packages
+├── tsconfig.json          # base config only, extended by each app
 └── turbo.json
 ```
 
@@ -79,7 +85,6 @@ export interface AthleteDto {
 ```
 
 ### `index.ts`
-Re-exports everything:
 ```typescript
 export * from './race.dto'
 export * from './athlete.dto'
@@ -97,6 +102,7 @@ export * from './athlete.dto'
   "exports": {
     ".": "./src/index.ts"
   },
+  "main": "./src/index.ts",
   "scripts": {
     "lint": "tsc --noEmit"
   }
@@ -128,17 +134,40 @@ export * from './athlete.dto'
 
 ---
 
-## Root `tsconfig.json`
+## Root `tsconfig.json` (base only)
 
 ```json
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true
+  }
+}
+```
+
+Do not set `module` or `moduleResolution` here — each app sets its own.
+
+---
+
+## Backend `tsconfig.json` — `paths` for `@ocr/types`
+
+The backend must keep its existing NestJS options and add a `paths` entry so TypeScript resolves the raw source:
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "nodenext",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@ocr/types": ["../../packages/types/src/index.ts"]
+    }
   }
 }
 ```
@@ -165,19 +194,22 @@ Remove both after verifying — they are smoke-test imports only.
 
 ## Build steps
 
-1. Create root folder structure and `pnpm-workspace.yaml`.
-2. Write root `package.json`, `tsconfig.json`, `turbo.json`, `.gitignore`.
-3. Scaffold frontend with `pnpm create vite apps/frontend -- --template react-ts`.
-4. Scaffold backend with `pnpm dlx @nestjs/cli new apps/backend --package-manager pnpm --skip-git`.
-5. Create `packages/types/` with folder structure, DTOs, and `package.json` above.
-6. Run `pnpm install` from root to link all workspaces.
-7. Add `@ocr/types` to the `dependencies` of both `apps/frontend/package.json` and `apps/backend/package.json` as `"@ocr/types": "workspace:*"`.
-8. Verify the smoke-test imports compile without errors, then remove them.
-9. Run `pnpm dev` and confirm both apps start.
+1. Move `frontend/` → `apps/frontend/` and `backend/` → `apps/backend/`.
+2. Update `pnpm-workspace.yaml` to declare `apps/*` and `packages/*`.
+3. Update root `package.json`: add `dev`, `build`, `lint` scripts delegating to `turbo`; add `turbo` to devDependencies.
+4. Write root `tsconfig.json` (base only, no `module`/`moduleResolution`).
+5. Write `turbo.json`.
+6. Augment root `.gitignore` — add `dist`, `.turbo`, `*.tsbuildinfo` if not already present.
+7. Create `packages/types/` with folder structure, DTOs, and `package.json` above.
+8. Update `apps/backend/tsconfig.json` to extend `../../tsconfig.json` and add `paths` for `@ocr/types`.
+9. Update `apps/frontend/tsconfig.json` to extend `../../tsconfig.json` if it doesn't already.
+10. Add `@ocr/types` to the `dependencies` of both `apps/frontend/package.json` and `apps/backend/package.json` as `"@ocr/types": "workspace:*"`.
+11. Run `pnpm install` from root to link all workspaces.
+12. Verify the smoke-test imports compile without errors, then remove them.
+13. Run `pnpm dev` and confirm both apps start.
 
 ## Notes for the implementer
 
-- If `pnpm install` complains about the `exports` field in `packages/types/package.json`, add `"main": "./src/index.ts"` as a fallback alongside `exports`.
-- The NestJS CLI may create its own `.git` folder inside `apps/backend` despite `--skip-git`. Delete it if present — there should be only one `.git` at the root.
-- Frontend will start on port `5173` (or the next available), backend on `3000`. No port changes needed at this step.
+- If `pnpm install` complains about the `exports` field in `packages/types/package.json`, the `"main"` fallback field is already included above.
+- The `nest build` command compiles only what's inside `rootDir: ./src`. `@ocr/types` is resolved by TypeScript via `paths` at type-check time; it does not need to be inside `rootDir`. For production runtime, types-only imports (interfaces) have no runtime representation and will not cause issues.
 - If WebStorm doesn't resolve `@ocr/types`, go to **File → Settings → Languages & Frameworks → TypeScript** and point it at `apps/frontend/node_modules/typescript`. This is an IDE config issue, not a build issue.
