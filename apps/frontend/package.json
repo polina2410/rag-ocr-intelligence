@@ -20,6 +20,7 @@
     "recharts": "^3.8.1"
   },
   "devDependencies": {
+    "@ocr/eslint-config": "workspace:*",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
