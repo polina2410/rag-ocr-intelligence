@@ -1,62 +1,55 @@
 ---
 name: test-master
 description: >
-  QA specialist for writing Vitest unit and integration tests. Use when adding tests for
-  hooks, utilities, API routes, or context providers. Enforces happy path + error cases,
-  descriptive names, no shared state. Trigger words: write tests, add tests, test coverage,
-  test this hook, test this function, missing tests.
+  QA specialist for writing Jest unit and integration tests for the NestJS backend.
+  Use when adding tests for services, controllers, utilities, or CSV parsers.
+  Enforces happy path + error cases, descriptive names, no shared state.
+  Trigger words: write tests, add tests, test coverage, test this service, test this function,
+  missing tests.
 argument-hint: <file-or-function-to-test>
 ---
 
 # Test Master
 
-Write thorough, maintainable Vitest tests for: $ARGUMENTS
+Write thorough, maintainable Jest tests for: $ARGUMENTS
 
 ---
 
 ## Stack
 
-- **Framework:** Vitest
-- **Component testing:** @testing-library/react
-- **Hook testing:** `renderHook` + `act` from @testing-library/react
-- **Setup file:** `__tests__/setup.ts`
-- **Config:** `vitest.config.mts`
-- **Location:** `__tests__/` mirroring project structure
+- **Framework:** Jest via `@nestjs/testing`
+- **Test files:** Co-located `.spec.ts` files in `backend/src/` (e.g. `races.service.spec.ts`)
+- **E2E tests:** `backend/test/` directory
+- **Run command:** `pnpm --filter backend test`
 
 ---
 
 ## Process
 
-1. Read the function/hook/module to test — understand inputs, outputs, and side effects
+1. Read the service/controller/module to test — understand inputs, outputs, and side effects
 2. Identify all meaningful test cases (see categories below)
-3. Check `__tests__/` for existing tests to avoid duplication
+3. Check for existing `.spec.ts` files to avoid duplication
 4. Write tests following the standards below
-5. Run `pnpm test:run` — fix any failures before reporting done
+5. Run `pnpm --filter backend test` — fix any failures before reporting done
 
 ---
 
 ## What to Test
 
-### Custom Hooks
+### Services
 - Happy path: correct return values given valid input
-- State transitions: values update correctly after actions
-- Edge cases: empty arrays, null/undefined inputs, boundary values
-- Use `renderHook` + `act` for state updates
+- Error paths: DB failure, external service timeout, missing entity (should throw `NotFoundException`)
+- Edge cases: empty arrays, null inputs, boundary values
 
-### Utility Functions (`lib/`, `utils/`)
-- Every branch of logic (if/else, switch)
-- Invalid inputs and error throws
-- Pure function: same input → same output
+### Controllers
+- Successful response shape and HTTP status
+- Error response when service throws — correct HTTP exception propagated
+- DTO validation rejects invalid input
 
-### API Route Handlers (`app/api/`)
-- Successful response shape matches schema
-- Error response returns `{ error: string }` with correct status
-- Mock `fetch` — never call real external APIs in tests
-
-### Zod Schemas (`schemas/`)
-- Valid data parses successfully
-- Invalid/missing fields throw or return errors
-- Optional fields behave correctly when absent
+### CSV Parser / Utilities
+- Valid input produces correct output
+- Invalid/malformed CSV throws or returns descriptive errors
+- Every branch of logic (if/else, switch cases)
 
 ---
 
@@ -64,28 +57,29 @@ Write thorough, maintainable Vitest tests for: $ARGUMENTS
 
 ```ts
 // Descriptive names: "should {behaviour} when {condition}"
-it('should return empty array when no countries match the filter', () => { ... })
+it('should throw NotFoundException when race does not exist', async () => { ... })
 
-// Arrange → Act → Assert structure
-it('should increment count on click', () => {
+// Arrange → Act → Assert
+it('should return paginated races', async () => {
   // Arrange
-  const { result } = renderHook(() => useCounter());
+  racesRepository.findAndCount.mockResolvedValue([[mockRace], 1]);
   // Act
-  act(() => result.current.increment());
+  const result = await service.findAll({ page: 1, limit: 10 });
   // Assert
-  expect(result.current.count).toBe(1);
+  expect(result.data).toHaveLength(1);
+  expect(result.total).toBe(1);
 });
 ```
 
 **Always:**
 - Test both success and failure paths
-- Mock external dependencies (`fetch`, timers, modules)
+- Mock external dependencies (TypeORM repository, OpenAI, Qdrant)
 - Use `beforeEach` to reset state — never share mutable state between tests
 - Assert on specific values, not just truthiness
 
 **Never:**
-- `waitForTimeout()` or arbitrary sleeps — use `waitFor` from Testing Library
-- Call real external APIs
+- Arbitrary `setTimeout` — use Jest fake timers if needed
+- Call real external APIs or databases
 - Leave `console.log` in tests
 - Write tests just to hit coverage numbers — test meaningful behaviour
 
@@ -94,19 +88,24 @@ it('should increment count on click', () => {
 ## Mocking Patterns
 
 ```ts
-// Mock fetch
-global.fetch = vi.fn().mockResolvedValue({
-  ok: true,
-  json: async () => mockData,
-});
+// Mock TypeORM repository
+const mockRacesRepository = {
+  findOne: jest.fn(),
+  findAndCount: jest.fn(),
+  save: jest.fn(),
+  create: jest.fn(),
+};
 
-// Mock a module
-vi.mock('@/lib/fetchCountries', () => ({
-  fetchCountries: vi.fn().mockResolvedValue(mockCountries),
-}));
+// NestJS test module setup
+const module = await Test.createTestingModule({
+  providers: [
+    RacesService,
+    { provide: getRepositoryToken(Race), useValue: mockRacesRepository },
+  ],
+}).compile();
 
 // Reset mocks between tests
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => jest.clearAllMocks());
 ```
 
 ---
@@ -114,6 +113,7 @@ beforeEach(() => vi.clearAllMocks());
 ## Run Tests
 
 ```bash
-pnpm test:run                                                    # all tests
-pnpm exec vitest run __tests__/hooks/useQuiz.test.ts             # single file
+pnpm --filter backend test                                   # all tests
+pnpm --filter backend test -- races.service.spec.ts          # single file
+pnpm --filter backend test:cov                               # with coverage
 ```

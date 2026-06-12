@@ -47,17 +47,18 @@ Review: $ARGUMENTS
 - Large imports done selectively (e.g. `import { x } from 'lib'` not `import lib`)
 
 ### 4. Convention Compliance (CLAUDE.md)
-- TypeScript — no `any`, no non-null assertions (`!`) without justification
-- Named exports only — no default exports
-- CSS Modules — no inline styles, no global class strings
-- Components are `const` arrow functions
-- API calls only in `lib/` — not inline in components or hooks
-- No magic numbers — named constants in `constants/`
+- TypeScript — no `any`, use `unknown` or proper generics
+- Named exports for backend; React components may use default exports
+- CSS Modules or plain CSS — no inline styles
+- React components are `const` arrow functions
+- HTTP calls only in `frontend/src/api/` — not inline in components or hooks
+- NestJS: follow module / controller / service / dto / entity structure
+- No magic numbers — extract named constants
 
 ### 5. Architecture
-- Component in the right folder (`features/` vs `UI/`)
-- Logic in `lib/` or `hooks/` — not inside components
-- No prop drilling beyond 2 levels
+- Frontend: component in the right folder (`components/` vs `pages/` vs `hooks/`)
+- Backend: logic in service — not in controller
+- No prop drilling beyond 2 levels — use context or TanStack Query
 - Single responsibility — one thing per file
 
 ### 6. Maintainability

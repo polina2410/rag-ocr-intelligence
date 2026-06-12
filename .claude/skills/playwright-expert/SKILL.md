@@ -16,7 +16,7 @@ Write or debug E2E tests for: $ARGUMENTS
 
 ## Setup
 
-- Dev server must be running: `pnpm dev` (http://localhost:3000)
+- Dev server must be running: `pnpm --filter frontend dev` (http://localhost:5175)
 - Use `mcp__playwright__*` tools for browser interaction
 - Tests go in `__tests__/e2e/` if writing to files
 
@@ -36,18 +36,18 @@ Write or debug E2E tests for: $ARGUMENTS
 
 ```ts
 // 1. Role-based (preferred)
-page.getByRole('button', { name: 'Start Quiz' })
-page.getByRole('heading', { name: 'World Explorer' })
+page.getByRole('link', { name: 'Races' })
+page.getByRole('heading', { name: 'OCR Intelligence' })
 
 // 2. Label / placeholder
-page.getByLabel('Search countries')
-page.getByPlaceholder('Search...')
+page.getByLabel('Ask a question')
+page.getByPlaceholder('Ask about a race...')
 
 // 3. Text content
-page.getByText('Next question')
+page.getByText('View race')
 
 // 4. Test ID (when nothing else works)
-page.getByTestId('flag-mosaic')
+page.getByTestId('race-card')
 
 // Never: CSS classes, nth(), first() without justification
 ```
@@ -58,15 +58,15 @@ page.getByTestId('flag-mosaic')
 
 ### Basic Flow
 ```ts
-await page.goto('http://localhost:3000');
-await page.getByRole('button', { name: 'Start Quiz' }).click();
-await expect(page.getByRole('heading', { name: 'Quiz Setup' })).toBeVisible();
+await page.goto('http://localhost:5175/races');
+await page.getByRole('link', { name: 'Races' }).click();
+await expect(page.getByRole('heading', { name: 'Races' })).toBeVisible();
 ```
 
 ### Waiting (use auto-waiting — never waitForTimeout)
 ```ts
 // Good — waits for element to appear
-await expect(page.getByText('Score:')).toBeVisible();
+await expect(page.getByRole('table')).toBeVisible();
 
 // Bad — arbitrary sleep
 await page.waitForTimeout(2000); // ❌ never do this
@@ -74,9 +74,9 @@ await page.waitForTimeout(2000); // ❌ never do this
 
 ### Assertions
 ```ts
-await expect(page.getByRole('button')).toBeEnabled();
-await expect(page.getByText('10/10')).toBeVisible();
-await expect(page).toHaveURL('/results');
+await expect(page.getByRole('button', { name: 'Ask' })).toBeEnabled();
+await expect(page.getByText('Finishers')).toBeVisible();
+await expect(page).toHaveURL('/races/1');
 ```
 
 ---
@@ -114,10 +114,10 @@ await expect(page).toHaveURL('/results');
 
 ## Key User Flows to Test in This Project
 
-<!-- Add project-specific flows here. Examples:
-- Home page loads with core content visible
-- Primary CTA navigates to the correct page
-- Main feature happy path (start → complete)
-- Form submission shows success/error feedback
-- Navigation between main routes works correctly
--->
+- `/races` loads race cards with name, date, location
+- Clicking a race card navigates to `/races/:id` dashboard
+- `/races/:id` shows leaderboard, obstacle split chart, penalty rate chart
+- Category filter on `/races/:id` filters the leaderboard
+- `/ask` page accepts a question and streams a response via SSE
+- Source citations panel expands to show retrieved chunks
+- Navbar links are active on the correct route
