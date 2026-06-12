@@ -12,7 +12,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 2. ✅ Configure `packages/types` — shared folder structure, `tsconfig.json`, `package.json`
 3. ✅ Add first shared DTOs: `RaceDto` and `AthleteDto` in `packages/types`
 4. ✅ Set up shared ESLint config in root, extend in all packages
-5. Set up shared Prettier config in root, extend in all packages
+5. ✅ Set up shared Prettier config in root, extend in all packages
 6. Configure `turbo.json` with `build`, `dev`, `lint` pipelines
 7. ✅ Set up `docker-compose.yml` with Postgres and Qdrant services
 8. ✅ Configure backend `.env` and `@nestjs/config` module
