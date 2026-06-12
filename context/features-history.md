@@ -59,3 +59,21 @@ Created `@ocr/eslint-config` as a peer-dep-only package exporting three flat con
 Created `@ocr/prettier-config` as a peer-dep-only package (mirrors `@ocr/eslint-config` pattern). Preserves existing backend settings: `singleQuote: true`, `trailingComma: 'all'`, adds `endOfLine: 'auto'` for Windows consistency. All consumers reference it via the `"prettier"` key in their `package.json`. Backend `.prettierrc` deleted. Pre-existing formatting issues in frontend and types are out of scope (no mass reformat). Backend lint passes (0 errors).
 
 ---
+
+## Turbo Pipelines
+
+**Branch:** turbo-pipelines
+**Completed:** 2026-06-12
+
+### Goals
+
+- `turbo.json` defines `build`, `dev`, `lint`, `typecheck`, `test` with correct `dependsOn`, `cache`, and `outputs`
+- `apps/backend/package.json` gains `"dev": "nest start --watch"` so `turbo dev` starts both apps
+- Root `package.json` gains `"typecheck": "turbo typecheck"` and `"test": "turbo test"` scripts
+- All four `turbo run` commands exit 0
+
+### Summary
+
+Replaced the skeleton `turbo.json` with a complete pipeline. `lint` set to `cache: false` (backend runs `--fix`). `typecheck` and `test` added with `dependsOn: ["^build"]`. `lint.dependsOn` kept as `[]` — type-aware ESLint rules resolve `@ocr/types` via tsconfig `paths` alias, no compiled output needed. Backend `dev` alias added. Removed `outputs: ["coverage/**"]` from `test` task after confirming the plain `jest` script doesn't produce coverage files. All four commands pass: `build` (frontend + backend), `lint` (frontend, backend, types), `typecheck` (types), `test` (backend 1/1).
+
+---
