@@ -1,11 +1,20 @@
 import { Module } from '@nestjs/common';
-import { CsvMetadataParserService } from './csv-metadata-parser.service.js';
-import { CsvRowsParserService } from './csv-rows-parser.service.js';
-import { IngestionController } from './ingestion.controller.js';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Athlete } from '../entities/athlete.entity';
+import { ObstacleSplit } from '../entities/obstacle-split.entity';
+import { Race } from '../entities/race.entity';
+import { RaceResult } from '../entities/race-result.entity';
+import { CsvMetadataParserService } from './csv-metadata-parser.service';
+import { CsvRowsParserService } from './csv-rows-parser.service';
+import { IngestionController } from './ingestion.controller';
+import { IngestionService } from './ingestion.service';
 
 @Module({
+  imports: [
+    TypeOrmModule.forFeature([Race, Athlete, RaceResult, ObstacleSplit]),
+  ],
   controllers: [IngestionController],
-  providers: [CsvMetadataParserService, CsvRowsParserService],
+  providers: [CsvMetadataParserService, CsvRowsParserService, IngestionService],
   exports: [CsvMetadataParserService, CsvRowsParserService],
 })
 export class IngestionModule {}
