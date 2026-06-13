@@ -24,7 +24,7 @@ export class RaceResult {
   @Column({ type: 'uuid', name: 'race_id' })
   raceId!: string;
 
-  @ManyToOne(() => Athlete)
+  @ManyToOne(() => Athlete, (athlete) => athlete.results)
   @JoinColumn({ name: 'athlete_id' })
   athlete!: Athlete;
 
