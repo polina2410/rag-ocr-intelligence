@@ -32,7 +32,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 17. ✅ Write unit tests for CSV rows parser
 18. ✅ Set up Multer file upload middleware for CSV ingestion
 19. ✅ Build `POST /ingest/csv` endpoint — validates file, calls parsers, saves to DB
-20. Build error handling and validation for ingestion endpoint
+20. ✅ Build error handling and validation for ingestion endpoint
 21. Build `GET /races` endpoint — returns paginated list of races
 22. Build `GET /races/:id` endpoint — returns race with results and splits
 23. Build `GET /athletes` endpoint — returns paginated list of athletes

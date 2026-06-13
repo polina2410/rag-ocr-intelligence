@@ -256,6 +256,27 @@ Created `RaceMetadata` interface in `@ocr/types` reusing `RaceDto['raceType']` u
 
 ---
 
+## Ingestion Endpoint Error Handling & Validation
+
+**Branch:** ingestion-error-handling
+**Completed:** 2026-06-13
+
+### Goals
+
+- `POST /ingest/csv` with no `file` field returns `400 Bad Request`
+- Multer `fileFilter` rejection (wrong type) and `LIMIT_FILE_SIZE` both return `400`
+- CSV parse failure (metadata or rows) returns `422 Unprocessable Entity` with the parser's error message
+- DB transaction failure returns `500 Internal Server Error` with a safe generic message (original logged server-side)
+- Parser calls and transaction wrapped in separate `try/catch` blocks — no cross-classification of error codes
+- Unit tests: missing file → 400, parse failure → 422, DB failure → 500, happy path → 201
+- `pnpm --filter backend lint`, `pnpm --filter backend build`, `pnpm --filter backend test` all pass
+
+### Summary
+
+Added `MulterExceptionFilter` (`@Catch(MulterError)`) registered via `@UseFilters` on `IngestionController` — maps `LIMIT_FILE_SIZE` to `BadRequestException`, other multer errors to `BadRequestException`. Updated `csv-upload.config.ts` to throw `BadRequestException` (not plain `Error`) in `fileFilter` so NestJS maps wrong-type uploads to 400. Added explicit `if (!file)` null guard in the controller. In `IngestionService`, split into two separate `try/catch` blocks: parser calls → `UnprocessableEntityException` (surfaces original parser message); `dataSource.transaction` → `InternalServerErrorException` with safe generic message + `Logger.error` for the full stack trace. Parser services unchanged — they still throw plain `Error`. Added `ingestion.service.spec.ts` (6 tests) and `ingestion.controller.spec.ts` (3 tests). All 57 tests pass.
+
+---
+
 ## POST /ingest/csv Endpoint
 
 **Branch:** ingest-csv-endpoint
