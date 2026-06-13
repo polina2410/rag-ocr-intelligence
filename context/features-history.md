@@ -256,6 +256,30 @@ Created `RaceMetadata` interface in `@ocr/types` reusing `RaceDto['raceType']` u
 
 ---
 
+## GET /races Endpoint — Paginated List of Races
+
+**Branch:** get-races-endpoint
+**Completed:** 2026-06-13
+
+### Goals
+
+- `packages/types/src/paginated.dto.ts` — `PaginatedResponse<T>` interface, re-exported from barrel with `.js` specifier
+- `apps/backend/src/races/dto/list-races-query.dto.ts` — `page` (int, min 1, default 1) and `limit` (int, min 1, max 100, default 20) with `@Type(() => Number)` coercion
+- `apps/backend/src/races/races.service.ts` — `findAll(page, limit)` using `findAndCount`, `date DESC`, `skip`/`take`, coerces `distanceKm` to number, returns `PaginatedResponse<RaceDto>`
+- `apps/backend/src/races/races.controller.ts` — `@Controller('races')`, `@Get()` handler, delegates to service
+- `apps/backend/src/races/races.module.ts` — `TypeOrmModule.forFeature([Race])`, registers controller and service
+- `RacesModule` added to `AppModule` imports with `.js` suffix convention
+- `GET /races` returns 200 `{ data: RaceDto[], total, page, limit }` ordered by `date DESC`
+- Invalid params (`page=0`, `limit=101`, `limit=abc`) return 400 via global `ValidationPipe`
+- Service unit tests: happy path + empty result + `distanceKm` coercion + skip/take + beyond-last-page
+- `pnpm --filter backend lint`, `pnpm --filter backend build`, `pnpm --filter backend test` all pass
+
+### Summary
+
+Created full `RacesModule` stack: `ListRacesQueryDto` coerces string query params to integers via `@Type(() => Number)` (class-transformer already present); `RacesService.findAll` uses `findAndCount` with `order: { date: 'DESC' }`, `skip`/`take`, and maps each row with `Number(row.distanceKm)` to handle Postgres returning `numeric` as string. Added generic `PaginatedResponse<T>` to `@ocr/types` for reuse in steps 23/24. Fixed pre-existing `@typescript-eslint/unbound-method` lint error in `ingestion.controller.spec.ts` by hoisting the `jest.fn()` to a named variable and referencing it directly rather than accessing it through the typed mock object. 62 tests pass.
+
+---
+
 ## Ingestion Endpoint Error Handling & Validation
 
 **Branch:** ingestion-error-handling
