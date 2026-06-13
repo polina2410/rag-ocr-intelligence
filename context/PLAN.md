@@ -28,8 +28,8 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 13. ✅ Create database connection module with TypeORM and config
 14. ✅ Build CSV metadata parser — reads `#` comment headers into a `RaceMetadata` object
 15. ✅ Build CSV rows parser — maps data rows to `RaceResult` and `ObstacleSplit` objects
-16. Write unit tests for CSV metadata parser
-17. Write unit tests for CSV rows parser
+16. ✅ Write unit tests for CSV metadata parser
+17. ✅ Write unit tests for CSV rows parser
 18. Set up Multer file upload middleware for CSV ingestion
 19. Build `POST /ingest/csv` endpoint — validates file, calls parsers, saves to DB
 20. Build error handling and validation for ingestion endpoint

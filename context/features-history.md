@@ -180,6 +180,25 @@ Also resolved a build toolchain blocker discovered while verifying the live conn
 
 ---
 
+## Unit Tests for CSV Parsers (Steps 16 + 17)
+
+**Branch:** csv-parser-unit-tests
+**Completed:** 2026-06-13
+
+### Goals
+
+- `csv-metadata-parser.service.spec.ts` — happy-path, missing-field, invalid-value, and edge-case tests for `CsvMetadataParserService`
+- `csv-rows-parser.service.spec.ts` — row-count, FINISHED mapping, DNS/DNF, penalty derivation, time formats, ordinal alignment, and error-branch tests for `CsvRowsParserService`
+- All 48 tests pass with `pnpm --filter backend test`
+
+### Summary
+
+21 tests for `CsvMetadataParserService`: 5 happy-path parses against real fixtures (all 4 race types, `totalObstacles ≠ obstacles.length` for Super, decimal `distanceKm`), 7 missing-field errors (one per required label), 5 invalid-value errors (bad date format, NaN distance, non-integer obstacles, unknown raceType, empty obstacles), 4 edge cases (unknown label ignored, blank `#` line skipped, case-insensitive labels, case-insensitive raceType normalisation). Shared `VALID_HEADER` constant + `withoutField()` helper keep error tests DRY.
+
+26 tests for `CsvRowsParserService`: row counts per fixture (22/20/19/19), FINISHED field mapping with exact second values (Chloe Thomas DEKA row), both time formats (`MM:SS` → 189s, `HH:MM:SS` → 4116s and 3706s), DNS and DNF rows (empty splits, null positions), penalty derivation (Ruby Anderson: Rope Climb + Multi Rig = index 5/15, others = 0), zero penalties for DEKA, ordinal split alignment (obstacleName from `metadata.obstacles[i]`, not slug), 18 splits for every Super FINISHED row, 3 error branches (cross-fixture metadata mismatch, missing column, invalid time string). Metadata produced by calling `CsvMetadataParserService.parseMetadata()` — no hand-crafted `RaceMetadata` objects.
+
+---
+
 ## CSV Rows Parser (RaceResult + ObstacleSplit)
 
 **Branch:** csv-rows-parser
