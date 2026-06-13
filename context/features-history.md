@@ -96,3 +96,22 @@ Replaced the skeleton `turbo.json` with a complete pipeline. `lint` set to `cach
 Created `Race` entity with all columns matching `RaceDto`. `raceType` stored as `varchar(20)` for flexibility. Properties use definite assignment (`!`) since TypeORM initialises them. Also fixed `packages/types/src/index.ts` to use `.js` extensions on relative imports — required by `module: nodenext` after `"type": "module"` was added to the types package in step 4. Build and lint pass with 0 errors.
 
 ---
+
+## Athlete TypeORM Entity
+
+**Branch:** athlete-entity
+**Completed:** 2026-06-13
+
+### Goals
+
+- `apps/backend/src/entities/athlete.entity.ts` — named `Athlete` class, `@Entity('athletes')`
+- UUID primary key + 4 typed columns matching `AthleteDto`, snake_case DB names (`first_name`, `last_name`)
+- `category` typed as `AthleteDto['category']`, stored as `varchar`
+- All varchar lengths extracted to named `const`s (255), no magic numbers
+- `build` and `lint` pass
+
+### Summary
+
+Created `Athlete` entity following Race entity conventions exactly. All five columns use `varchar` with named length constants. `firstName` and `lastName` get explicit `name:` overrides for snake_case DB columns. `category` typed via `AthleteDto['category']` for DTO alignment without introducing a Postgres enum. Build and lint pass with 0 errors.
+
+---
