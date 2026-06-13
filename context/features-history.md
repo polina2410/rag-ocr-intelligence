@@ -255,3 +255,22 @@ Created `ParsedObstacleSplit` and `ParsedRaceResult` interfaces in `@ocr/types` 
 Created `RaceMetadata` interface in `@ocr/types` reusing `RaceDto['raceType']` union (no duplication). Re-exported with `.js` specifier to keep the ESM package clean. Scaffolded `ingestion` feature module with `CsvMetadataParserService`: reads only leading `#` lines (stops at first non-`#` line), parses `label: value` pairs case-insensitively, maps 7 known labels to typed fields, ignores unknown labels and blank `#` lines. Number coercion uses `Number.isFinite` / `Number.isInteger` guards — no silent NaN. `raceType` matched case-insensitively and normalised to one of `Sprint | Super | DEKA | Open`. `IngestionModule` registered in `AppModule` (exports the service for future DI by the step-19 controller). Build and lint pass with 0 errors.
 
 ---
+
+## POST /ingest/csv Endpoint
+
+**Branch:** ingest-csv-endpoint
+**Completed:** 2026-06-13
+
+### Goals
+
+- New `apps/backend/src/ingestion/ingestion.service.ts` — `IngestionService.ingestCsv(fileBuffer: Buffer): Promise<{ raceId: string; rowsIngested: number }>` orchestrating parse → persist in a single transaction
+- `IngestionController` updated with `@Post('csv')` route using `FileInterceptor('file', CSV_MULTER_OPTIONS)` and `@UploadedFile()`, returns HTTP 201
+- `IngestionModule` updated: `TypeOrmModule.forFeature([Race, Athlete, RaceResult, ObstacleSplit])` added to imports; `IngestionService` added to providers
+- All entities saved atomically: Race → (per row) Athlete find-or-create → RaceResult → ObstacleSplit[] batch
+- `pnpm --filter backend build` and `pnpm --filter backend lint` pass
+
+### Summary
+
+Created `IngestionService` with a `DataSource.transaction` call that saves Race first, then per-row does an Athlete find-or-create (read via injected repo outside the transaction manager, write via manager), then saves `RaceResult` and batches `ObstacleSplit[]` in a single `manager.save` call. Controller updated with `@Post('csv')`, `@HttpCode(HttpStatus.CREATED)`, and `@UseInterceptors(FileInterceptor(...))` — all HTTP concerns stay in the controller, all logic in the service. `IngestionModule` gains `TypeOrmModule.forFeature([Race, Athlete, RaceResult, ObstacleSplit])` and `IngestionService` in providers. No `try/catch` added (error handling is step 20). Build and lint pass with 0 errors.
+
+---
