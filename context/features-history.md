@@ -77,3 +77,22 @@ Created `@ocr/prettier-config` as a peer-dep-only package (mirrors `@ocr/eslint-
 Replaced the skeleton `turbo.json` with a complete pipeline. `lint` set to `cache: false` (backend runs `--fix`). `typecheck` and `test` added with `dependsOn: ["^build"]`. `lint.dependsOn` kept as `[]` — type-aware ESLint rules resolve `@ocr/types` via tsconfig `paths` alias, no compiled output needed. Backend `dev` alias added. Removed `outputs: ["coverage/**"]` from `test` task after confirming the plain `jest` script doesn't produce coverage files. All four commands pass: `build` (frontend + backend), `lint` (frontend, backend, types), `typecheck` (types), `test` (backend 1/1).
 
 ---
+
+## Race TypeORM Entity
+
+**Branch:** race-entity
+**Completed:** 2026-06-13
+
+### Goals
+
+- `apps/backend/src/entities/race.entity.ts` — named `Race` class, `@Entity('races')`
+- UUID primary key + 6 typed columns matching `RaceDto`, snake_case DB names
+- `raceType` typed as `RaceDto['raceType']`, stored as `varchar`
+- All numeric constraints in named `const`s, no audit columns
+- `build` and `lint` pass
+
+### Summary
+
+Created `Race` entity with all columns matching `RaceDto`. `raceType` stored as `varchar(20)` for flexibility. Properties use definite assignment (`!`) since TypeORM initialises them. Also fixed `packages/types/src/index.ts` to use `.js` extensions on relative imports — required by `module: nodenext` after `"type": "module"` was added to the types package in step 4. Build and lint pass with 0 errors.
+
+---

@@ -21,7 +21,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 
 ## Phase 2 — Data Layer
 
-9. Create `Race` TypeORM entity
+9. ✅ Create `Race` TypeORM entity
 10. Create `Athlete` TypeORM entity
 11. Create `RaceResult` TypeORM entity
 12. Create `ObstacleSplit` TypeORM entity
