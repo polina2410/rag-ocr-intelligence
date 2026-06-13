@@ -8,12 +8,14 @@ import { ObstacleSplit } from './entities/obstacle-split.entity';
 import { Race } from './entities/race.entity';
 import { RaceResult } from './entities/race-result.entity';
 import { IngestionModule } from './ingestion/ingestion.module.js';
+import { RacesModule } from './races/races.module.js';
 
 const DEFAULT_DB_PORT = 5432;
 
 @Module({
   imports: [
     IngestionModule,
+    RacesModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
