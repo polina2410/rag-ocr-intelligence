@@ -14,7 +14,7 @@ export class ObstacleSplit {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => RaceResult)
+  @ManyToOne(() => RaceResult, (result) => result.splits)
   @JoinColumn({ name: 'race_result_id' })
   raceResult!: RaceResult;
 
