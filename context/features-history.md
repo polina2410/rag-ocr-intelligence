@@ -322,6 +322,25 @@ Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /
 
 ---
 
+## Qdrant Collection Setup
+
+**Branch:** qdrant-collection-setup
+**Completed:** 2026-06-13
+
+### Goals
+
+- `vector-store.constants.ts` exports `QDRANT_CLIENT` token, `RACE_RESULTS_COLLECTION = 'race_results'`, `EMBEDDING_DIMENSION = 1536`, `VECTOR_DISTANCE: Schemas['Distance'] = 'Cosine'`
+- `VectorStoreModule` registers `QdrantClient` via `useFactory` (reads `QDRANT_URL`/`QDRANT_API_KEY` from `ConfigService`); exports `VectorStoreService` and `QDRANT_CLIENT`
+- `VectorStoreService` implements `OnModuleInit` — idempotently creates `race_results` collection via `collectionExists()` → `createCollection()`; logs outcome; stub `upsert`/`query` methods
+- `VectorStoreModule` wired into `AppModule` with `.js`-suffix path
+- Build, lint, and 83/83 tests pass
+
+### Summary
+
+Created `apps/backend/src/vector-store/` with three files. `vector-store.constants.ts` holds all four named constants — `VECTOR_DISTANCE` typed as `Schemas['Distance']` (the correct type from `@qdrant/js-client-rest`) to avoid bare-string issues. `VectorStoreModule` registers `QdrantClient` as a custom `QDRANT_CLIENT` provider via `useFactory` injecting `ConfigService` (`getOrThrow` for the required URL). `VectorStoreService` calls `collectionExists()` in `onModuleInit` and only calls `createCollection` if absent — safe across restarts. Stub `upsert`/`query` methods return `Promise.reject` (not `async` with no `await`) to satisfy the `require-await` lint rule while preserving the async signature for steps 27–28. `VectorStoreModule` added to `AppModule` imports.
+
+---
+
 ## Swagger / OpenAPI Documentation
 
 **Branch:** swagger-openapi-documentation

@@ -43,7 +43,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 
 ## Phase 3 — RAG Pipeline
 
-26. Set up Qdrant collection with correct vector size and distance metric
+26. ✅ Set up Qdrant collection with correct vector size and distance metric
 27. Build `VectorStoreService` — upsert vectors with metadata to Qdrant
 28. Build `VectorStoreService` — query Qdrant for top-k similar vectors
 29. Build text serializer — converts `RaceResult` row to natural language chunk
