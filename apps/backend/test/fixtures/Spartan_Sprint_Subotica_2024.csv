@@ -1,0 +1,29 @@
+# Race: Spartan Sprint Subotica 2024
+# Date: 2024-09-28
+# Location: Subotica, Serbia
+# Distance (km): 8.5
+# Total obstacles: 23
+# Race type: Sprint
+# Obstacles: Rolling Mud, Z Wall, Barbed Wire Crawl, Sandbag Carry, Spear Throw, Rope Climb, Hercules Hoist, Dunk Wall, Tyrolean Traverse, Monkey Bars, Bucket Carry, Atlas Carry, Wall Climb, Inverted Wall, Jump and Carry, Multi Rig, Box Jump
+#
+bib,first_name,last_name,category,nationality,finish_time,chip_time,total_penalties_sec,penalty_obstacles,obstacles_completed,overall_place,category_place,split_rolling_mud,split_z_wall,split_barbed_wire_crawl,split_sandbag_carry,split_spear_throw,split_rope_climb,split_hercules_hoist,split_dunk_wall,split_tyrolean_traverse,split_monkey_bars,split_bucket_carry,split_atlas_carry,split_wall_climb,split_inverted_wall,split_jump_and_carry,split_multi_rig,split_box_jump
+9445,Ruby,Roberts,Age Group 20-29 M,GBR,57:51,56:52,30,Monkey Bars,17,16,2,04:10,08:11,11:14,14:52,17:39,21:13,24:41,28:49,32:01,35:39,39:39,42:57,46:36,49:47,53:37,56:49,57:21
+7491,Ruby,Anderson,Age Group 40-49 M,SVN,01:09:39,01:07:40,60,Rope Climb; Multi Rig,17,3,2,03:47,08:26,12:05,15:59,19:27,24:11,28:34,32:43,37:15,40:50,45:18,48:55,52:53,56:25,01:00:07,01:04:03,01:08:22
+9091,Ana,Moore,Elite Men,DEU,51:01,50:07,60,Rope Climb; Tyrolean Traverse,17,9,2,02:30,05:37,08:25,10:48,13:48,16:20,20:03,23:05,25:43,28:20,30:44,33:40,37:00,40:49,43:26,47:16,50:31
+6008,Jelena,Anderson,Age Group 20-29 F,SRB,01:00:16,59:09,60,Rope Climb; Multi Rig,17,18,2,04:11,08:20,12:08,15:06,18:10,22:03,26:09,30:07,32:59,37:09,41:04,45:07,48:27,51:35,55:02,58:46,59:46
+7940,Max,Green,Elite Men,SRB,50:49,49:06,0,,17,8,1,03:08,06:14,09:05,11:26,14:30,16:57,20:00,22:49,26:32,30:11,32:43,36:16,39:17,41:53,44:17,47:21,50:19
+6434,Stefan,Djordjevic,Age Group 40-49 F,SVN,58:44,58:21,0,,17,17,2,03:10,06:00,09:25,12:49,16:39,20:14,24:08,27:53,31:10,33:59,38:06,41:15,44:36,48:06,50:57,55:05,58:14
+7226,Isabella,Scott,Age Group 30-39 F,HRV,01:10:13,01:08:52,30,Spear Throw,17,4,1,04:18,07:52,12:11,16:52,20:39,25:12,29:13,33:18,36:55,40:29,44:34,49:22,53:23,57:26,01:01:47,01:06:28,01:09:43
+2355,Sara,Djordjevic,Age Group 40-49 M,DEU,01:04:54,01:04:08,60,Spear Throw; Multi Rig,17,2,1,03:26,06:35,09:59,14:22,18:54,22:56,26:06,29:28,32:42,36:18,40:46,44:38,48:30,52:25,56:43,59:53,01:04:16
+3148,Laura,Thomas,Age Group 30-39 M,GBR,DNS,DNS,,,11,,,,,,,,,,,,,,,,,,,
+2952,Ryan,Nelson,Elite Women,SVN,51:26,50:21,30,Multi Rig,17,10,2,02:48,06:27,09:24,13:13,16:36,19:22,21:58,24:36,27:06,30:24,33:07,36:24,38:56,42:44,45:45,49:31,50:56
+5744,Vladimir,Stojanovic,Age Group 20-29 F,SRB,54:44,52:52,30,Spear Throw,17,13,1,03:18,07:00,10:45,14:04,17:35,21:17,24:05,27:55,30:38,33:18,36:29,39:51,43:24,47:03,50:27,53:51,54:14
+2862,Ruby,Nelson,Age Group 20-29 M,SRB,49:24,49:03,30,Multi Rig,17,7,1,02:21,04:50,08:10,10:43,13:35,16:10,18:44,21:39,25:23,28:05,31:03,34:23,37:13,39:37,42:23,45:02,48:37
+1430,Matt,Roberts,Age Group 30-39 F,SRB,DNF,DNF,,,13,,,,,,,,,,,,,,,,,,,
+5331,Ruby,Carter,Age Group 30-39 M,SVN,54:41,53:50,60,Spear Throw; Multi Rig,17,14,2,03:53,06:28,10:03,13:55,17:36,20:45,24:39,27:49,31:22,34:25,38:24,41:47,44:57,48:27,51:08,54:11,54:11
+6542,Stefan,Harris,Elite Women,DEU,53:23,52:25,30,Multi Rig,17,12,3,03:24,06:22,09:07,11:46,14:19,17:23,20:39,24:24,27:44,30:42,33:29,36:37,40:17,43:24,46:15,49:02,52:32
+9108,Katarina,Garcia,Age Group 30-39 F,HRV,54:09,52:24,0,,17,11,2,03:53,07:49,11:19,14:25,18:03,20:34,23:17,26:42,29:29,32:32,35:48,39:09,42:25,45:00,48:21,50:57,53:39
+6538,Grace,Roberts,Elite Women,HRV,46:53,45:38,60,Spear Throw; Tyrolean Traverse,17,6,1,02:49,06:06,08:58,11:22,13:53,17:16,20:27,23:24,26:34,28:45,30:56,33:06,35:29,38:17,41:23,44:35,46:23
+6329,Emily,Green,Age Group 40-49 F,SRB,01:16:41,01:14:56,30,Tyrolean Traverse,17,5,1,04:32,08:59,14:10,18:09,22:47,27:46,32:10,37:23,42:28,46:16,51:17,56:02,01:00:20,01:05:28,01:10:27,01:15:25,01:16:11
+7631,Ella,Davis,Elite Men,DEU,57:02,56:19,0,,17,15,3,02:42,06:18,09:38,13:11,16:10,19:42,23:50,26:56,30:28,34:12,38:10,41:50,44:37,48:47,51:44,55:30,56:32
+2499,Max,White,Age Group 30-39 M,HRV,01:04:01,01:03:56,0,,17,1,1,04:14,07:55,11:26,15:07,18:46,23:19,26:48,31:19,35:52,39:57,43:40,47:44,51:31,55:45,59:23,01:03:02,01:03:31

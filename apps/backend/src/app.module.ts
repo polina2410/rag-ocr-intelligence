@@ -7,11 +7,13 @@ import { Athlete } from './entities/athlete.entity';
 import { ObstacleSplit } from './entities/obstacle-split.entity';
 import { Race } from './entities/race.entity';
 import { RaceResult } from './entities/race-result.entity';
+import { IngestionModule } from './ingestion/ingestion.module.js';
 
 const DEFAULT_DB_PORT = 5432;
 
 @Module({
   imports: [
+    IngestionModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
