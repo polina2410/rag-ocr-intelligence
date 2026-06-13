@@ -27,7 +27,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 12. ✅ Create `ObstacleSplit` TypeORM entity
 13. ✅ Create database connection module with TypeORM and config
 14. ✅ Build CSV metadata parser — reads `#` comment headers into a `RaceMetadata` object
-15. Build CSV rows parser — maps data rows to `RaceResult` and `ObstacleSplit` objects
+15. ✅ Build CSV rows parser — maps data rows to `RaceResult` and `ObstacleSplit` objects
 16. Write unit tests for CSV metadata parser
 17. Write unit tests for CSV rows parser
 18. Set up Multer file upload middleware for CSV ingestion
@@ -99,6 +99,4 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 69. Build `data-cursor-hint` tooltip system — reads attribute, shows hint near cursor
 70. Build magnifier mode — `<canvas>` redraws zoomed DOM region around cursor
 71. Build Framer Motion parallax hero section on `/races` page
-72. Write README — project overview and architecture diagram
-73. Write README — local setup instructions with Docker
-74. Write README — example RAG queries and demo screenshots
+72. Write README — project overview and architecture diagram, local setup instructions with Docker, example RAG queries and demo screenshots

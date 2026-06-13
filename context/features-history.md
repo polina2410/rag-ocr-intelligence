@@ -180,6 +180,26 @@ Also resolved a build toolchain blocker discovered while verifying the live conn
 
 ---
 
+## CSV Rows Parser (RaceResult + ObstacleSplit)
+
+**Branch:** csv-rows-parser
+**Completed:** 2026-06-13
+
+### Goals
+
+- Shared DTOs `ParsedObstacleSplit` and `ParsedRaceResult` in `packages/types/src/parsed-result.dto.ts`, re-exported from `index.ts` with `.js` specifier
+- `CsvRowsParserService.parseRows(csv: string, metadata: RaceMetadata): ParsedRaceResult[]` in the existing `ingestion` module
+- Parser skips `#` header block and column-header line; returns one result per data row
+- Time parsing handles `HH:MM:SS` and `MM:SS` → integer seconds; DNS/DNF/DSQ rows produce `splits: []`
+- Per-obstacle `penaltyCount` derived from `penalty_obstacles` semicolon-split name list
+- Build and lint pass, zero `any`
+
+### Summary
+
+Created `ParsedObstacleSplit` and `ParsedRaceResult` interfaces in `@ocr/types` as the pure parser output types (no IDs, no entity references). `CsvRowsParserService` skips `#` lines, reads the column-header row dynamically, and processes each data row in order. Split columns are matched to `metadata.obstacles` by ordinal position (not by parsing the `split_` suffix — `Box Step-Ups` → `split_box_step-ups` doesn't round-trip). Both `MM:SS` and `HH:MM:SS` time formats handled in a single `parseTime` helper that branches on colon count. `genderPosition` always `null` (absent from CSV). DNS/DNF/DSQ rows produce `splits: []`. Penalty set built once per row from semicolon-split `penalty_obstacles` names; each named obstacle gets `penaltyCount: 1`. Registered in `IngestionModule` providers and exports. Build and lint pass with 0 errors.
+
+---
+
 ## CSV Metadata Parser (RaceMetadata)
 
 **Branch:** csv-metadata-parser
