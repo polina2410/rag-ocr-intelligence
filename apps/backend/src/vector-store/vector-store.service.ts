@@ -19,6 +19,8 @@ export interface QdrantResult {
   payload: Record<string, unknown>;
 }
 
+const WAIT_FOR_UPSERT = true;
+
 @Injectable()
 export class VectorStoreService implements OnModuleInit {
   private readonly logger = new Logger(VectorStoreService.name);
@@ -45,8 +47,23 @@ export class VectorStoreService implements OnModuleInit {
     );
   }
 
-  upsert(_points: QdrantPoint[]): Promise<void> {
-    return Promise.reject(new Error('not implemented — see step 27'));
+  async upsert(points: QdrantPoint[]): Promise<void> {
+    if (points.length === 0) {
+      return;
+    }
+
+    await this.client.upsert(RACE_RESULTS_COLLECTION, {
+      wait: WAIT_FOR_UPSERT,
+      points: points.map((p) => ({
+        id: p.id,
+        vector: p.vector,
+        payload: p.payload,
+      })),
+    });
+
+    this.logger.debug(
+      `Upserted ${points.length} point(s) to "${RACE_RESULTS_COLLECTION}"`,
+    );
   }
 
   query(_vector: number[], _topK: number): Promise<QdrantResult[]> {
