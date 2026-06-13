@@ -1,16 +1,29 @@
-import type { QdrantClient } from '@qdrant/js-client-rest';
+import type { QdrantClient, Schemas } from '@qdrant/js-client-rest';
 import { RACE_RESULTS_COLLECTION } from './vector-store.constants';
 import { type QdrantPoint, VectorStoreService } from './vector-store.service';
 
 const upsertMock = jest.fn();
+const searchMock = jest.fn();
 const mockClient = {
   upsert: upsertMock,
+  search: searchMock,
 } as unknown as QdrantClient;
 
 const makePoint = (id: string): QdrantPoint => ({
   id,
   vector: Array.from({ length: 3 }, (_, i) => i * 0.1),
   payload: { raceId: 'race-1', athleteId: id },
+});
+
+const makeScoredPoint = (
+  id: Schemas['ExtendedPointId'],
+  score: number,
+  payload?: Record<string, unknown> | null,
+): Schemas['ScoredPoint'] => ({
+  id,
+  version: 1,
+  score,
+  payload,
 });
 
 describe('VectorStoreService.upsert', () => {
@@ -49,6 +62,71 @@ describe('VectorStoreService.upsert', () => {
 
     await expect(service.upsert([makePoint('id-1')])).rejects.toThrow(
       'Qdrant unavailable',
+    );
+  });
+});
+
+describe('VectorStoreService.query', () => {
+  let service: VectorStoreService;
+  const queryVector = [0.1, 0.2, 0.3];
+  const topK = 5;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new VectorStoreService(mockClient);
+  });
+
+  it('calls client.search with correct args and returns mapped results', async () => {
+    searchMock.mockResolvedValue([
+      makeScoredPoint('uuid-a', 0.95, { raceId: 'r1' }),
+      makeScoredPoint('uuid-b', 0.87, { raceId: 'r2' }),
+    ]);
+
+    const results = await service.query(queryVector, topK);
+
+    expect(searchMock).toHaveBeenCalledTimes(1);
+    expect(searchMock).toHaveBeenCalledWith(RACE_RESULTS_COLLECTION, {
+      vector: queryVector,
+      limit: topK,
+      with_payload: true,
+    });
+    expect(results).toEqual([
+      { id: 'uuid-a', score: 0.95, payload: { raceId: 'r1' } },
+      { id: 'uuid-b', score: 0.87, payload: { raceId: 'r2' } },
+    ]);
+  });
+
+  it('returns empty array when client returns no hits', async () => {
+    searchMock.mockResolvedValue([]);
+
+    const results = await service.query(queryVector, topK);
+
+    expect(searchMock).toHaveBeenCalledTimes(1);
+    expect(results).toEqual([]);
+  });
+
+  it('maps null payload to empty object', async () => {
+    searchMock.mockResolvedValue([makeScoredPoint('uuid-c', 0.5, null)]);
+
+    const results = await service.query(queryVector, topK);
+
+    expect(results[0].payload).toEqual({});
+  });
+
+  it('coerces numeric id to string', async () => {
+    searchMock.mockResolvedValue([makeScoredPoint(42, 0.9, {})]);
+
+    const results = await service.query(queryVector, topK);
+
+    expect(results[0].id).toBe('42');
+  });
+
+  it('propagates errors thrown by the client', async () => {
+    const error = new Error('search failed');
+    searchMock.mockRejectedValue(error);
+
+    await expect(service.query(queryVector, topK)).rejects.toThrow(
+      'search failed',
     );
   });
 });

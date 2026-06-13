@@ -66,7 +66,17 @@ export class VectorStoreService implements OnModuleInit {
     );
   }
 
-  query(_vector: number[], _topK: number): Promise<QdrantResult[]> {
-    return Promise.reject(new Error('not implemented — see step 28'));
+  async query(vector: number[], topK: number): Promise<QdrantResult[]> {
+    const hits = await this.client.search(RACE_RESULTS_COLLECTION, {
+      vector,
+      limit: topK,
+      with_payload: true,
+    });
+
+    return hits.map((hit) => ({
+      id: String(hit.id),
+      score: hit.score,
+      payload: hit.payload ?? {},
+    }));
   }
 }
