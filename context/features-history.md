@@ -136,3 +136,25 @@ Created `Athlete` entity following Race entity conventions exactly. All five col
 Created `RaceResult` as the join/fact table between `Race` and `Athlete`. Relations are unidirectional from `RaceResult` — no changes to existing entities. Each FK has both a relation property and a scalar uuid column for projection ergonomics. Nullable int columns for positions and finish time; status stored as varchar with a default. Build and lint pass with 0 errors.
 
 ---
+
+## ObstacleSplit TypeORM Entity
+
+**Branch:** obstacle-split-entity
+**Completed:** 2026-06-13
+
+### Goals
+
+- `apps/backend/src/entities/obstacle-split.entity.ts` — named `ObstacleSplit` class, `@Entity('obstacle_splits')`
+- UUID primary key
+- FK → `RaceResult`: unidirectional `@ManyToOne` + `@JoinColumn({ name: 'race_result_id' })` + scalar `raceResultId: string`
+- `obstacleNumber: number` — 1-based ordinal, int
+- `obstacleName: string` — varchar(255), named constant
+- `splitTimeSeconds: number | null` — nullable int, per-obstacle duration in seconds
+- `penaltyCount: number` — int, default 0 (count from CSV; boolean `penalty` column dropped as redundant)
+- Build and lint pass
+
+### Summary
+
+Created `ObstacleSplit` as the per-obstacle fact table linked to `RaceResult` (not directly to Race/Athlete). Relation is unidirectional — no changes to existing entities. Dropped the specced boolean `penalty` column in favour of `penaltyCount` alone (count > 0 implies a penalty, avoids redundancy). `splitTimeSeconds` stores per-obstacle duration. Build and lint pass with 0 errors.
+
+---
