@@ -301,6 +301,27 @@ Added `MulterExceptionFilter` (`@Catch(MulterError)`) registered via `@UseFilter
 
 ---
 
+## GET /athletes/:id Endpoint
+
+**Branch:** get-athlete-by-id
+**Completed:** 2026-06-13
+
+### Goals
+
+- New `packages/types/src/athlete-detail.dto.ts` — `AthleteResultDto` and `AthleteDetailDto extends AthleteDto`
+- `Athlete` entity gains `@OneToMany('RaceResult', 'athlete') results!`; `RaceResult.athlete` `@ManyToOne` updated with inverse arg
+- `athletes.module.ts` expanded to `forFeature([Athlete, RaceResult, Race, ObstacleSplit])`
+- `AthletesService.findOne(id)` — loads `results → race` and `results → splits`, 404 on miss, `distanceKm` coerced
+- `@Get(':id')` with `ParseUUIDPipe` — 400 on bad UUID, 404 on miss
+- Results by race `date` DESC; splits by `obstacleNumber` ASC
+- 8 new `findOne` unit tests (83 total); lint, build, tests all pass
+
+### Summary
+
+Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /races/:id`: athlete is the root, each result embeds the parent `RaceDto` (with `distanceKm: Number(...)`) plus `ObstacleSplitDto[]`. Added `@OneToMany('RaceResult', 'athlete')` to `Athlete` entity (string-based ref to avoid circular imports) and updated `RaceResult.athlete` `@ManyToOne` with the inverse function arg. `athletes.module.ts` expanded to register all four entities. Results sorted by race `date` DESC via `localeCompare`; splits by `obstacleNumber` ASC. `AthleteResultDto` and `AthleteDetailDto` added to `@ocr/types` with `.js` re-export. 83 tests pass across 7 suites.
+
+---
+
 ## GET /athletes Endpoint
 
 **Branch:** get-athletes-endpoint
