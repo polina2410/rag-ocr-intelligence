@@ -322,6 +322,27 @@ Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /
 
 ---
 
+## VectorStoreService Query
+
+**Branch:** vector-store-query
+**Completed:** 2026-06-13
+
+### Goals
+
+- `query(vector: number[], topK: number): Promise<QdrantResult[]>` implemented — stub removed, parameters used (no underscores)
+- Calls `this.client.search(RACE_RESULTS_COLLECTION, { vector, limit: topK, with_payload: true })`
+- Each `ScoredPoint` mapped: `id: String(hit.id)`, `score: hit.score`, `payload: hit.payload ?? {}`
+- Errors from the client propagate unchanged (no try/catch)
+- Existing 3 upsert tests still pass unchanged
+- 5 new tests in a `describe('VectorStoreService.query')` block: happy path, empty result, null payload → `{}`, numeric id → `'42'`, error propagation
+- `mockClient` extended with `search: jest.fn()` alongside existing `upsert: jest.fn()`
+
+### Summary
+
+Replaced the `Promise.reject` stub in `VectorStoreService.query` with a real implementation: calls `this.client.search(RACE_RESULTS_COLLECTION, { vector, limit: topK, with_payload: true })` and maps each `ScoredPoint` to `{ id: String(hit.id), score: hit.score, payload: hit.payload ?? {} }`. No try/catch — errors propagate unchanged. Extended the existing spec file's `mockClient` with `search: jest.fn()` and added 5 tests covering happy path (mapped fields), empty result, null payload coercion, numeric id string coercion, and error propagation. 91/91 tests pass.
+
+---
+
 ## VectorStoreService Upsert
 
 **Branch:** vector-store-upsert
