@@ -7,6 +7,7 @@ import { Athlete } from './entities/athlete.entity';
 import { ObstacleSplit } from './entities/obstacle-split.entity';
 import { Race } from './entities/race.entity';
 import { RaceResult } from './entities/race-result.entity';
+import { AthletesModule } from './athletes/athletes.module.js';
 import { IngestionModule } from './ingestion/ingestion.module.js';
 import { RacesModule } from './races/races.module.js';
 
@@ -14,6 +15,7 @@ const DEFAULT_DB_PORT = 5432;
 
 @Module({
   imports: [
+    AthletesModule,
     IngestionModule,
     RacesModule,
     ConfigModule.forRoot({ isGlobal: true }),
