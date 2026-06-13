@@ -26,7 +26,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 11. ✅ Create `RaceResult` TypeORM entity
 12. ✅ Create `ObstacleSplit` TypeORM entity
 13. ✅ Create database connection module with TypeORM and config
-14. Build CSV metadata parser — reads `#` comment headers into a `RaceMetadata` object
+14. ✅ Build CSV metadata parser — reads `#` comment headers into a `RaceMetadata` object
 15. Build CSV rows parser — maps data rows to `RaceResult` and `ObstacleSplit` objects
 16. Write unit tests for CSV metadata parser
 17. Write unit tests for CSV rows parser
