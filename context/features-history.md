@@ -301,6 +301,27 @@ Added `MulterExceptionFilter` (`@Catch(MulterError)`) registered via `@UseFilter
 
 ---
 
+## GET /athletes Endpoint
+
+**Branch:** get-athletes-endpoint
+**Completed:** 2026-06-13
+
+### Goals
+
+- New `AthletesModule` with `TypeOrmModule.forFeature([Athlete])`, controller, and service
+- `AthletesModule` wired into `AppModule` imports with `.js`-suffix path
+- `AthletesController` — `@Controller('athletes')`, `@Get()` handler returning `Promise<PaginatedResponse<AthleteDto>>`
+- `AthletesService.findAll(page, limit)` — `order: { lastName: 'ASC', firstName: 'ASC' }`, no numeric coercion
+- `ListAthletesQueryDto` — `page`/`limit` with `@Type(() => Number)`, `@IsInt`, `@Min`/`@Max`, defaults
+- `GET /athletes` → 200 with `PaginatedResponse<AthleteDto>`; invalid params → 400
+- 5 unit tests; lint, build, and tests all pass
+
+### Summary
+
+Created full `AthletesModule` stack mirroring the `GET /races` pattern exactly. `ListAthletesQueryDto` is a direct copy of `ListRacesQueryDto` (same constants, same decorators). `AthletesService.findAll` uses `findAndCount` with `order: { lastName: 'ASC', firstName: 'ASC' }` and maps rows to `AthleteDto` with a straight field copy — no `Number()` coercion since `Athlete` has no `numeric` columns. `AthletesModule` registered in `AppModule` with `.js`-suffix import path. No changes to `packages/types/` — `AthleteDto` and `PaginatedResponse<T>` were already exported. 75 tests pass across 7 suites.
+
+---
+
 ## GET /races/:id Endpoint
 
 **Branch:** get-race-by-id
