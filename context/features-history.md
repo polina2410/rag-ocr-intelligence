@@ -158,3 +158,24 @@ Created `RaceResult` as the join/fact table between `Race` and `Athlete`. Relati
 Created `ObstacleSplit` as the per-obstacle fact table linked to `RaceResult` (not directly to Race/Athlete). Relation is unidirectional — no changes to existing entities. Dropped the specced boolean `penalty` column in favour of `penaltyCount` alone (count > 0 implies a penalty, avoids redundancy). `splitTimeSeconds` stores per-obstacle duration. Build and lint pass with 0 errors.
 
 ---
+
+## Database Connection Module (TypeORM + Config)
+
+**Branch:** database-connection-module
+**Completed:** 2026-06-13
+
+### Goals
+
+- `ConfigModule.forRoot({ isGlobal: true })` registered in `app.module.ts`
+- `TypeOrmModule.forRootAsync` injecting `ConfigService`, reading `DB_*` env vars
+- `type: 'postgres'`, `synchronize: false`, `autoLoadEntities: true`, 4 entities registered
+- `DB_PORT` parsed to a number
+- Live Postgres connection verified on `start:dev`; build and lint pass
+
+### Summary
+
+Wired TypeORM into `app.module.ts` via `forRootAsync` reading connection params from `@nestjs/config`. All four entities registered explicitly with `autoLoadEntities: true` and `synchronize: false`. `DB_PORT` parsed with `Number(...) || DEFAULT_DB_PORT`. `logging: ['error']`.
+
+Also resolved a build toolchain blocker discovered while verifying the live connection: removing the `@ocr/types` `paths` alias (TS now resolves it through `node_modules` as a library, fixing TS6059 in watch mode), and disabling `incremental` compilation which conflicted with nest-cli's `deleteOutDir: true` (stale `.tsbuildinfo` caused the watcher to skip emitting `dist/main.js`). `typeorm` pinned to `^0.3.20`. Added `packages/types/.gitignore` for compiled artifacts emitted alongside source. Connection verified: `TypeOrmCoreModule dependencies initialized` with no errors against Docker Postgres on 5433.
+
+---
