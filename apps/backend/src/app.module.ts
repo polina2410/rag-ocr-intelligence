@@ -10,6 +10,7 @@ import { RaceResult } from './entities/race-result.entity';
 import { AthletesModule } from './athletes/athletes.module.js';
 import { IngestionModule } from './ingestion/ingestion.module.js';
 import { RacesModule } from './races/races.module.js';
+import { VectorStoreModule } from './vector-store/vector-store.module.js';
 
 const DEFAULT_DB_PORT = 5432;
 
@@ -18,6 +19,7 @@ const DEFAULT_DB_PORT = 5432;
     AthletesModule,
     IngestionModule,
     RacesModule,
+    VectorStoreModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
