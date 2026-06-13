@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { memoryStorage } from 'multer';
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -14,7 +15,7 @@ export const CSV_MULTER_OPTIONS = {
     if (isCsv) {
       cb(null, true);
     } else {
-      cb(new Error('Only CSV files are accepted'), false);
+      cb(new BadRequestException('Only CSV files are accepted'), false);
     }
   },
 };
