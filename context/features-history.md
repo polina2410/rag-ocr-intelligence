@@ -322,6 +322,26 @@ Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /
 
 ---
 
+## VectorStoreService Upsert
+
+**Branch:** vector-store-upsert
+**Completed:** 2026-06-13
+
+### Goals
+
+- `upsert(points: QdrantPoint[]): Promise<void>` implemented — calls `client.upsert` with `RACE_RESULTS_COLLECTION`, `wait: WAIT_FOR_UPSERT`, and mapped points
+- Empty-array guard returns early without calling the client
+- Logger debug line records point count
+- 3 tests: happy path, empty input, error propagation — all pass
+- `moduleNameMapper: { "^(\\.{1,2}/.*)\\.js$": "$1" }` added to Jest config to resolve intra-module `.js` imports in ts-jest
+- Build and lint clean; 86/86 tests pass
+
+### Summary
+
+Replaced the `Promise.reject` stub in `VectorStoreService.upsert` with a real implementation: empty-array guard, `.map` to `{ id, vector, payload }` shape, `await this.client.upsert(RACE_RESULTS_COLLECTION, { wait: WAIT_FOR_UPSERT, points })`, and a debug log. `WAIT_FOR_UPSERT = true` defined as a named constant above the class. Created `vector-store.service.spec.ts` with 3 tests mocking `QdrantClient` as `{ upsert: jest.fn() }`. Also added `moduleNameMapper` to the backend Jest config — this was required because `vector-store.service.ts` is the first service in the project to use a `.js` extension for an intra-module import (the constants file), which ts-jest in CJS mode cannot resolve without explicit mapping.
+
+---
+
 ## Qdrant Collection Setup
 
 **Branch:** qdrant-collection-setup
