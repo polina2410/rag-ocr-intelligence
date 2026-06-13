@@ -22,13 +22,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@ocr/types": "workspace:*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.4.4",
     "@nestjs/typeorm": "^11.0.1",
+    "@ocr/types": "workspace:*",
     "@qdrant/js-client-rest": "^1.18.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
@@ -39,16 +39,16 @@
     "pg": "^8.21.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^1.0.0"
+    "typeorm": "^0.3.20"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
-    "@ocr/eslint-config": "workspace:*",
-    "@ocr/prettier-config": "workspace:*",
     "@eslint/js": "^10.0.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@ocr/eslint-config": "workspace:*",
+    "@ocr/prettier-config": "workspace:*",
     "@types/csv-parse": "^1.2.5",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
