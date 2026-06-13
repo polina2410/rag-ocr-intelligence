@@ -322,6 +322,27 @@ Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /
 
 ---
 
+## Swagger / OpenAPI Documentation
+
+**Branch:** swagger-openapi-documentation
+**Completed:** 2026-06-13
+
+### Goals
+
+- `GET /docs` serves Swagger UI via `SwaggerModule` wired in `main.ts`
+- 9 backend Swagger response classes in `apps/backend/src/common/swagger/` and `ingestion/dto/`, each `implements` its shared interface for compile-time drift protection
+- Paginated schemas (`PaginatedRacesResponseDto`, `PaginatedAthletesResponseDto`) reference real item types
+- `@ApiPropertyOptional` on both query DTOs (`page`, `limit`) with type, min, max, and default
+- All 5 endpoints annotated with `@ApiTags`, `@ApiOperation`, typed response decorators, `@ApiParam` (UUID format), `@ApiBadRequestResponse` (ingest), `@ApiNotFoundResponse` (`:id` lookups)
+- `POST /ingest/csv` has `@ApiConsumes('multipart/form-data')` + `@ApiBody` (file picker in UI)
+- Build and lint clean; 83/83 tests pass
+
+### Summary
+
+Added full Swagger documentation to the NestJS backend. Shared types in `@ocr/types` are plain interfaces and cannot carry decorators, so introduced backend-only Swagger response classes — each `implements` its corresponding shared interface so shape drift is caught at compile time. Created `apps/backend/src/common/swagger/` for the 9 response classes (`AthleteResponseDto`, `RaceResponseDto`, `ObstacleSplitResponseDto`, `RaceResultResponseDto`, `RaceDetailResponseDto`, `AthleteResultResponseDto`, `AthleteDetailResponseDto`, `PaginatedRacesResponseDto`, `PaginatedAthletesResponseDto`) and `apps/backend/src/ingestion/dto/ingest-csv-response.dto.ts`. Nullable fields use `nullable: true`; enums (`raceType`, `status`) documented as string arrays. Paginated shapes use concrete subclasses (one per item type) to avoid generic-resolution issues in OpenAPI. `main.ts` bootstraps `DocumentBuilder` + `SwaggerModule.setup('docs', ...)`. `void bootstrap()` added to satisfy the no-floating-promises lint rule.
+
+---
+
 ## GET /athletes Endpoint
 
 **Branch:** get-athletes-endpoint

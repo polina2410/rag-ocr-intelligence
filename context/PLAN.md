@@ -37,7 +37,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 22. ✅ Build `GET /races/:id` endpoint — returns race with results and splits
 23. ✅ Build `GET /athletes` endpoint — returns paginated list of athletes
 24. ✅ Build `GET /athletes/:id` endpoint — returns athlete with all race results
-25. Add Swagger decorators to all endpoints and DTOs
+25. ✅ Add Swagger decorators to all endpoints and DTOs
 
 ---
 
