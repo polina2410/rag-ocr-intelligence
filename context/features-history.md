@@ -180,6 +180,24 @@ Also resolved a build toolchain blocker discovered while verifying the live conn
 
 ---
 
+## Multer CSV Upload Configuration
+
+**Branch:** multer-csv-upload
+**Completed:** 2026-06-13
+
+### Goals
+
+- `csv-upload.config.ts` — `CSV_MULTER_OPTIONS` with memory storage, 10 MB file size limit, CSV-only file filter
+- `ingestion.controller.ts` — empty `@Controller('ingest')` shell, no routes
+- `IngestionController` wired into `IngestionModule` controllers array
+- Build and lint pass
+
+### Summary
+
+Created `CSV_MULTER_OPTIONS` using `memoryStorage()` from multer. File filter accepts `mimetype === 'text/csv'` or `.csv` extension (handles Safari/curl sending CSV as `text/plain`); rejects with a descriptive `Error`. Dropped the explicit `: MulterOptions` annotation — multer 2.x doesn't export that name directly (`Options` lives inside the `multer` namespace); TypeScript infers the shape from the value, and `FileInterceptor` in step 19 validates compatibility at the call site. Empty `IngestionController` added to `IngestionModule` — step 19 adds the `POST /ingest/csv` method to it. Build and lint pass with 0 errors.
+
+---
+
 ## Unit Tests for CSV Parsers (Steps 16 + 17)
 
 **Branch:** csv-parser-unit-tests
