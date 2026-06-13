@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import type { RaceDto } from '@ocr/types';
+import type { RaceResult } from './race-result.entity';
 
 const NAME_MAX_LENGTH = 255;
 const LOCATION_MAX_LENGTH = 255;
@@ -34,4 +35,7 @@ export class Race {
 
   @Column({ type: 'varchar', length: RACE_TYPE_MAX_LENGTH, name: 'race_type' })
   raceType!: RaceDto['raceType'];
+
+  @OneToMany('RaceResult', 'race')
+  results!: RaceResult[];
 }

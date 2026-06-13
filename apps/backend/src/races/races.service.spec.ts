@@ -1,10 +1,16 @@
+import { NotFoundException } from '@nestjs/common';
 import type { Repository } from 'typeorm';
+import type { Athlete } from '../entities/athlete.entity';
+import type { ObstacleSplit } from '../entities/obstacle-split.entity';
 import type { Race } from '../entities/race.entity';
+import type { RaceResult } from '../entities/race-result.entity';
 import { RacesService } from './races.service';
 
 const findAndCountMock = jest.fn();
+const findOneMock = jest.fn();
 const mockRaceRepo = {
   findAndCount: findAndCountMock,
+  findOne: findOneMock,
 } as unknown as Repository<Race>;
 
 const makeRace = (overrides: Partial<Race> = {}): Race => ({
@@ -15,6 +21,42 @@ const makeRace = (overrides: Partial<Race> = {}): Race => ({
   distanceKm: '5.00' as unknown as number,
   totalObstacles: 10,
   raceType: 'Sprint',
+  results: [],
+  ...overrides,
+});
+
+const makeAthlete = (overrides: Partial<Athlete> = {}): Athlete => ({
+  id: 'athlete-1',
+  firstName: 'Ana',
+  lastName: 'Ilic',
+  nationality: 'RS',
+  category: 'Elite',
+  ...overrides,
+});
+
+const makeSplit = (overrides: Partial<ObstacleSplit> = {}): ObstacleSplit => ({
+  id: 'split-1',
+  raceResultId: 'result-1',
+  raceResult: {} as RaceResult,
+  obstacleNumber: 1,
+  obstacleName: 'Wall',
+  splitTimeSeconds: 30,
+  penaltyCount: 0,
+  ...overrides,
+});
+
+const makeResult = (overrides: Partial<RaceResult> = {}): RaceResult => ({
+  id: 'result-1',
+  raceId: 'uuid-1',
+  race: {} as Race,
+  athleteId: 'athlete-1',
+  athlete: makeAthlete(),
+  overallPosition: 1,
+  finishTimeSeconds: 3600,
+  status: 'FINISHED',
+  categoryPosition: 1,
+  genderPosition: 1,
+  splits: [makeSplit()],
   ...overrides,
 });
 
@@ -82,6 +124,122 @@ describe('RacesService', () => {
       expect(result.total).toBe(5);
       expect(result.page).toBe(99);
       expect(result.limit).toBe(20);
+    });
+  });
+
+  describe('findOne', () => {
+    it('returns mapped RaceDetailDto with results, athlete, and splits', async () => {
+      const split = makeSplit({
+        obstacleNumber: 1,
+        obstacleName: 'Wall',
+        splitTimeSeconds: 30,
+        penaltyCount: 0,
+      });
+      const result = makeResult({
+        id: 'result-1',
+        overallPosition: 1,
+        splits: [split],
+      });
+      const race = makeRace({
+        id: 'uuid-1',
+        distanceKm: '5.00' as unknown as number,
+        results: [result],
+      });
+      findOneMock.mockResolvedValue(race);
+
+      const detail = await service.findOne('uuid-1');
+
+      expect(detail.id).toBe('uuid-1');
+      expect(detail.results).toHaveLength(1);
+      expect(detail.results[0].id).toBe('result-1');
+      expect(detail.results[0].athlete.firstName).toBe('Ana');
+      expect(detail.results[0].splits).toHaveLength(1);
+      expect(detail.results[0].splits[0].obstacleName).toBe('Wall');
+    });
+
+    it('coerces distanceKm from string to number', async () => {
+      const race = makeRace({
+        distanceKm: '12.50' as unknown as number,
+        results: [],
+      });
+      findOneMock.mockResolvedValue(race);
+
+      const detail = await service.findOne('uuid-1');
+
+      expect(typeof detail.distanceKm).toBe('number');
+      expect(detail.distanceKm).toBe(12.5);
+    });
+
+    it('returns results: [] when race has no results', async () => {
+      const race = makeRace({ results: [] });
+      findOneMock.mockResolvedValue(race);
+
+      const detail = await service.findOne('uuid-1');
+
+      expect(detail.results).toEqual([]);
+    });
+
+    it('returns splits: [] when a result has no splits', async () => {
+      const result = makeResult({ splits: [] });
+      const race = makeRace({ results: [result] });
+      findOneMock.mockResolvedValue(race);
+
+      const detail = await service.findOne('uuid-1');
+
+      expect(detail.results[0].splits).toEqual([]);
+    });
+
+    it('passes nullable fields through as null', async () => {
+      const result = makeResult({
+        overallPosition: null,
+        finishTimeSeconds: null,
+        categoryPosition: null,
+        genderPosition: null,
+        splits: [],
+      });
+      const race = makeRace({ results: [result] });
+      findOneMock.mockResolvedValue(race);
+
+      const detail = await service.findOne('uuid-1');
+
+      expect(detail.results[0].overallPosition).toBeNull();
+      expect(detail.results[0].finishTimeSeconds).toBeNull();
+      expect(detail.results[0].categoryPosition).toBeNull();
+      expect(detail.results[0].genderPosition).toBeNull();
+    });
+
+    it('orders results by overallPosition ascending, nulls last', async () => {
+      const r1 = makeResult({ id: 'r1', overallPosition: 3, splits: [] });
+      const r2 = makeResult({ id: 'r2', overallPosition: null, splits: [] });
+      const r3 = makeResult({ id: 'r3', overallPosition: 1, splits: [] });
+      const race = makeRace({ results: [r1, r2, r3] });
+      findOneMock.mockResolvedValue(race);
+
+      const detail = await service.findOne('uuid-1');
+
+      expect(detail.results.map((r) => r.id)).toEqual(['r3', 'r1', 'r2']);
+    });
+
+    it('orders splits by obstacleNumber ascending', async () => {
+      const s1 = makeSplit({ id: 's1', obstacleNumber: 3 });
+      const s2 = makeSplit({ id: 's2', obstacleNumber: 1 });
+      const result = makeResult({ splits: [s1, s2] });
+      const race = makeRace({ results: [result] });
+      findOneMock.mockResolvedValue(race);
+
+      const detail = await service.findOne('uuid-1');
+
+      expect(detail.results[0].splits.map((s) => s.obstacleNumber)).toEqual([
+        1, 3,
+      ]);
+    });
+
+    it('throws NotFoundException when race does not exist', async () => {
+      findOneMock.mockResolvedValue(null);
+
+      await expect(service.findOne('no-such-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

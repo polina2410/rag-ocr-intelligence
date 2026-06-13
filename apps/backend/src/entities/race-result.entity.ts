@@ -3,8 +3,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import type { ObstacleSplit } from './obstacle-split.entity';
 import { Athlete } from './athlete.entity';
 import { Race } from './race.entity';
 
@@ -15,7 +17,7 @@ export class RaceResult {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => Race)
+  @ManyToOne(() => Race, (race) => race.results)
   @JoinColumn({ name: 'race_id' })
   race!: Race;
 
@@ -48,4 +50,7 @@ export class RaceResult {
 
   @Column({ type: 'int', name: 'gender_position', nullable: true })
   genderPosition!: number | null;
+
+  @OneToMany('ObstacleSplit', 'raceResult')
+  splits!: ObstacleSplit[];
 }
