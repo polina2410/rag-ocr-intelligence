@@ -301,6 +301,28 @@ Added `MulterExceptionFilter` (`@Catch(MulterError)`) registered via `@UseFilter
 
 ---
 
+## GET /races/:id Endpoint
+
+**Branch:** get-race-by-id
+**Completed:** 2026-06-13
+
+### Goals
+
+- New `packages/types/src/race-detail.dto.ts` with `ObstacleSplitDto`, `RaceResultDto`, and `RaceDetailDto`
+- `packages/types/src/index.ts` updated with `export * from './race-detail.dto.js'`
+- `RacesService.findOne(id)` loads race + results + athlete + splits, throws `NotFoundException` on miss, coerces `distanceKm` to number
+- `RacesController` `@Get(':id')` handler with `ParseUUIDPipe` (400 on bad UUID)
+- `races.module.ts` expanded to register `Race`, `RaceResult`, `ObstacleSplit`, `Athlete`
+- `GET /races/{validUuid}` → 200 with full `RaceDetailDto` (results, athlete, splits)
+- `GET /races/{unknownUuid}` → 404; `GET /races/{nonUuid}` → 400
+- 7 new `findOne` unit tests (70 total); lint, build, and tests all pass
+
+### Summary
+
+Added `GET /races/:id` returning a full `RaceDetailDto` including the nested result graph (results → athlete, results → splits). Added `@OneToMany` inverse relations on `Race` (→ `RaceResult[]`) and `RaceResult` (→ `ObstacleSplit[]`) using string-based entity references to avoid circular value imports; wired back-references on `@ManyToOne` decorators. `RacesService.findOne` loads via `relations: ['results', 'results.athlete', 'results.splits']`, sorts results by `overallPosition` asc nulls-last and splits by `obstacleNumber` asc, coerces `distanceKm` with `Number()`. `ParseUUIDPipe` on the `:id` param yields 400 for non-UUID inputs. `races.module.ts` expanded to register all four entities. `ObstacleSplitDto`, `RaceResultDto`, and `RaceDetailDto extends RaceDto` added to `@ocr/types` with `.js` re-export. 70 tests pass, 0 errors.
+
+---
+
 ## POST /ingest/csv Endpoint
 
 **Branch:** ingest-csv-endpoint
