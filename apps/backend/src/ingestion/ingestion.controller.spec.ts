@@ -2,8 +2,9 @@ import { BadRequestException } from '@nestjs/common';
 import type { IngestionService } from './ingestion.service';
 import { IngestionController } from './ingestion.controller';
 
+const ingestCsvMock = jest.fn();
 const mockIngestionService = {
-  ingestCsv: jest.fn(),
+  ingestCsv: ingestCsvMock,
 } as unknown as IngestionService;
 
 describe('IngestionController', () => {
@@ -31,15 +32,12 @@ describe('IngestionController', () => {
 
     it('returns service result when file is provided', async () => {
       const file = { buffer: Buffer.from('csv data') } as Express.Multer.File;
-      (mockIngestionService.ingestCsv as jest.Mock).mockResolvedValue({
-        raceId: 'abc-123',
-        rowsIngested: 5,
-      });
+      ingestCsvMock.mockResolvedValue({ raceId: 'abc-123', rowsIngested: 5 });
 
       const result = await controller.ingestCsv(file);
 
       expect(result).toEqual({ raceId: 'abc-123', rowsIngested: 5 });
-      expect(mockIngestionService.ingestCsv).toHaveBeenCalledWith(file.buffer);
+      expect(ingestCsvMock).toHaveBeenCalledWith(file.buffer);
     });
   });
 });

@@ -103,7 +103,9 @@ describe('IngestionService', () => {
     it('returns raceId and rowsIngested on success', async () => {
       (mockMetadataParser.parseMetadata as jest.Mock).mockReturnValue({});
       (mockRowsParser.parseRows as jest.Mock).mockReturnValue([{}, {}]);
-      (mockDataSource.transaction as jest.Mock).mockResolvedValue('race-uuid-123');
+      (mockDataSource.transaction as jest.Mock).mockResolvedValue(
+        'race-uuid-123',
+      );
 
       const result = await service.ingestCsv(buffer);
 
