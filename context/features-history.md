@@ -673,3 +673,22 @@ Queue INFRASTRUCTURE only — the producer/consumer come in steps 38/39. Chose *
 Consumer half of the background embedding pipeline (producer is step 39). `EmbedProcessor` is a BullMQ `WorkerHost` decorated `@Processor(EMBED_QUEUE)`; its `process(job: Job<EmbedJobData>)` runs `EmbedService.batchEmbedRace(raceId)` and lets errors propagate so BullMQ applies its retry/failure handling. Added an `@OnWorkerEvent('failed')` handler (opted in for observability) logging the failed job id + error stack via Nest `Logger` — the `failed` listener signature `(job: Job | undefined, error: Error, prev)` was verified against the bullmq types. `EmbedModule` imports `QueueModule` (so the worker binds to the registered `EMBED_QUEUE`) and registers `EmbedProcessor` as a provider; `forRoot` is NOT re-run (already global). Shared `EmbedJobData` type lives in `queue/` for the step-39 producer to reuse. `process` overrides the base `Promise<any>` with `Promise<void>` to stay `any`-free. Tests use the standalone-const harness: the processor is constructed directly (`new EmbedProcessor(mock)`) and `process`/`onFailed` called directly — the `worker` getter is never touched (it would build a real Redis-backed Worker). 3 new tests (148 total). The synchronous `batchEmbedRace` call in `IngestionService` is intentionally left in place until step 39. Boot check: worker registers with no Redis errors, app starts clean (Qdrant 401 was fixed post-step-37). 148/148 tests pass, build and lint clean.
 
 ---
+
+## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
+
+**Branch:** wire-ingestion-queue
+**Completed:** 2026-06-14
+
+### Goals
+
+- `queue/queue.constants.ts` — add `EMBED_JOB = 'embed-race'`
+- `IngestionService` — drop `EmbedService`; inject `@InjectQueue(EMBED_QUEUE) embedQueue: Queue<EmbedJobData>`; replace the synchronous `batchEmbedRace(raceId)` with `await this.embedQueue.add(EMBED_JOB, { raceId })` (after the transaction, outside the try/catch)
+- `IngestionModule` — swap `EmbedModule` import for `QueueModule`
+- `ingestion.service.spec.ts` — queue mock (captured `add` fn), success asserts `add(EMBED_JOB, { raceId })`, new no-enqueue-on-failure test
+- Lint, test (149), build pass; verified end-to-end
+
+### Summary
+
+Moved embedding off the request path: `POST /ingest/csv` now saves the race in a transaction, then enqueues a BullMQ `EmbedJobData` job (`{ raceId }`) and returns immediately, instead of awaiting `EmbedService.batchEmbedRace` synchronously. The enqueue stays after the transaction and outside the DB try/catch — preserving the prior "error-after-successful-save propagates" semantics (a Redis-down enqueue failure is far rarer than the old synchronous-embed failure; mis-mapping it to a DB 500 would be wrong). `IngestionService` no longer depends on `EmbedService`, so `IngestionModule` swapped its `EmbedModule` import for `QueueModule` (which provides the injectable `Queue`); `EmbedModule` stays in the graph via `AppModule` (it hosts the `EmbedProcessor` consumer + `EmbedService`). Queue and job names are constants (`EMBED_QUEUE`/`EMBED_JOB`); `EmbedProcessor.process` handles all job names so `EMBED_JOB` is consumed fine. The spec's `add` mock is captured in a const to satisfy `unbound-method`; new test asserts no enqueue when the transaction fails. **Verified end-to-end with a real OpenAI key:** ingesting a fixture CSV returned `201 { raceId, rowsIngested: 19 }` immediately (async decoupling proven), the `EmbedProcessor` picked up the job, and called OpenAI — which returned **429 quota-exceeded** (an account billing limitation, not a code defect; auth succeeded — it was not a 401). The `onFailed` handler logged it correctly. The only unverified link is the final Qdrant upsert, blocked solely by the OpenAI account quota. 149/149 tests pass, build and lint clean. **Phase 3 (RAG pipeline, steps 26–39) is complete.**
+
+---
