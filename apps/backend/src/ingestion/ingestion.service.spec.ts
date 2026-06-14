@@ -5,6 +5,7 @@ import {
 import type { DataSource, Repository } from 'typeorm';
 import type { Athlete } from '../entities/athlete.entity';
 import type { Race } from '../entities/race.entity';
+import type { EmbedService } from '../embed/embed.service';
 import type { CsvMetadataParserService } from './csv-metadata-parser.service';
 import type { CsvRowsParserService } from './csv-rows-parser.service';
 import { IngestionService } from './ingestion.service';
@@ -27,6 +28,10 @@ const mockDataSource = {
   transaction: jest.fn(),
 } as unknown as DataSource;
 
+const mockEmbedService = {
+  batchEmbedRace: jest.fn().mockResolvedValue(undefined),
+} as unknown as EmbedService;
+
 describe('IngestionService', () => {
   let service: IngestionService;
 
@@ -38,6 +43,7 @@ describe('IngestionService', () => {
       mockRaceRepo,
       mockAthleteRepo,
       mockDataSource,
+      mockEmbedService,
     );
   });
 

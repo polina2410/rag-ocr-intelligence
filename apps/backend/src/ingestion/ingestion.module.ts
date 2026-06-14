@@ -4,6 +4,7 @@ import { Athlete } from '../entities/athlete.entity';
 import { ObstacleSplit } from '../entities/obstacle-split.entity';
 import { Race } from '../entities/race.entity';
 import { RaceResult } from '../entities/race-result.entity';
+import { EmbedModule } from '../embed/embed.module';
 import { CsvMetadataParserService } from './csv-metadata-parser.service';
 import { CsvRowsParserService } from './csv-rows-parser.service';
 import { IngestionController } from './ingestion.controller';
@@ -12,6 +13,7 @@ import { IngestionService } from './ingestion.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Race, Athlete, RaceResult, ObstacleSplit]),
+    EmbedModule,
   ],
   controllers: [IngestionController],
   providers: [CsvMetadataParserService, CsvRowsParserService, IngestionService],

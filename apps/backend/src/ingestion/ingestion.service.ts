@@ -11,6 +11,7 @@ import { Athlete } from '../entities/athlete.entity';
 import { ObstacleSplit } from '../entities/obstacle-split.entity';
 import { Race } from '../entities/race.entity';
 import { RaceResult } from '../entities/race-result.entity';
+import { EmbedService } from '../embed/embed.service';
 import { CsvMetadataParserService } from './csv-metadata-parser.service';
 import { CsvRowsParserService } from './csv-rows-parser.service';
 
@@ -25,6 +26,7 @@ export class IngestionService {
     @InjectRepository(Athlete)
     private readonly athleteRepo: Repository<Athlete>,
     private readonly dataSource: DataSource,
+    private readonly embedService: EmbedService,
   ) {}
 
   async ingestCsv(
@@ -110,6 +112,8 @@ export class IngestionService {
       );
       throw new InternalServerErrorException('Failed to save race data');
     }
+
+    await this.embedService.batchEmbedRace(raceId);
 
     return { raceId, rowsIngested: rows.length };
   }
