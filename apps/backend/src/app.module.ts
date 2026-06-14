@@ -11,6 +11,7 @@ import { AskModule } from './ask/ask.module.js';
 import { AthletesModule } from './athletes/athletes.module.js';
 import { EmbedModule } from './embed/embed.module.js';
 import { IngestionModule } from './ingestion/ingestion.module.js';
+import { QueueModule } from './queue/queue.module.js';
 import { RacesModule } from './races/races.module.js';
 import { VectorStoreModule } from './vector-store/vector-store.module.js';
 
@@ -22,6 +23,7 @@ const DEFAULT_DB_PORT = 5432;
     AthletesModule,
     EmbedModule,
     IngestionModule,
+    QueueModule,
     RacesModule,
     VectorStoreModule,
     ConfigModule.forRoot({ isGlobal: true }),
