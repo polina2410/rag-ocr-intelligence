@@ -71,10 +71,24 @@ describe('GenerateService', () => {
       await drain(service.generate(messages));
 
       expect(createFn).toHaveBeenCalledTimes(1);
-      expect(createFn).toHaveBeenCalledWith({
-        model: CHAT_MODEL,
-        messages,
-        stream: true,
+      expect(createFn).toHaveBeenCalledWith(
+        {
+          model: CHAT_MODEL,
+          messages,
+          stream: true,
+        },
+        { signal: undefined },
+      );
+    });
+
+    it('forwards an abort signal in the request options', async () => {
+      const { service, createFn } = setup({ chunks: [chunkOf('hi')] });
+      const controller = new AbortController();
+
+      await drain(service.generate(messages, controller.signal));
+
+      expect(createFn).toHaveBeenCalledWith(expect.anything(), {
+        signal: controller.signal,
       });
     });
 

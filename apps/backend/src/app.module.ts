@@ -7,6 +7,7 @@ import { Athlete } from './entities/athlete.entity';
 import { ObstacleSplit } from './entities/obstacle-split.entity';
 import { Race } from './entities/race.entity';
 import { RaceResult } from './entities/race-result.entity';
+import { AskModule } from './ask/ask.module.js';
 import { AthletesModule } from './athletes/athletes.module.js';
 import { EmbedModule } from './embed/embed.module.js';
 import { IngestionModule } from './ingestion/ingestion.module.js';
@@ -17,6 +18,7 @@ const DEFAULT_DB_PORT = 5432;
 
 @Module({
   imports: [
+    AskModule,
     AthletesModule,
     EmbedModule,
     IngestionModule,
