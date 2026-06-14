@@ -548,3 +548,25 @@ Created `IngestionService` with a `DataSource.transaction` call that saves Race 
 Created `apps/backend/src/retrieve/` (service + module + spec). `RetrieveService.retrieve` calls `EmbedService.embed(query)` once, passes the vector to `VectorStoreService.query(vector, topK)`, and maps each hit to a `RetrievedChunk`. Extracted a shared `RaceResultPayload` interface into `vector-store.service.ts` (alongside `QdrantPoint`/`QdrantResult`) and typed `EmbedService.batchEmbedRace`'s payload with it — one source of truth for the payload contract across upsert and retrieve. Two intentional boundary casts handle the TS interface-vs-index-signature quirk: `RaceResultPayload` → `Record<string, unknown>` at upsert, and back at retrieve. Resolved a pre-existing red lint gate: `embed.service.spec.ts` (and the new retrieve spec) were failing `@typescript-eslint/unbound-method` on the jest mock idiom — rewrote both to a standalone-const mock harness (assert against captured `jest.fn()`s, not `obj.method`) rather than disabling the rule. 6 retrieve tests including embed-error and query-error propagation (the latter added during review). **Known gap for step 33:** the Qdrant payload stores only IDs/names/date, not the serialized chunk text — the prompt builder will need to re-serialize from Postgres via `raceResultId` or add a `text` field at upsert time. 119/119 tests pass, build and lint clean.
 
 ---
+
+## Prompt Builder — RAG Context Assembly (Step 33)
+
+**Branch:** prompt-builder
+**Completed:** 2026-06-14
+
+### Goals
+
+- Store serialized chunk text in the Qdrant payload: add `text: string` to `RaceResultPayload`, populate `text: chunk` in `EmbedService.batchEmbedRace`, update the embed spec assertion
+- `PromptBuilderService.buildMessages(query, chunks): ChatCompletionMessageParam[]` — pure, zero dependencies: a system message (instructions + numbered context block) + a user message (raw query)
+- Named constants for system/no-data instructions, context header, delimiter, message count
+- Empty chunks → no-data instruction (anti-hallucination), no context block
+- Tolerate missing/empty `metadata.text` on a chunk (older points predate the field) — skip without crashing
+- `PromptModule` providing/exporting the service
+- Spec: chunk text in order, query verbatim, empty path, missing-text skip, all-unusable → no-data, output shape
+- Lint, test (125/125), and build all pass
+
+### Summary
+
+Resolved the step-32 known gap by storing the serialized chunk text in the Qdrant payload (chosen over re-serializing from Postgres): added `text: string` to `RaceResultPayload` and populated it in `EmbedService.batchEmbedRace` from the already-computed `chunk` variable (no recomputation). Created `apps/backend/src/prompt/` (service + module + constants + spec). `PromptBuilderService.buildMessages` is a pure function of `(query, chunks)` — it filters chunks to those with usable `text`, numbers them under `SYSTEM_INSTRUCTION` into a context block, and returns `[system, user]` as `ChatCompletionMessageParam[]` (the OpenAI SDK type, accessed via the `OpenAI.Chat.Completions` namespace off the default import to avoid subpath-resolution risk). When no usable context remains it returns `NO_CONTEXT_INSTRUCTION` instead, instructing the model not to hallucinate. Return type is `ChatCompletionMessageParam[]` so step-34 GenerateService can pass it straight to `client.chat.completions.create({ messages })` with no adapter layer. Token-budget truncation of the context is noted as a future concern in a code comment, not implemented. **Migration note:** races ingested before this change lack `text` in their payload (`metadata.text` is `undefined` at runtime until re-ingested); the builder skips such chunks, covered by tests. 6 new prompt-builder tests; 125/125 tests pass, build and lint clean.
+
+---

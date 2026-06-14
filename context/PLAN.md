@@ -50,7 +50,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 30. ✅ Build `EmbedService` — calls OpenAI embeddings API for a single chunk
 31. ✅ Build `EmbedService` — batch embed all results for a race after ingestion
 32. ✅ Build `RetrieveService` — embeds user query and fetches top-k chunks with metadata
-33. Build prompt builder — assembles system prompt with retrieved context chunks
+33. ✅ Build prompt builder — assembles system prompt with retrieved context chunks
 34. Build `GenerateService` — calls LLM API and streams response tokens
 35. Build SSE stream handler in NestJS — pipes LLM stream to HTTP response
 36. Build `POST /ask` endpoint — wires retrieve, prompt builder, and SSE stream
