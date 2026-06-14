@@ -122,6 +122,7 @@ describe('EmbedService', () => {
           athleteName: 'Jane Smith',
           raceName: 'OCR Champ',
           raceDate: '2026-05-10',
+          text: 'text chunk',
         },
       });
     });

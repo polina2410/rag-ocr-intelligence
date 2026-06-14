@@ -50,6 +50,7 @@ export class EmbedService {
         athleteName: `${result.athlete.firstName} ${result.athlete.lastName}`,
         raceName: result.race.name,
         raceDate: result.race.date,
+        text: chunk,
       };
       points.push({
         id: result.id,

@@ -14,6 +14,7 @@ export interface RaceResultPayload {
   athleteName: string;
   raceName: string;
   raceDate: string;
+  text: string;
 }
 
 export interface QdrantPoint {
