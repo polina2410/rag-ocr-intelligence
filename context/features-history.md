@@ -591,3 +591,25 @@ Resolved the step-32 known gap by storing the serialized chunk text in the Qdran
 Extracted a shared `OpenAiModule` owning the `OPENAI_CLIENT` token + its `useFactory` (moved verbatim from `EmbedModule`), so one OpenAI client instance now serves embed + generate. `EmbedModule` imports it and dropped its inline provider; `OPENAI_CLIENT` moved to `openai/openai.constants.ts` (only `EMBEDDING_MODEL` stays in embed, `CHAT_MODEL` lives with generate — model names stay next to their consumer). The refactor is DI-wiring only; `embed.service.spec.ts` constructs the service with a mock client and was unaffected. Created `apps/backend/src/generate/` — `GenerateService.generate` is an `async *` generator that opens a streaming chat completion and yields each non-empty `chunk.choices[0]?.delta?.content`, guarding null/undefined/empty; errors propagate unwrapped. `ChatCompletionMessageParam` accessed via the `OpenAI` namespace (matching the prompt builder). Two review-driven type-safety improvements applied: `CHAT_MODEL` typed with `satisfies OpenAI.ChatModel` (typo/autocomplete guard — `'gpt-4o-mini'` confirmed in the SDK union), and the test's fake stream typed as `ChatCompletionChunk` (full shape, not naive `Partial`) so mock drift is caught at compile time. 6 new generate tests including open-error and mid-stream-throw propagation. **Caveat:** Context7 was unauthenticated this session, so the streaming pattern came from the stable v6 SDK, not freshly fetched docs. `GenerateModule` is exported for step 35 to import; not yet registered in `app.module.ts` (deferred until a consumer exists). 131/131 tests pass, build and lint clean.
 
 ---
+
+## SSE Stream Handler — writeSse (Step 35)
+
+**Branch:** sse-stream-handler
+**Completed:** 2026-06-14
+
+### Goals
+
+- `common/sse/sse-stream.ts` — `writeSse(res: Response, tokens: AsyncIterable<string>, onClose?): Promise<void>`, decoupled from `GenerateService` (generic over `AsyncIterable<string>`); manual Express streaming, NOT `@Sse()`
+- `common/sse/sse-stream.constants.ts` — named constants for SSE headers, field labels, `done`/`error` events, `[DONE]` sentinel, frame terminator, safe error message, `'close'` event
+- 4 headers + `flushHeaders()` before first write; each token → `data: ${JSON.stringify(token)}\n\n` in order; completion → `done` event + `res.end()` once
+- Mid-stream error → `Logger.error` full server-side, safe `error` frame (no leak), end, no rethrow
+- Client disconnect (`res.on('close')`) → break iteration; guarded `safeWrite`/`safeEnd` + `finally` so the response always closes and end is idempotent
+- Optional `onClose` hook fires once on premature disconnect (not normal completion) for step-36 `AbortController` wiring
+- Spec: header ordering, ordered JSON frames, done+end, empty stream, error path, disconnect stops iteration, onClose fires on disconnect / not on completion
+- Lint, test (139/139), and build all pass
+
+### Summary
+
+Created `apps/backend/src/common/sse/` — a reusable, framework-light SSE writer used by step 36's `POST /ask` controller. `writeSse` sets the streaming headers (`text/event-stream`, `no-cache`, `keep-alive`, `X-Accel-Buffering: no`), flushes, then writes each token as a JSON-encoded `data:` frame (JSON encoding so newlines/quotes can't break framing), emits a terminal `done` event, and ends. Mid-stream errors are logged in full server-side via Nest `Logger` and surfaced to the client as a generic `error` frame with no internal detail; the function resolves rather than rethrowing (the response is already committed once streaming starts). It is decoupled from the LLM layer — generic over `AsyncIterable<string>`. A devil's-advocate review drove two hardening changes: (1) all writes/ends route through guarded `safeWrite`/`safeEnd` helpers with a `finally`, guaranteeing the response closes even if the catch block throws and making `end()` idempotent; (2) an optional `onClose?: () => void` hook that fires once on *premature* client disconnect (guarded by an `ended` flag so a normal completion's trailing `close` doesn't trigger it) — step 36 will wire this to an `AbortController` so a disconnect cancels the in-flight OpenAI request immediately instead of at the next token boundary. 8 unit tests (standalone-const harness, mocked Express `Response`, fake async-generator sources; safe-error proven via `expect.not...stringContaining`). **Deferred (known limitations):** no keepalive heartbeat (aggressive proxies may close idle connections during the pre-first-token wait — flag for step-36 e2e under slow-network); full disconnect→OpenAI-abort lands in step 36 by threading an `AbortSignal` into `GenerateService.generate` and wiring `onClose`. 139/139 tests pass, build and lint clean.
+
+---
