@@ -634,3 +634,23 @@ Created `apps/backend/src/common/sse/` — a reusable, framework-light SSE write
 Final step of Phase 3 — `POST /ask` runs the full RAG pipeline end-to-end. The controller retrieves chunks, builds the prompt, then streams the OpenAI completion via the step-35 `writeSse` helper. Orchestration order is load-bearing: `retrieve` (await) and `buildMessages` (sync) run before any streaming so their errors propagate to Nest's exception filter as normal JSON 4xx/5xx (the response isn't committed yet); only the `generate` stream is wrapped by `writeSse`'s safe `error` frame. Closed the step-35 devil's-advocate Objection 1 by threading an `AbortSignal` through `GenerateService.generate` (passed as the OpenAI request options 2nd arg, `create(body, { signal })`) and wiring the controller's `AbortController` to `writeSse`'s `onClose` — a mid-stream client disconnect now aborts the in-flight OpenAI request immediately. `AskModule` brings `GenerateModule`/`OpenAiModule` into the DI graph for the first time. Logic kept in the controller (thin-controller convention, no `AskService`); `AskQueryDto` validated with class-validator (empty/over-length/extra-prop → 400 via the global `ValidationPipe`). Controller unit-tested by direct construction with mocked services and a `jest.mock`-ed `writeSse`, asserting the wiring and the pre-stream error path (retrieve rejects → `writeSse` never called). 6 new tests (5 controller + 1 generate signal-forwarding). **Deferred (known minor):** every client cancel logs `error`-level noise in `writeSse`'s catch (the abort error) — optional one-line `debug`-when-`closed` refinement left for later; SSE keepalive heartbeat still not implemented (flag for e2e under slow proxies). 145/145 tests pass, build and lint clean.
 
 ---
+
+## BullMQ Queue Module with Redis Connection (Step 37)
+
+**Branch:** bull-queue-module
+**Completed:** 2026-06-14
+
+### Goals
+
+- Add `redis:7-alpine` service (`ocr_redis`, `6379:6379`, `redis_data` volume) to `docker-compose.yml`
+- Install `@nestjs/bullmq` + `bullmq`; add `REDIS_HOST`/`REDIS_PORT` to root `.env.example` (docs) + `apps/backend/.env` (runtime)
+- `queue/queue.constants.ts` — `EMBED_QUEUE = 'race-embed'`
+- `queue/queue.module.ts` — `QueueModule`: `BullModule.forRootAsync` (connection from `ConfigService`) + `registerQueue({ name: EMBED_QUEUE })` + `exports: [BullModule]`, registered once in `app.module.ts`
+- Build + lint + 145 tests pass; boot connects to Redis
+- No processor (38), no ingestion enqueue (39)
+
+### Summary
+
+Queue INFRASTRUCTURE only — the producer/consumer come in steps 38/39. Chose **BullMQ** (`@nestjs/bullmq@^11.0.4` + `bullmq@^5.78.1`) over legacy Bull (Bull is in maintenance mode); BullMQ uses a `connection` object (ioredis options), not Bull's `redis` key. Added a `redis:7-alpine` service + `redis_data` volume to compose. `QueueModule` calls `BullModule.forRootAsync` (host/port from `ConfigService.getOrThrow`, `REDIS_PORT` coerced via `Number`) and `registerQueue({ name: EMBED_QUEUE })`, exporting `BullModule`; it is imported once in `AppModule` so `forRoot` runs exactly once — steps 38/39 import `QueueModule` (singleton) to reach the queue without re-running root config. The queue name lives in the `EMBED_QUEUE` constant (no magic string). Verified the BullMQ API (`forRootAsync`/`registerQueue`/`connection`) directly against the installed `@nestjs/bullmq` types since Context7 was unavailable. **Two env surfaces:** docker-compose interpolates from the repo-root env file while the Nest app reads `apps/backend/.env` — the Redis vars were added to both (root `.env.example` for docs/visibility; `apps/backend/.env`, untracked, for runtime). No unit test was added — pure DI/connection wiring is verified by the boot check: with `docker compose up -d` the app initialized `QueueModule` + all `BullModule` instances with zero Redis errors and Redis answered `PONG`. **Pre-existing/unrelated:** full app boot currently fails at `VectorStoreService.onModuleInit` with a Qdrant 401 — the running `ocr_qdrant` container's API key differs from `apps/backend/.env` (local credential drift, not introduced here). 145/145 tests pass, build and lint clean.
+
+---
