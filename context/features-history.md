@@ -613,3 +613,24 @@ Extracted a shared `OpenAiModule` owning the `OPENAI_CLIENT` token + its `useFac
 Created `apps/backend/src/common/sse/` — a reusable, framework-light SSE writer used by step 36's `POST /ask` controller. `writeSse` sets the streaming headers (`text/event-stream`, `no-cache`, `keep-alive`, `X-Accel-Buffering: no`), flushes, then writes each token as a JSON-encoded `data:` frame (JSON encoding so newlines/quotes can't break framing), emits a terminal `done` event, and ends. Mid-stream errors are logged in full server-side via Nest `Logger` and surfaced to the client as a generic `error` frame with no internal detail; the function resolves rather than rethrowing (the response is already committed once streaming starts). It is decoupled from the LLM layer — generic over `AsyncIterable<string>`. A devil's-advocate review drove two hardening changes: (1) all writes/ends route through guarded `safeWrite`/`safeEnd` helpers with a `finally`, guaranteeing the response closes even if the catch block throws and making `end()` idempotent; (2) an optional `onClose?: () => void` hook that fires once on *premature* client disconnect (guarded by an `ended` flag so a normal completion's trailing `close` doesn't trigger it) — step 36 will wire this to an `AbortController` so a disconnect cancels the in-flight OpenAI request immediately instead of at the next token boundary. 8 unit tests (standalone-const harness, mocked Express `Response`, fake async-generator sources; safe-error proven via `expect.not...stringContaining`). **Deferred (known limitations):** no keepalive heartbeat (aggressive proxies may close idle connections during the pre-first-token wait — flag for step-36 e2e under slow-network); full disconnect→OpenAI-abort lands in step 36 by threading an `AbortSignal` into `GenerateService.generate` and wiring `onClose`. 139/139 tests pass, build and lint clean.
 
 ---
+
+## POST /ask Endpoint — RAG Pipeline Wiring (Step 36)
+
+**Branch:** ask-endpoint
+**Completed:** 2026-06-14
+
+### Goals
+
+- Extend `GenerateService.generate(messages, signal?: AbortSignal)` — `signal` passed in the OpenAI request options (2nd arg), not the body; no behavior change when omitted
+- Update `generate.service.spec.ts` for the options arg + add a signal-forwarding test
+- `AskQueryDto { query }` (`@IsString`/`@IsNotEmpty`/`@MaxLength(1000)` + Swagger)
+- `AskController` `@Post('ask')` orchestrating retrieve → buildMessages → `AbortController` → `writeSse(res, generate(messages, signal), () => ctrl.abort())`; `@Res()` handler returns void; Swagger documents the SSE response in prose
+- `AskModule` imports `RetrieveModule` + `PromptModule` + `GenerateModule`; registered in `app.module.ts`
+- `ask.controller.spec.ts` mocking `writeSse`; validation → 400
+- Lint, test (145/145), and build all pass
+
+### Summary
+
+Final step of Phase 3 — `POST /ask` runs the full RAG pipeline end-to-end. The controller retrieves chunks, builds the prompt, then streams the OpenAI completion via the step-35 `writeSse` helper. Orchestration order is load-bearing: `retrieve` (await) and `buildMessages` (sync) run before any streaming so their errors propagate to Nest's exception filter as normal JSON 4xx/5xx (the response isn't committed yet); only the `generate` stream is wrapped by `writeSse`'s safe `error` frame. Closed the step-35 devil's-advocate Objection 1 by threading an `AbortSignal` through `GenerateService.generate` (passed as the OpenAI request options 2nd arg, `create(body, { signal })`) and wiring the controller's `AbortController` to `writeSse`'s `onClose` — a mid-stream client disconnect now aborts the in-flight OpenAI request immediately. `AskModule` brings `GenerateModule`/`OpenAiModule` into the DI graph for the first time. Logic kept in the controller (thin-controller convention, no `AskService`); `AskQueryDto` validated with class-validator (empty/over-length/extra-prop → 400 via the global `ValidationPipe`). Controller unit-tested by direct construction with mocked services and a `jest.mock`-ed `writeSse`, asserting the wiring and the pre-stream error path (retrieve rejects → `writeSse` never called). 6 new tests (5 controller + 1 generate signal-forwarding). **Deferred (known minor):** every client cancel logs `error`-level noise in `writeSse`'s catch (the abort error) — optional one-line `debug`-when-`closed` refinement left for later; SSE keepalive heartbeat still not implemented (flag for e2e under slow proxies). 145/145 tests pass, build and lint clean.
+
+---
