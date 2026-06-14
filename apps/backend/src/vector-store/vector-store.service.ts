@@ -7,6 +7,15 @@ import {
   VECTOR_DISTANCE,
 } from './vector-store.constants.js';
 
+export interface RaceResultPayload {
+  raceResultId: string;
+  raceId: string;
+  athleteId: string;
+  athleteName: string;
+  raceName: string;
+  raceDate: string;
+}
+
 export interface QdrantPoint {
   id: string;
   vector: number[];

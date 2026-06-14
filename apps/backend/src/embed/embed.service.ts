@@ -4,7 +4,11 @@ import type OpenAI from 'openai';
 import { Repository } from 'typeorm';
 import { RaceResult } from '../entities/race-result.entity.js';
 import { RaceResultSerializerService } from '../serializer/race-result-serializer.service.js';
-import { QdrantPoint, VectorStoreService } from '../vector-store/vector-store.service.js';
+import {
+  QdrantPoint,
+  RaceResultPayload,
+  VectorStoreService,
+} from '../vector-store/vector-store.service.js';
 import { EMBEDDING_MODEL, OPENAI_CLIENT } from './embed.constants.js';
 
 @Injectable()
@@ -39,17 +43,18 @@ export class EmbedService {
     for (const result of results) {
       const chunk = this.serializer.serialize(result);
       const vector = await this.embed(chunk);
+      const payload: RaceResultPayload = {
+        raceResultId: result.id,
+        raceId: result.raceId,
+        athleteId: result.athleteId,
+        athleteName: `${result.athlete.firstName} ${result.athlete.lastName}`,
+        raceName: result.race.name,
+        raceDate: result.race.date,
+      };
       points.push({
         id: result.id,
         vector,
-        payload: {
-          raceResultId: result.id,
-          raceId: result.raceId,
-          athleteId: result.athleteId,
-          athleteName: `${result.athlete.firstName} ${result.athlete.lastName}`,
-          raceName: result.race.name,
-          raceDate: result.race.date,
-        },
+        payload: payload as unknown as Record<string, unknown>,
       });
     }
 
