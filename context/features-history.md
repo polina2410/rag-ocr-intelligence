@@ -527,3 +527,24 @@ Added `GET /races/:id` returning a full `RaceDetailDto` including the nested res
 Created `IngestionService` with a `DataSource.transaction` call that saves Race first, then per-row does an Athlete find-or-create (read via injected repo outside the transaction manager, write via manager), then saves `RaceResult` and batches `ObstacleSplit[]` in a single `manager.save` call. Controller updated with `@Post('csv')`, `@HttpCode(HttpStatus.CREATED)`, and `@UseInterceptors(FileInterceptor(...))` — all HTTP concerns stay in the controller, all logic in the service. `IngestionModule` gains `TypeOrmModule.forFeature([Race, Athlete, RaceResult, ObstacleSplit])` and `IngestionService` in providers. No `try/catch` added (error handling is step 20). Build and lint pass with 0 errors.
 
 ---
+
+## RetrieveService — Embed Query and Fetch Top-K Chunks (Step 32)
+
+**Branch:** retrieve-service
+**Completed:** 2026-06-14
+
+### Goals
+
+- Shared `RaceResultPayload` interface in `vector-store.service.ts`, reused on both the upsert (`EmbedService.batchEmbedRace`) and retrieve sides to prevent payload key drift
+- `RetrieveService.retrieve(query: string, topK?: number): Promise<RetrievedChunk[]>` — embeds the query once via `EmbedService.embed`, fetches top-k via `VectorStoreService.query`
+- Each `QdrantResult` mapped to a typed `RetrievedChunk` (`{ id; score; metadata: RaceResultPayload }`) — `Record<string, unknown>` → typed conversion once, at the service boundary
+- Named `DEFAULT_TOP_K = 5` constant
+- `RetrieveModule` imports `EmbedModule` + `VectorStoreModule`, provides/exports `RetrieveService`, not registered in `app.module.ts` (deferred to step 36)
+- `retrieve.service.spec.ts` covers happy path, metadata mapping, default topK, explicit topK, empty results, embed-error and query-error propagation
+- Lint, test (119/119), and build all pass
+
+### Summary
+
+Created `apps/backend/src/retrieve/` (service + module + spec). `RetrieveService.retrieve` calls `EmbedService.embed(query)` once, passes the vector to `VectorStoreService.query(vector, topK)`, and maps each hit to a `RetrievedChunk`. Extracted a shared `RaceResultPayload` interface into `vector-store.service.ts` (alongside `QdrantPoint`/`QdrantResult`) and typed `EmbedService.batchEmbedRace`'s payload with it — one source of truth for the payload contract across upsert and retrieve. Two intentional boundary casts handle the TS interface-vs-index-signature quirk: `RaceResultPayload` → `Record<string, unknown>` at upsert, and back at retrieve. Resolved a pre-existing red lint gate: `embed.service.spec.ts` (and the new retrieve spec) were failing `@typescript-eslint/unbound-method` on the jest mock idiom — rewrote both to a standalone-const mock harness (assert against captured `jest.fn()`s, not `obj.method`) rather than disabling the rule. 6 retrieve tests including embed-error and query-error propagation (the latter added during review). **Known gap for step 33:** the Qdrant payload stores only IDs/names/date, not the serialized chunk text — the prompt builder will need to re-serialize from Postgres via `raceResultId` or add a `text` field at upsert time. 119/119 tests pass, build and lint clean.
+
+---
