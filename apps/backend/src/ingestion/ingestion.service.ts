@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import {
   Injectable,
   InternalServerErrorException,
@@ -6,12 +7,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { ParsedRaceResult, RaceMetadata } from '@ocr/types';
+import type { Queue } from 'bullmq';
 import { DataSource, Repository } from 'typeorm';
 import { Athlete } from '../entities/athlete.entity';
 import { ObstacleSplit } from '../entities/obstacle-split.entity';
 import { Race } from '../entities/race.entity';
 import { RaceResult } from '../entities/race-result.entity';
-import { EmbedService } from '../embed/embed.service';
+import type { EmbedJobData } from '../queue/embed-job.types';
+import { EMBED_JOB, EMBED_QUEUE } from '../queue/queue.constants';
 import { CsvMetadataParserService } from './csv-metadata-parser.service';
 import { CsvRowsParserService } from './csv-rows-parser.service';
 
@@ -26,7 +29,8 @@ export class IngestionService {
     @InjectRepository(Athlete)
     private readonly athleteRepo: Repository<Athlete>,
     private readonly dataSource: DataSource,
-    private readonly embedService: EmbedService,
+    @InjectQueue(EMBED_QUEUE)
+    private readonly embedQueue: Queue<EmbedJobData>,
   ) {}
 
   async ingestCsv(
@@ -113,7 +117,7 @@ export class IngestionService {
       throw new InternalServerErrorException('Failed to save race data');
     }
 
-    await this.embedService.batchEmbedRace(raceId);
+    await this.embedQueue.add(EMBED_JOB, { raceId });
 
     return { raceId, rowsIngested: rows.length };
   }

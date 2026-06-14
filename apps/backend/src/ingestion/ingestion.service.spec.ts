@@ -2,10 +2,12 @@ import {
   InternalServerErrorException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import type { Queue } from 'bullmq';
 import type { DataSource, Repository } from 'typeorm';
 import type { Athlete } from '../entities/athlete.entity';
 import type { Race } from '../entities/race.entity';
-import type { EmbedService } from '../embed/embed.service';
+import type { EmbedJobData } from '../queue/embed-job.types';
+import { EMBED_JOB } from '../queue/queue.constants';
 import type { CsvMetadataParserService } from './csv-metadata-parser.service';
 import type { CsvRowsParserService } from './csv-rows-parser.service';
 import { IngestionService } from './ingestion.service';
@@ -28,9 +30,11 @@ const mockDataSource = {
   transaction: jest.fn(),
 } as unknown as DataSource;
 
-const mockEmbedService = {
-  batchEmbedRace: jest.fn().mockResolvedValue(undefined),
-} as unknown as EmbedService;
+const embedQueueAdd = jest.fn().mockResolvedValue(undefined);
+
+const mockEmbedQueue = {
+  add: embedQueueAdd,
+} as unknown as Queue<EmbedJobData>;
 
 describe('IngestionService', () => {
   let service: IngestionService;
@@ -43,7 +47,7 @@ describe('IngestionService', () => {
       mockRaceRepo,
       mockAthleteRepo,
       mockDataSource,
-      mockEmbedService,
+      mockEmbedQueue,
     );
   });
 
@@ -116,6 +120,22 @@ describe('IngestionService', () => {
       const result = await service.ingestCsv(buffer);
 
       expect(result).toEqual({ raceId: 'race-uuid-123', rowsIngested: 2 });
+      expect(embedQueueAdd).toHaveBeenCalledWith(EMBED_JOB, {
+        raceId: 'race-uuid-123',
+      });
+    });
+
+    it('does not enqueue an embed job when the transaction fails', async () => {
+      (mockMetadataParser.parseMetadata as jest.Mock).mockReturnValue({});
+      (mockRowsParser.parseRows as jest.Mock).mockReturnValue([]);
+      (mockDataSource.transaction as jest.Mock).mockRejectedValue(
+        new Error('DB connection lost'),
+      );
+
+      await expect(service.ingestCsv(buffer)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      expect(embedQueueAdd).not.toHaveBeenCalled();
     });
   });
 });
