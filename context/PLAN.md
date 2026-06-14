@@ -48,7 +48,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 28. ✅ Build `VectorStoreService` — query Qdrant for top-k similar vectors
 29. ✅ Build text serializer — converts `RaceResult` row to natural language chunk
 30. ✅ Build `EmbedService` — calls OpenAI embeddings API for a single chunk
-31. Build `EmbedService` — batch embed all results for a race after ingestion
+31. ✅ Build `EmbedService` — batch embed all results for a race after ingestion
 32. Build `RetrieveService` — embeds user query and fetches top-k chunks with metadata
 33. Build prompt builder — assembles system prompt with retrieved context chunks
 34. Build `GenerateService` — calls LLM API and streams response tokens

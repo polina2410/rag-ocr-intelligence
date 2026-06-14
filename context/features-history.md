@@ -322,6 +322,27 @@ Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /
 
 ---
 
+## EmbedService — Batch Embed a Race and Upsert Vectors to Qdrant
+
+**Branch:** batch-embed
+**Completed:** 2026-06-14
+
+### Goals
+
+- `EmbedService.batchEmbedRace(raceId: string): Promise<void>` — loads all `RaceResult` rows with `race`, `athlete`, `splits` relations; serializes; embeds; upserts
+- Empty result set → early return, no `upsert` call
+- `QdrantPoint` payload: `{ raceResultId, raceId, athleteId, athleteName, raceName, raceDate }`
+- `EmbedService` constructor gained 3 new deps: `@InjectRepository(RaceResult)`, `RaceResultSerializerService`, `VectorStoreService`
+- `EmbedModule` updated: imports `TypeOrmModule.forFeature([RaceResult])` + `VectorStoreModule`; provides `RaceResultSerializerService`
+- `IngestionService` calls `await this.embedService.batchEmbedRace(raceId)` after the transaction
+- 112/112 tests pass
+
+### Summary
+
+Extended `EmbedService` with `batchEmbedRace`: loads all `RaceResult` rows for a `raceId` with full relations, serializes each via `RaceResultSerializerService`, embeds via `embed()`, builds `QdrantPoint[]` with attribution payload, upserts once via `VectorStoreService`. `EmbedModule` now imports `VectorStoreModule` and `TypeOrmModule.forFeature([RaceResult])`; `RaceResultSerializerService` registered directly as a provider (no separate module). `IngestionModule` imports `EmbedModule`; `IngestionService` gets `EmbedService` injected and calls `batchEmbedRace` synchronously after the transaction (a one-liner, trivially replaced by a Bull job in step 38–39). Updated `embed.service.spec.ts` constructor call sites; added 3 new `batchEmbedRace` tests. Updated `ingestion.service.spec.ts` to mock `EmbedService`. 112/112 tests pass, build clean.
+
+---
+
 ## EmbedService — Embed a Single Text Chunk via OpenAI
 
 **Branch:** embed-service
