@@ -570,3 +570,24 @@ Created `apps/backend/src/retrieve/` (service + module + spec). `RetrieveService
 Resolved the step-32 known gap by storing the serialized chunk text in the Qdrant payload (chosen over re-serializing from Postgres): added `text: string` to `RaceResultPayload` and populated it in `EmbedService.batchEmbedRace` from the already-computed `chunk` variable (no recomputation). Created `apps/backend/src/prompt/` (service + module + constants + spec). `PromptBuilderService.buildMessages` is a pure function of `(query, chunks)` — it filters chunks to those with usable `text`, numbers them under `SYSTEM_INSTRUCTION` into a context block, and returns `[system, user]` as `ChatCompletionMessageParam[]` (the OpenAI SDK type, accessed via the `OpenAI.Chat.Completions` namespace off the default import to avoid subpath-resolution risk). When no usable context remains it returns `NO_CONTEXT_INSTRUCTION` instead, instructing the model not to hallucinate. Return type is `ChatCompletionMessageParam[]` so step-34 GenerateService can pass it straight to `client.chat.completions.create({ messages })` with no adapter layer. Token-budget truncation of the context is noted as a future concern in a code comment, not implemented. **Migration note:** races ingested before this change lack `text` in their payload (`metadata.text` is `undefined` at runtime until re-ingested); the builder skips such chunks, covered by tests. 6 new prompt-builder tests; 125/125 tests pass, build and lint clean.
 
 ---
+
+## GenerateService — Streaming LLM + Shared OpenAiModule (Step 34)
+
+**Branch:** generate-service
+**Completed:** 2026-06-14
+
+### Goals
+
+- Extract a shared `OpenAiModule` (`openai/openai.module.ts` + `openai/openai.constants.ts`) that provides + exports the `OPENAI_CLIENT` token; both `EmbedModule` and `GenerateModule` import it (single client instance)
+- Move `OPENAI_CLIENT` out of `embed.constants.ts` (keep `EMBEDDING_MODEL`); repoint `embed.service.ts`; refactor `EmbedModule` to import `OpenAiModule` and drop its inline provider — `EmbedService` behavior unchanged
+- `CHAT_MODEL = 'gpt-4o-mini'` named constant
+- `GenerateService.generate(messages): AsyncGenerator<string>` — streaming `chat.completions.create({ model, messages, stream: true })`, yields each non-empty `delta.content`, errors propagate unwrapped
+- `GenerateModule` imports `OpenAiModule`, provides + exports `GenerateService`
+- Spec: create-args, ordered deltas, null/undefined/empty skip, empty stream, open-error and mid-stream-throw propagation
+- Lint, test (131/131), and build all pass
+
+### Summary
+
+Extracted a shared `OpenAiModule` owning the `OPENAI_CLIENT` token + its `useFactory` (moved verbatim from `EmbedModule`), so one OpenAI client instance now serves embed + generate. `EmbedModule` imports it and dropped its inline provider; `OPENAI_CLIENT` moved to `openai/openai.constants.ts` (only `EMBEDDING_MODEL` stays in embed, `CHAT_MODEL` lives with generate — model names stay next to their consumer). The refactor is DI-wiring only; `embed.service.spec.ts` constructs the service with a mock client and was unaffected. Created `apps/backend/src/generate/` — `GenerateService.generate` is an `async *` generator that opens a streaming chat completion and yields each non-empty `chunk.choices[0]?.delta?.content`, guarding null/undefined/empty; errors propagate unwrapped. `ChatCompletionMessageParam` accessed via the `OpenAI` namespace (matching the prompt builder). Two review-driven type-safety improvements applied: `CHAT_MODEL` typed with `satisfies OpenAI.ChatModel` (typo/autocomplete guard — `'gpt-4o-mini'` confirmed in the SDK union), and the test's fake stream typed as `ChatCompletionChunk` (full shape, not naive `Partial`) so mock drift is caught at compile time. 6 new generate tests including open-error and mid-stream-throw propagation. **Caveat:** Context7 was unauthenticated this session, so the streaming pattern came from the stable v6 SDK, not freshly fetched docs. `GenerateModule` is exported for step 35 to import; not yet registered in `app.module.ts` (deferred until a consumer exists). 131/131 tests pass, build and lint clean.
+
+---
