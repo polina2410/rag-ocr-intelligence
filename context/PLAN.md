@@ -55,7 +55,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 35. ✅ Build SSE stream handler in NestJS — pipes LLM stream to HTTP response
 36. ✅ Build `POST /ask` endpoint — wires retrieve, prompt builder, and SSE stream
 37. ✅ Set up Bull queue module with Redis connection (BullMQ)
-38. Build Bull job processor — runs embedding pipeline for a race in the background
+38. ✅ Build Bull job processor — runs embedding pipeline for a race in the background
 39. Wire CSV ingestion endpoint to trigger Bull job after successful DB save
 
 ---
