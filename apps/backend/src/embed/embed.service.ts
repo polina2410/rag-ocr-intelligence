@@ -4,12 +4,13 @@ import type OpenAI from 'openai';
 import { Repository } from 'typeorm';
 import { RaceResult } from '../entities/race-result.entity.js';
 import { RaceResultSerializerService } from '../serializer/race-result-serializer.service.js';
+import { OPENAI_CLIENT } from '../openai/openai.constants.js';
 import {
   QdrantPoint,
   RaceResultPayload,
   VectorStoreService,
 } from '../vector-store/vector-store.service.js';
-import { EMBEDDING_MODEL, OPENAI_CLIENT } from './embed.constants.js';
+import { EMBEDDING_MODEL } from './embed.constants.js';
 
 @Injectable()
 export class EmbedService {
