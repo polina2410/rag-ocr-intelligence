@@ -322,6 +322,28 @@ Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /
 
 ---
 
+## Text Serializer — RaceResult to Natural Language Chunk
+
+**Branch:** text-serializer
+**Completed:** 2026-06-14
+
+### Goals
+
+- `RaceResultSerializerService` with `serialize(result: RaceResult): string` — pure, synchronous, `@Injectable()`
+- Output includes athlete full name, nationality, category, race name, date, location, distance (km), race type
+- `FINISHED`: finish time as `H:MM:SS` / `MM:SS`; non-null positions only (null omitted entirely)
+- `DNF` / `DNS` / `DSQ`: status stated in words; no finish time or position claimed
+- Splits rendered sorted by `obstacleNumber`; obstacle name + split time (when non-null) + penalty count (when > 0)
+- Splits with `splitTimeSeconds === null` still appear by name — not silently dropped
+- Empty `splits` array returns valid string with no crash
+- 106/106 tests pass
+
+### Summary
+
+Created `apps/backend/src/serializer/race-result-serializer.service.ts` with `RaceResultSerializerService.serialize()`. The method builds three prose clauses — athlete (name, nationality, category), race (name, date, location, distance, type, obstacle count), and result (status-branched: finish time + non-null positions for FINISHED; status in words for DNF/DNS/DSQ) — then appends an obstacle-splits sentence from a sorted copy of `splits`. Private `formatDuration` helper produces `H:MM:SS` when ≥ 1 hour, `MM:SS` otherwise. `SECONDS_PER_HOUR` and `SECONDS_PER_MINUTE` named constants; `distanceKm` coerced with `Number()`. No module wiring (deferred to step 30). Co-located spec covers 14 test cases across all branches and edge cases. 106/106 tests pass, lint clean.
+
+---
+
 ## VectorStoreService Query
 
 **Branch:** vector-store-query
