@@ -322,6 +322,26 @@ Added `GET /athletes/:id` returning `AthleteDetailDto` — the inverse of `GET /
 
 ---
 
+## EmbedService — Embed a Single Text Chunk via OpenAI
+
+**Branch:** embed-service
+**Completed:** 2026-06-14
+
+### Goals
+
+- `OPENAI_CLIENT` injection token and `EMBEDDING_MODEL = 'text-embedding-3-small'` in `embed.constants.ts`
+- `EmbedService.embed(text: string): Promise<number[]>` — calls `client.embeddings.create`, returns `response.data[0].embedding`
+- Errors propagate — no try/catch
+- `EmbedModule` registers `OPENAI_CLIENT` via `ConfigService.getOrThrow('OPENAI_API_KEY')`; exports `EmbedService` only
+- `EmbedModule` wired into `AppModule`
+- Co-located spec: happy path + error propagation; 109/109 tests pass
+
+### Summary
+
+Created `apps/backend/src/embed/` with four files following the `VectorStoreModule` DI pattern. `OPENAI_CLIENT` is a custom injection token; the factory reads `OPENAI_API_KEY` via `ConfigService.getOrThrow` and instantiates `new OpenAI(...)` — the service never touches the constructor. `embed()` is a one-liner: call `embeddings.create`, return `response.data[0].embedding`. `EmbedModule` exports only `EmbedService` (not the raw client token). Registered in `AppModule`. 109/109 tests pass, build clean.
+
+---
+
 ## Text Serializer — RaceResult to Natural Language Chunk
 
 **Branch:** text-serializer
