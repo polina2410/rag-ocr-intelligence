@@ -1,6 +1,19 @@
 :root {
   --color-accent: #6366f1;
   --color-border: #e5e7eb;
+  --color-surface: #fff;
+  --color-text: #374151;
+  --color-text-muted: #6b7280;
+  --color-danger: #ef4444;
+  --color-skeleton-highlight: #f3f4f6;
+  --color-badge-sprint-bg: #e0e7ff;
+  --color-badge-sprint-text: #3730a3;
+  --color-badge-super-bg: #ede9fe;
+  --color-badge-super-text: #5b21b6;
+  --color-badge-deka-bg: #e0f2fe;
+  --color-badge-deka-text: #0369a1;
+  --color-badge-open-bg: #d1fae5;
+  --color-badge-open-text: #065f46;
 }
 
 *, *::before, *::after {
