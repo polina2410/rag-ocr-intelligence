@@ -825,6 +825,25 @@ Created `Badge` as a purely presentational `<span>` component. Color variants ar
 
 ---
 
+## SkeletonCard Component (Step 48)
+
+**Branch:** skeleton-card
+**Completed:** 2026-06-15
+
+### Goals
+
+- `SkeletonCard.tsx` — named `const` arrow component, named export, zero props
+- `SkeletonCard.module.css` — `.card` shell, `.shimmer` with local `@keyframes`, `.title`/`.badge`/`.line` dimension classes
+- Four shimmer blocks: title 60%×20px, badge 30%×16px, two lines 80%×14px; badge→line gap wider than line→line gap
+- Shimmer gradient: `#e5e7eb → #f3f4f6 → #e5e7eb`, `background-position` animated left-to-right, infinite
+- No hardcoded card width; no existing files modified; lint + build pass
+
+### Summary
+
+Created `SkeletonCard` as a zero-prop animated placeholder approximating `RaceCard`'s visual footprint. The `.shimmer` class carries the gradient (`#e5e7eb`/`#f3f4f6`) and `@keyframes shimmer` animation; four separate dimension classes (`.title`, `.badge`, `.line`) carry width/height and are composed with `.shimmer` via template literals. A `.divider` spacer creates the larger gap between the badge and detail lines. Card border uses `var(--color-border)`; shimmer fills are hardcoded greys (not tokens). No card width is hardcoded — the step-53 grid controls it. Also fixed a pre-existing `verbatimModuleSyntax` violation in `PageWrapper.tsx` (`ReactNode` → `type ReactNode`) discovered during the build check.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue
