@@ -844,6 +844,25 @@ Created `SkeletonCard` as a zero-prop animated placeholder approximating `RaceCa
 
 ---
 
+## SkeletonTable Component (Step 49)
+
+**Branch:** skeleton-table
+**Completed:** 2026-06-15
+
+### Goals
+
+- `SkeletonTable.tsx` — named export, one optional prop `rows?: number` (default `DEFAULT_ROWS = 5`)
+- `SkeletonTable.module.css` — local shimmer + keyframes, `.table`, `.cell`, `.headerShimmer`/`.bodyShimmer`, five column-width classes
+- Renders real `<table>` → `<thead>` (6 shimmer `<th>`s, 12px) → `<tbody>` (`rows` rows of 6 shimmer `<td>`s, 14px)
+- Column order: position 24px, name 140px, category 64px, finish-time 72px, overall place 32px, category place 32px
+- Row separators via `var(--color-border)`; no outer table border; no existing files modified
+
+### Summary
+
+Created `SkeletonTable` as a `<table>`-based loading placeholder for `AthleteLeaderboard`. A `COLUMNS` array of CSS Module class references drives both `<thead>` and `<tbody>` cell rendering — a single source of truth for column order and widths. Header shimmer blocks are 12px tall; body shimmer blocks are 14px. The shared `.colPlace` class covers both place columns (same 32px). Shimmer keyframes defined locally in `SkeletonTable.module.css` — not imported from `SkeletonCard`. Index-based keys used (static list). Lint passes with no changes to existing files.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue

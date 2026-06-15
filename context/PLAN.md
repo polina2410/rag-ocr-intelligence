@@ -71,7 +71,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 46. ✅ Build `PageWrapper` component — max-width, consistent padding
 47. ✅ Build `Badge` component — category label with color variants
 48. ✅ Build `SkeletonCard` component
-49. Build `SkeletonTable` component
+49. ✅ Build `SkeletonTable` component
 50. Build `SkeletonChart` component
 51. Build `RaceCard` component — name, date, location, distance, obstacle count
 52. Build `RaceCardStats` component — lazy-loaded on hover, finisher count, avg time, DNF rate
