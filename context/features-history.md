@@ -674,6 +674,25 @@ Consumer half of the background embedding pipeline (producer is step 39). `Embed
 
 ---
 
+## Per-Route Suspense Boundaries with Fallbacks (Step 41)
+
+**Branch:** per-route-suspense-boundaries
+**Completed:** 2026-06-15
+
+### Goals
+
+- Each lazy route (`/races`, `/races/:id`, `/ask`) wrapped in its own `<Suspense fallback={<RouteFallback />}>`
+- Root `<Suspense fallback={null}>` removed from `App.tsx`
+- `RouteFallback` component with CSS spinner (CSS Module, named export)
+- `--color-accent` and `--color-border` CSS custom properties defined in `index.css` `:root`
+- Build and lint pass
+
+### Summary
+
+Replaced the temporary root `<Suspense fallback={null}>` from step 40 with per-route boundaries in `router.tsx`, each wrapping its lazy element. Created `RouteFallback` as a named-export arrow component in `components/RouteFallback.tsx` with a `@keyframes spin` CSS Module spinner. Extracted the two hardcoded hex colors into `--color-accent` (`#6366f1`) and `--color-border` (`#e5e7eb`) on `:root` in `index.css`; the module references them via `var()`. The redirect route (`/`) is synchronous (`<Navigate>`) and intentionally left without a Suspense wrapper.
+
+---
+
 ## React Router with Lazy Routes (Step 40)
 
 **Branch:** react-router-lazy-routes

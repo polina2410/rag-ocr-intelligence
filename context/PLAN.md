@@ -63,7 +63,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 ## Phase 4 — Frontend UI
 
 40. ✅ Set up React Router with lazy routes for `/races`, `/races/:id`, `/ask`
-41. Set up Suspense boundaries with fallbacks per route
+41. ✅ Set up Suspense boundaries with fallbacks per route
 42. Set up TanStack Query client with global config and devtools
 43. Build `ErrorBoundary` component
 44. Build `RootLayout` — navbar, cursor provider wrapper, page slot
