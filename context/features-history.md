@@ -674,6 +674,25 @@ Consumer half of the background embedding pipeline (producer is step 39). `Embed
 
 ---
 
+## RootLayout (Step 44)
+
+**Branch:** root-layout
+**Completed:** 2026-06-15
+
+### Goals
+
+- `RootLayout` component: placeholder `<header>` → `ErrorBoundary` → `<Suspense fallback={<RouteFallback />}>` → `<Outlet />`
+- `RootLayout.module.css` — flex column shell, header with `var(--color-border)` bottom border
+- `router.tsx` rewired — parent route `{ element: <RootLayout /> }` with three page routes as children; `/` redirect stays top-level
+- Per-route `<Suspense>` wrappers removed from `router.tsx`
+- All four URLs still resolve correctly; build and lint pass
+
+### Summary
+
+Created `RootLayout` as a named `const` arrow component. Renders a placeholder `<header>` (text "ocr-intelligence" — replaced by Navbar in step 45), then wraps `<Outlet />` in `ErrorBoundary` → `Suspense`. Rewired `router.tsx` from a flat array to a layout-parent + children structure; the `/` redirect remains a top-level sibling to avoid rendering chrome around it. Centralising `Suspense` in `RootLayout` means the header stays visible while lazy pages load. `CursorProvider` omitted entirely — added in step 66.
+
+---
+
 ## ErrorBoundary Component (Step 43)
 
 **Branch:** error-boundary
