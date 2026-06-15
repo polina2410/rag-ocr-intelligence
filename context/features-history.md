@@ -921,6 +921,28 @@ Introduced the frontend `api/` layer: a module-scoped Axios instance (`http.ts`)
 
 ---
 
+## /races Page (Step 53)
+
+**Branch:** races-page
+**Completed:** 2026-06-15
+
+### Goals
+
+- Add `getRaces(page?, limit?)` to `src/api/races.ts` returning `Promise<PaginatedResponse<RaceDto>>`
+- Replace `RacesPage` stub with a `useQuery`-driven component
+- Loading state: grid of 6 `<SkeletonCard />` instances (`SKELETON_COUNT = 6`)
+- Error state: `<p>Failed to load races.</p>`
+- Empty state: `<p>No races found.</p>`
+- Success state: grid of `<RaceCard race={race} />` keyed by `race.id`
+- All states wrapped in `<PageWrapper>` with a persistent `<h1>Races</h1>` heading
+- Co-located `RacesPage.module.css` with `.grid` using `repeat(auto-fill, minmax(280px, 1fr))` and `gap: 24px`
+
+### Summary
+
+Added `getRaces(page = 1, limit = 20)` to `src/api/races.ts` calling `http.get('/races', { params: { page, limit } })` and returning `PaginatedResponse<RaceDto>`. Replaced the placeholder `RacesPage` stub with a `useQuery`-driven component: `isPending` renders a grid of 6 `SkeletonCard` instances, `isError` renders `<p>Failed to load races.</p>`, empty `data.data` renders `<p>No races found.</p>`, and success renders one `<RaceCard />` per item keyed by `race.id`. Skeleton and success grids share the same `.grid` CSS Module class to prevent layout shift. `SKELETON_COUNT = 6` named constant eliminates the magic number. Lint and build pass with 0 errors.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue

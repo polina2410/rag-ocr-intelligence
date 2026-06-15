@@ -5,7 +5,7 @@ Not Started
 
 ## Goals
 
-<!-- Add goals here -->
+<!-- List goals here -->
 
 ## Notes
 
