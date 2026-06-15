@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RaceResult } from '../entities/race-result.entity.js';
 import type { ObstacleSplit } from '../entities/obstacle-split.entity.js';
-
-const SECONDS_PER_HOUR = 3600;
-const SECONDS_PER_MINUTE = 60;
+import { SECONDS_PER_HOUR, SECONDS_PER_MINUTE } from '../common/constants.js';
 
 const STATUS_LABELS: Record<RaceResult['status'], string> = {
   FINISHED: 'finished',

@@ -4,9 +4,7 @@ import type {
   ParsedRaceResult,
   RaceMetadata,
 } from '@ocr/types';
-
-const SECONDS_PER_HOUR = 3600;
-const SECONDS_PER_MINUTE = 60;
+import { SECONDS_PER_HOUR, SECONDS_PER_MINUTE } from '../common/constants.js';
 
 type Status = ParsedRaceResult['status'];
 
