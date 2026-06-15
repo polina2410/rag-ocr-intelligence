@@ -807,6 +807,24 @@ Created `PageWrapper` as a minimal layout wrapper: a `<div className={styles.wra
 
 ---
 
+## Badge Component (Step 47)
+
+**Branch:** badge
+**Completed:** 2026-06-15
+
+### Goals
+
+- `Badge.tsx` — named exports `const Badge` and `interface BadgeProps { label: string; variant: string }`
+- `Badge.module.css` — pill-shaped `.badge` base (neutral grey) + `[data-variant]` attribute-selector overrides for `Sprint`, `Super`, `DEKA`, `Open`
+- Unknown/free-form variant values fall through to neutral base style automatically
+- No existing files modified; no new global tokens
+
+### Summary
+
+Created `Badge` as a purely presentational `<span>` component. Color variants are resolved via `data-variant` attribute selectors in the CSS Module rather than one class per variant — this ensures free-form `AthleteDto.category` strings (e.g. "Elite", "Masters") degrade gracefully to the neutral style with zero extra code. Four named variants use accent-family colours with WCAG AA contrast pairs: Sprint → indigo, Super → violet, DEKA → sky, Open → emerald. `variant` prop is typed `string` (not a union) to accommodate open-ended category values. No existing files touched.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue
