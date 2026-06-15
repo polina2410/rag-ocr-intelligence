@@ -674,6 +674,25 @@ Consumer half of the background embedding pipeline (producer is step 39). `Embed
 
 ---
 
+## React Router with Lazy Routes (Step 40)
+
+**Branch:** react-router-lazy-routes
+**Completed:** 2026-06-15
+
+### Goals
+
+- `pages/RacesPage.tsx`, `pages/RaceDetailPage.tsx`, `pages/AskPage.tsx` as default-export arrow components
+- `RaceDetailPage` reads `:id` via `useParams` and displays it
+- `router.tsx` defines 3 lazy routes with `createBrowserRouter`: `/` → redirect to `/races`, `/races`, `/races/:id`, `/ask`
+- `App.tsx` renders `<Suspense fallback={null}><RouterProvider /></Suspense>` (fallback replaced in step 41)
+- `pnpm --filter frontend build` and lint pass
+
+### Summary
+
+Wired React Router v7 into the frontend using `createBrowserRouter` + `RouterProvider`. Created three minimal placeholder pages as default-export arrow components. Each route lazy-loads its page via `React.lazy()`, with a temporary `<Suspense fallback={null}>` wrapping `<RouterProvider>` in `App.tsx` — step 41 will replace it with per-route fallbacks. Added a root `/` → `/races` redirect so navigating to the dev server root doesn't 404. ESLint's `react-refresh/only-export-components` suppressed at the top of `router.tsx` (legitimate — a router config file mixes lazy component variables with the non-component `router` export). Build produces three separate page chunks, confirming code splitting works.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue
