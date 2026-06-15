@@ -921,6 +921,24 @@ Introduced the frontend `api/` layer: a module-scoped Axios instance (`http.ts`)
 
 ---
 
+## PenaltyRateChart Component (Step 56)
+
+**Branch:** penalty-rate-chart
+**Completed:** 2026-06-15
+
+### Goals
+
+- `PenaltyRateChart.tsx` — named exports `const PenaltyRateChart` and `interface PenaltyRateChartProps { results: RaceResultDto[] }`
+- `computePenaltyRates()` — FINISHED results only; per obstacle: penalised ÷ total × 100; sorted by `obstacleNumber` ASC; zero-penalty obstacles included at `0%`
+- Empty state: `<p>No penalty data available.</p>`
+- Recharts horizontal `BarChart` (`layout="vertical"`), X-axis `domain={[0, 100]}`, ticks and tooltip as `"${value}%"`; red bars (`#ef4444` = `--color-danger`)
+
+### Summary
+
+Created `PenaltyRateChart` mirroring `ObstacleSplitChart`'s structure exactly. `computePenaltyRates` counts per obstacle how many FINISHED results had `penaltyCount > 0` vs total, returning raw `penaltyRate` (0–100) for Recharts axis scaling. `formatPercent` rounds to one decimal for display. Chart uses `domain={[0, 100]}` on X-axis so full range is always visible. Bar fill is `#ef4444` (`--color-danger`) — red to visually distinguish from the indigo time chart. Same dynamic height formula (`data.length * BAR_HEIGHT + 40`). Also in this branch: extracted all hardcoded CSS colors into tokens in `index.css` (9 new custom properties) and added the CSS token rule to `developer.md` and `start.md`. Lint and build pass with 0 errors.
+
+---
+
 ## ObstacleSplitChart Component (Step 55)
 
 **Branch:** obstacle-split-chart

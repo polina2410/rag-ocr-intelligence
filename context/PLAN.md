@@ -78,12 +78,11 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 53. ✅ Build `/races` page — grid of `RaceCard` components with `SkeletonCard` fallback
 54. ✅ Build `RaceHeader` component — race name, date, location, distance
 55. ✅ Build `ObstacleSplitChart` — Recharts bar chart, average time per obstacle
-56. Build `PenaltyRateChart` — Recharts bar chart, fail percentage per obstacle
+56. ✅ Build `PenaltyRateChart` — Recharts bar chart, fail percentage per obstacle
 57. Build `CategoryFilter` — dropdown to filter leaderboard by category
 58. Build `AthleteLeaderboard` — sortable table with overall and category place
 59. Build `/races/:id` dashboard page — composes all dashboard components
 60. Build `useSSE` hook — connects to SSE endpoint, streams tokens into state
-61. 
 61. Build `ChatInput` component — text input and submit button
 62. Build `ChatMessage` component — message bubble, renders streaming tokens
 63. Build `SourceCitations` component — expandable panel with retrieved chunks
