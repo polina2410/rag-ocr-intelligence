@@ -14,6 +14,7 @@
   --color-badge-deka-text: #0369a1;
   --color-badge-open-bg: #d1fae5;
   --color-badge-open-text: #065f46;
+  --font-size-sm: 0.875rem;
 }
 
 *, *::before, *::after {
