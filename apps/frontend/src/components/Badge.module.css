@@ -6,26 +6,26 @@
   padding: 4px 10px;
   border-radius: 9999px;
   white-space: nowrap;
-  background-color: #e5e7eb;
-  color: #374151;
+  background-color: var(--color-border);
+  color: var(--color-text);
 }
 
 .badge[data-variant="Sprint"] {
-  background-color: #e0e7ff;
-  color: #3730a3;
+  background-color: var(--color-badge-sprint-bg);
+  color: var(--color-badge-sprint-text);
 }
 
 .badge[data-variant="Super"] {
-  background-color: #ede9fe;
-  color: #5b21b6;
+  background-color: var(--color-badge-super-bg);
+  color: var(--color-badge-super-text);
 }
 
 .badge[data-variant="DEKA"] {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  background-color: var(--color-badge-deka-bg);
+  color: var(--color-badge-deka-text);
 }
 
 .badge[data-variant="Open"] {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: var(--color-badge-open-bg);
+  color: var(--color-badge-open-text);
 }

@@ -6,6 +6,14 @@
 4. Create and checkout the feature branch (derive name from H1 heading)
 5. List the goals, then implement them one by one
 
+## CSS Token Rule (apply while implementing)
+
+Before writing any color or font-size value in a `.module.css` file:
+1. Check `apps/frontend/src/index.css` for an existing token
+2. If one fits → use `var(--token-name)`
+3. If none exists → define the token in `index.css` first, then use `var()`
+Never hardcode color or font-size literals in component stylesheets.
+
 ## Quality Gate (run after all goals implemented)
 
 6. Run `pnpm lint` — fix any errors before continuing

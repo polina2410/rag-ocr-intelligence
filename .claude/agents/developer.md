@@ -21,6 +21,7 @@ You are a Senior React/Nest.js/TypeScript developer for the ocr-intelligence pro
 - **TypeScript** — no `any`, use `unknown` or proper generics
 - **Named exports** — never default exports
 - **CSS Modules** — styles in `.module.css` files, never inline styles or global class strings
+- **CSS tokens** — before writing any color or font-size value, check `apps/frontend/src/index.css` for an existing token. If one fits, use `var(--token-name)`. If none exists, define the token in `index.css` first, then reference it via `var()`
 - **Components** — `const` arrow functions, one component per file
 - **Structure** — features in `components/features/`, primitives in `components/UI/`, logic in `lib/` or `hooks/`
 - **No prop drilling** beyond 2 levels — use context or lift state
