@@ -882,6 +882,26 @@ Created `SkeletonChart` as a pure CSS/flexbox bar-chart loading placeholder for 
 
 ---
 
+## RaceCard Component (Step 51)
+
+**Branch:** race-card
+**Completed:** 2026-06-15
+
+### Goals
+
+- `RaceCard.tsx` — named exports `const RaceCard` and `interface RaceCardProps { race: RaceDto }`
+- `RaceCard.module.css` — card shell, name heading, detail list, `:hover` accent border + shadow
+- Outermost element: `<Link to={`/races/${race.id}`}>` — whole card clickable, no underline
+- Content: name → `<Badge raceType>` → detail row (formatted date · location · "X km" · "X obstacles")
+- Date via module-level `Intl.DateTimeFormat`; no external library
+- No data fetching; no existing files modified; lint + build pass
+
+### Summary
+
+Created `RaceCard` as a clickable `<Link>` wrapping a flex-column card shell. Detail items are an unstyled `<ul>` / `<li>` list rendered in a wrapping flex row for natural layout. Date formatted with a module-level `Intl.DateTimeFormat` instance (reused across renders). Hover state uses `color-mix(in srgb, var(--color-accent) 12%, transparent)` for a subtle accent ring alongside the border-color change — requires no hardcoded hex. `RaceDto` imported with `import { type RaceDto }` for `verbatimModuleSyntax` compliance. No existing files touched.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue
