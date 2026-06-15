@@ -863,6 +863,25 @@ Created `SkeletonTable` as a `<table>`-based loading placeholder for `AthleteLea
 
 ---
 
+## SkeletonChart Component (Step 50)
+
+**Branch:** skeleton-chart
+**Completed:** 2026-06-15
+
+### Goals
+
+- `SkeletonChart.tsx` — named export, one optional prop `bars?: number` (`DEFAULT_BARS = 8`)
+- `SkeletonChart.module.css` — local shimmer + keyframes, `.root`, `.title`, `.chartArea`, `.leftCol`/`.rightCol`, `.label`, `.bar`, `.axis`
+- Layout: title shimmer → two-column chart area (left: label shimmers, right: bar shimmers + x-axis strip)
+- Both columns use `gap: 12px` and `14px` row height for horizontal row alignment
+- No outer border/background; no fixed root height; no SVG/Recharts; no existing files modified
+
+### Summary
+
+Created `SkeletonChart` as a pure CSS/flexbox bar-chart loading placeholder for `ObstacleSplitChart` and `PenaltyRateChart` (steps 55–56). A `rows` array derived from `bars ?? DEFAULT_BARS` drives both columns. Left column uses `flex-shrink: 0` with fixed 80px label blocks; right column uses `flex: 1` so bars fill remaining width. The x-axis strip is rendered as a single element after the bar rows in `.rightCol`, outside the mapped array. Shimmer pattern identical to `SkeletonCard`/`SkeletonTable` — same gradient, timing, and radius, with local `@keyframes`. No existing files modified.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue
