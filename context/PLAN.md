@@ -76,7 +76,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 51. ✅ Build `RaceCard` component — name, date, location, distance, obstacle count
 52. ✅ Build `RaceCardStats` component — lazy-loaded on hover, finisher count, avg time, DNF rate
 53. ✅ Build `/races` page — grid of `RaceCard` components with `SkeletonCard` fallback
-54. Build `RaceHeader` component — race name, date, location, distance
+54. ✅ Build `RaceHeader` component — race name, date, location, distance
 55. Build `ObstacleSplitChart` — Recharts bar chart, average time per obstacle
 56. Build `PenaltyRateChart` — Recharts bar chart, fail percentage per obstacle
 57. Build `CategoryFilter` — dropdown to filter leaderboard by category

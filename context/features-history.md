@@ -921,6 +921,25 @@ Introduced the frontend `api/` layer: a module-scoped Axios instance (`http.ts`)
 
 ---
 
+## RaceHeader Component (Step 54)
+
+**Branch:** race-header
+**Completed:** 2026-06-15
+
+### Goals
+
+- `RaceHeader.tsx` — named exports `const RaceHeader` and `interface RaceHeaderProps { race: RaceDto }`
+- Renders race `name` as `<h1>`, `<Badge>` for `raceType`, and a detail row: formatted date · location · distance km · obstacle count
+- Module-level `Intl.DateTimeFormat` (same pattern as `RaceCard`)
+- `RaceHeader.module.css` — flex-column layout, `var(--color-accent)` heading, CSS `·` separators via `::before`
+- Pure presentational — no data fetching, no existing files modified
+
+### Summary
+
+Created `RaceHeader` as a pure presentational component. Renders a flex-column layout: `<h1>` with the race name in `var(--color-accent)`, a `<Badge>` row for `raceType`, and a `<ul>` detail list (date, location, distance km, obstacle count) with CSS `·` separators via `.detail + .detail::before`. Module-level `Intl.DateTimeFormat` matches `RaceCard` exactly. Props type is `RaceDto` — `RaceDetailDto` extends it so the step-59 page can pass either without a cast. Lint and build pass with 0 errors.
+
+---
+
 ## /races Page (Step 53)
 
 **Branch:** races-page
