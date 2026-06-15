@@ -674,6 +674,24 @@ Consumer half of the background embedding pipeline (producer is step 39). `Embed
 
 ---
 
+## TanStack Query Client with Global Config and Devtools (Step 42)
+
+**Branch:** tanstack-query-client
+**Completed:** 2026-06-15
+
+### Goals
+
+- `@tanstack/react-query-devtools` installed as devDependency (v5)
+- `src/lib/queryClient.ts` — module-scoped `QueryClient` with `STALE_TIME_MS: 60_000`, `MAX_RETRIES: 1`, `refetchOnWindowFocus: false`
+- `App.tsx` wraps `<RouterProvider>` in `<QueryClientProvider>`; devtools lazy-imported, dev-only, excluded from prod bundle
+- `apps/backend/src/common/constants.ts` created, consolidating `SECONDS_PER_MINUTE/HOUR`, `DEFAULT_PAGE/LIMIT/MAX_LIMIT`, `RACE_TYPES`, `RESULT_STATUSES` (previously duplicated across 8 files)
+
+### Summary
+
+Wired `QueryClientProvider` around `RouterProvider` in `App.tsx`. `QueryClient` lives at module scope in `src/lib/queryClient.ts` (avoids StrictMode remount discarding the cache). Devtools use `React.lazy()` + dynamic import gated by `import.meta.env.DEV` — Vite tree-shakes the chunk entirely in production builds (confirmed: no devtools chunk in `vite build` output). Also consolidated all duplicated backend constants into `apps/backend/src/common/constants.ts` — 8 consumer files updated with `.js`-extension imports (required by `"moduleResolution": "nodenext"`). The IDE repeatedly misresolved paths to `apps/constants` (a phantom location); the file was recreated at the correct path after the IDE moved and I deleted the stray copy.
+
+---
+
 ## Per-Route Suspense Boundaries with Fallbacks (Step 41)
 
 **Branch:** per-route-suspense-boundaries
