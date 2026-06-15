@@ -768,6 +768,26 @@ Wired React Router v7 into the frontend using `createBrowserRouter` + `RouterPro
 
 ---
 
+## Navbar Component (Step 45)
+
+**Branch:** navbar
+**Completed:** 2026-06-15
+
+### Goals
+
+- `Navbar.tsx` — named `const` arrow component with brand text and two `NavLink`s
+- `Navbar.module.css` — horizontal flex layout, active accent styling, responsive wrap at 480px
+- Active link uses `var(--color-accent)` text color + bottom border
+- `RootLayout.tsx` — placeholder `<header>` replaced with `<Navbar />`
+- `RootLayout.module.css` — orphaned `.header` rule removed
+- Lint passes; no `any` types
+
+### Summary
+
+Created `Navbar` component rendering "ocr-intelligence" brand span and two `NavLink`s ("Races" → `/races`, "Ask AI" → `/ask`). Active state composed via the `isActive` callback — base class always present, `.linkActive` appended when active (`var(--color-accent)` color + bottom border). Added `aria-label="Main"` on `<nav>`, `:focus-visible` accent outline on links, and vertical padding for adequate mobile tap targets. Media query at 480px wraps the brand to its own row and reduces gap. `RootLayout` updated to use `<Navbar />` in place of the placeholder header; orphaned `.header` CSS rule removed.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue

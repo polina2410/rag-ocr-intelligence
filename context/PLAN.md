@@ -67,7 +67,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 42. ✅ Set up TanStack Query client with global config and devtools
 43. ✅ Build `ErrorBoundary` component
 44. ✅ Build `RootLayout` — navbar, cursor provider wrapper, page slot
-45. Build `Navbar` component — links, active state, responsive
+45. ✅ Build `Navbar` component — links, active state, responsive
 46. Build `PageWrapper` component — max-width, consistent padding
 47. Build `Badge` component — category label with color variants
 48. Build `SkeletonCard` component
