@@ -902,6 +902,25 @@ Created `RaceCard` as a clickable `<Link>` wrapping a flex-column card shell. De
 
 ---
 
+## RaceCardStats Component (Step 52)
+
+**Branch:** race-card-stats
+**Completed:** 2026-06-15
+
+### Goals
+
+- `src/api/http.ts` — named `http` Axios instance with `baseURL` from `VITE_API_URL`
+- `src/api/races.ts` — named `getRace(id): Promise<RaceDetailDto>`
+- `apps/frontend/.env` — `VITE_API_URL=http://localhost:3000` (gitignored, not committed)
+- `RaceCardStats.tsx` — TanStack Query on mount; shimmer (pending) / null (error) / 3 stats (success)
+- `RaceCard.tsx` — hover state via `useState` + conditional `<RaceCardStats>` render
+
+### Summary
+
+Introduced the frontend `api/` layer: a module-scoped Axios instance (`http.ts`) and a typed `getRace` function (`races.ts`). `RaceCardStats` uses `useQuery` with no `enabled` flag — it fires immediately on mount, which only happens when `RaceCard` is hovered (conditional mount via `useState`). Loading state shows three shimmer blocks (local `@keyframes`). Error state returns `null`. Success renders finisher count, avg finish time (MM:SS / H:MM:SS), and DNF rate as a horizontal stat row. Three private helpers (`formatTime`, `calcAvgTime`, `calcDnfRate`) handle derivation; named constants (`SECONDS_PER_HOUR`, `SECONDS_PER_MINUTE`, `PERCENT`) replace magic numbers. `RaceCard.tsx` updated with `onMouseEnter`/`onMouseLeave` and conditional render — only change to that file. `.env` is gitignored and was not committed.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue
