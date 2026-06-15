@@ -2,8 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { AthleteResultDto } from '@ocr/types';
 import { ObstacleSplitResponseDto } from './obstacle-split-response.dto';
 import { RaceResponseDto } from './race-response.dto';
-
-const RESULT_STATUSES = ['FINISHED', 'DNF', 'DNS', 'DSQ'] as const;
+import { RESULT_STATUSES } from '../constants.js';
 
 export class AthleteResultResponseDto implements AthleteResultDto {
   @ApiProperty()

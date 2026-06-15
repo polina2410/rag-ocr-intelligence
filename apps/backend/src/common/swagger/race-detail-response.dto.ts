@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import type { RaceDetailDto } from '@ocr/types';
 import { RaceResultResponseDto } from './race-result-response.dto';
-
-const RACE_TYPES = ['Sprint', 'Super', 'DEKA', 'Open'] as const;
+import { RACE_TYPES } from '../constants.js';
 
 export class RaceDetailResponseDto implements RaceDetailDto {
   @ApiProperty()
