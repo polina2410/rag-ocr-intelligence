@@ -788,6 +788,25 @@ Created `Navbar` component rendering "ocr-intelligence" brand span and two `NavL
 
 ---
 
+## PageWrapper Component (Step 46)
+
+**Branch:** page-wrapper
+**Completed:** 2026-06-15
+
+### Goals
+
+- `PageWrapper.tsx` — named `const` arrow component, named export, `children: ReactNode` only
+- `PageWrapper.module.css` — single `.wrapper` class with `max-width: 1200px`, `margin-inline: auto`, `padding-inline: 24px`
+- Max-width value local to the CSS Module; no new global tokens
+- No existing files modified; `PageWrapper` not wired into any page yet
+- Lint passes, no `any` types
+
+### Summary
+
+Created `PageWrapper` as a minimal layout wrapper: a `<div className={styles.wrapper}>` accepting `children: ReactNode`. The `.wrapper` class sets `max-width: 1200px`, `margin-inline: auto` for centring, and `padding-inline: 24px` for consistent horizontal breathing room. Max-width is kept local to `PageWrapper.module.css` with a comment — no new `:root` token added. No existing files touched. Wiring into page components is deferred to steps 53, 59, and the `/ask` page.
+
+---
+
 ## Wire CSV Ingestion to Enqueue Embed Job (Step 39 — Phase 3 finale)
 
 **Branch:** wire-ingestion-queue
