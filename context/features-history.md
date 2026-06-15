@@ -921,6 +921,25 @@ Introduced the frontend `api/` layer: a module-scoped Axios instance (`http.ts`)
 
 ---
 
+## ObstacleSplitChart Component (Step 55)
+
+**Branch:** obstacle-split-chart
+**Completed:** 2026-06-15
+
+### Goals
+
+- `ObstacleSplitChart.tsx` — named exports `const ObstacleSplitChart` and `interface ObstacleSplitChartProps { results: RaceResultDto[] }`
+- Derives average `splitTimeSeconds` per obstacle from FINISHED results; skips null splits; sorted by `obstacleNumber` ASC
+- Empty state: `<p>No split data available.</p>`
+- Recharts horizontal `BarChart` (`layout="vertical"`) in `ResponsiveContainer` — obstacle names on Y-axis, avg seconds on X-axis, custom `Tooltip` formatted as `MM:SS`
+- `ObstacleSplitChart.module.css` — wrapper with "Avg Time per Obstacle" title
+
+### Summary
+
+Created `ObstacleSplitChart` as a pure presentational component. `computeAvgSplits` (module-level, not exported) filters to FINISHED results, iterates splits, groups by `obstacleNumber` in a `Map`, skips null `splitTimeSeconds`, then sorts ascending and returns `{ name, avgSeconds }[]`. `formatMmss` converts seconds to `M:SS`. Chart uses Recharts `layout="vertical"` for horizontal orientation; `YAxis type="category"` renders obstacle names (160px wide); `XAxis type="number"` ticks formatted as `MM:SS`; `Tooltip formatter` likewise. Chart height is dynamic (`data.length * BAR_HEIGHT + 40`) so all bars are visible without scrolling. Bar fill is `#6366f1` (Recharts `fill` prop doesn't resolve CSS custom properties). Lint and build pass with 0 errors.
+
+---
+
 ## RaceHeader Component (Step 54)
 
 **Branch:** race-header
