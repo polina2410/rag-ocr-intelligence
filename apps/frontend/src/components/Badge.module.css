@@ -1,0 +1,31 @@
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.badge[data-variant="Sprint"] {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.badge[data-variant="Super"] {
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+
+.badge[data-variant="DEKA"] {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge[data-variant="Open"] {
+  background-color: #d1fae5;
+  color: #065f46;
+}
