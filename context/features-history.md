@@ -939,6 +939,28 @@ Created `PenaltyRateChart` mirroring `ObstacleSplitChart`'s structure exactly. `
 
 ---
 
+## CategoryFilter Component (Step 57)
+
+**Branch:** category-filter
+**Completed:** 2026-06-15
+
+### Goals
+
+- `CategoryFilter.tsx` — named `const CategoryFilter` export with `CategoryFilterProps` (`categories: string[]`, `value: string | null`, `onChange: (value: string | null) => void`)
+- Renders a native `<select>` with "All" option first, then one option per category in received order
+- Controlled: `<select value>` driven by `value` prop; `null` maps to internal `''` sentinel
+- Accessible label linked via `htmlFor`/`id` with visible "Category" text
+- Handles empty `categories` without crashing
+- `CategoryFilter.module.css` — `.wrapper`, `.label`, `.select` using CSS token vars; hover/focus accent states, `font-family: inherit`, `min-width: 160px`
+- Added `--font-size-sm: 0.875rem` token to `index.css`
+- Lints and builds clean
+
+### Summary
+
+Created `CategoryFilter` as a purely presentational controlled dropdown. Uses `ALL_SENTINEL = ''` internally (since `<select>` can't hold `null`) and maps to/from `null` at the prop boundary. Empty `categories` array renders only the "All" option — no crash. Fixed four UI reviewer findings: added `:hover` accent border, `font-family: inherit`, `min-width: 160px`, and defined `--font-size-sm` token in `index.css` (as required by the CSS token rule — use token or define it first). Follows `ObstacleSplitChart` / `PenaltyRateChart` idiom exactly: named export, `Props` interface, co-located CSS module. Category derivation and leaderboard filtering deferred to Steps 58–59.
+
+---
+
 ## ObstacleSplitChart Component (Step 55)
 
 **Branch:** obstacle-split-chart
