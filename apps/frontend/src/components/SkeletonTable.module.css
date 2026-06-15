@@ -1,0 +1,37 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cell {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+  display: block;
+}
+
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to   { background-position: -100% 0; }
+}
+
+.headerShimmer {
+  height: 12px;
+}
+
+.bodyShimmer {
+  height: 14px;
+}
+
+.colPosition { width: 24px; }
+.colName     { width: 140px; }
+.colCategory { width: 64px; }
+.colTime     { width: 72px; }
+.colPlace    { width: 32px; }
