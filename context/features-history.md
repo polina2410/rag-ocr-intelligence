@@ -674,6 +674,25 @@ Consumer half of the background embedding pipeline (producer is step 39). `Embed
 
 ---
 
+## ErrorBoundary Component (Step 43)
+
+**Branch:** error-boundary
+**Completed:** 2026-06-15
+
+### Goals
+
+- `ErrorBoundary` class component with `getDerivedStateFromError` + `componentDidCatch`
+- Render-prop `fallback?: (error: Error, reset: () => void) => ReactNode`
+- Default fallback UI: error message + "Try again" button wired to `reset`
+- Co-located `ErrorBoundary.module.css` using `var(--color-accent)` / `var(--color-border)`
+- No existing files modified; lint + build pass
+
+### Summary
+
+Created `ErrorBoundary` as a React class component (required by React — only supported mechanism). `getDerivedStateFromError` normalises `unknown` caught values to `Error` via `instanceof` narrowing before storing in state. `componentDidCatch` logs with `console.error`. Arrow method `reset` reverts state to no-error. Render: children when healthy; `fallback(error, reset)` when provided; default CSS Module UI otherwise. Fixed a `verbatimModuleSyntax` tsconfig violation on first build — `ErrorInfo` and `ReactNode` required `import type`. No existing files changed.
+
+---
+
 ## TanStack Query Client with Global Config and Devtools (Step 42)
 
 **Branch:** tanstack-query-client
