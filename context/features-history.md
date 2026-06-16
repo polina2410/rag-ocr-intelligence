@@ -1079,3 +1079,21 @@ Created `AthleteLeaderboard` following the `ObstacleSplitChart`/`PenaltyRateChar
 Replaced the step-40 placeholder with a full dashboard page following the `RacesPage.tsx` convention exactly: `useQuery` + `isPending`/`isError` branches inside a `renderBody()` helper, wrapped in `PageWrapper`. `categories` is memoized off `race?.results ?? []` via `[...new Set(...)].filter(Boolean)` — computed unconditionally before any early return so hook ordering stays stable across all four render branches (no-id, pending, error, success). Success branch passes `race.results` directly (unfiltered) to all three result-consuming children — filtering by category happens inside `AthleteLeaderboard` itself, not at the page level. New `.charts` CSS Module class uses `grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))` for the responsive side-by-side/stacked layout. Reviewed two `code-scanner` findings as false positives after verifying against the actual type system: TanStack Query v5's discriminated `UseQueryResult` union means `race` narrows to non-undefined once `isPending`/`isError` are both false (confirmed by a clean `tsc -b`), and `AthleteDto.category` is already typed as a non-nullable `string` so `.filter(Boolean)` needs no extra type predicate. `pnpm --filter frontend lint`/`build` both pass with 0 errors; no backend, `@ocr/types`, or `api/` files touched.
 
 ---
+
+## useSSE Hook (Step 60)
+
+**Branch:** use-sse-hook
+**Completed:** 2026-06-16
+
+### Goals
+
+- `apps/frontend/src/api/ask.ts` — `streamAsk(query, signal, callbacks)` POSTs `{ query }` to `/ask`, manually parses the `text/event-stream` response (native `EventSource` can't be used — the endpoint is POST), emits tokens/done/error via typed callbacks
+- `apps/frontend/src/hooks/useSSE.ts` — `useSSE()` hook wrapping `streamAsk`, exposing `text`, `isStreaming`, `error`, `start`, `stop`
+- Typed `UseSSEResult` return shape, no `any`
+- `pnpm --filter frontend lint`/`build` pass
+
+### Summary
+
+First custom hook in the frontend. `streamAsk` reads `response.body` via `getReader()` + `TextDecoder`, buffers chunks, splits on `\n\n` frame separators, and parses each frame's `event:`/`data:` lines per the backend's fixed SSE wire format (`apps/backend/src/common/sse/sse-stream.ts`) — `data:` payloads are JSON-encoded strings requiring `JSON.parse`. `useSSE` holds an `AbortController` ref, resets state on `start`, aborts on `stop`/unmount, and appends tokens via a functional `setText` update. A `code-scanner` pass on the two new files surfaced one real critical bug (unvalidated `JSON.parse` cast to `string` on the `error` frame payload — now wrapped in a `parseStringPayload` helper with a `typeof` check and try/catch) and two real warnings (trailing buffer silently dropped when the stream closes without a final `\n\n`-terminated frame — now flushed after the read loop; a stale-callback race where a second rapid `start()` call's state updates could be clobbered by the first call's in-flight callbacks — now guarded by comparing the closure's controller against `controllerRef.current` before each `setState`). Declined the scanner's other suggestions (buffer size cap, SSE multi-line `data:` field accumulation, `id:`/`retry:` support) as over-engineering against a fixed, trusted, single-line backend wire format. `AskPage.tsx` and the chat UI components remain untouched (steps 61–65). `pnpm --filter frontend lint`/`build` and `pnpm --filter backend test` (150/150, unrelated) all pass.
+
+---
