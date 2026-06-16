@@ -82,21 +82,26 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 57. ✅ Build `CategoryFilter` — dropdown to filter leaderboard by category
 58. ✅ Build `AthleteLeaderboard` — sortable table with overall and category place
 59. ✅ Build `/races/:id` dashboard page — composes all dashboard components
-60. Build `useSSE` hook — connects to SSE endpoint, streams tokens into state
+60. ✅ Build `useSSE` hook — connects to SSE endpoint, streams tokens into state
 61. Build `ChatInput` component — text input and submit button
 62. Build `ChatMessage` component — message bubble, renders streaming tokens
 63. Build `SourceCitations` component — expandable panel with retrieved chunks
 64. Build `ChatHistory` component — scrollable list of messages
 65. Build `/ask` page — composes chat components, wires `useSSE` hook
+66. Build `DropZone` component — drag and drop CSV, file type validation
+67. Build `/upload` page — composes DropZone, upload progress, error feedback, redirects to `/races/:id` on success
+68. Build `DELETE /races/:id` endpoint — deletes race, cascades to RaceResult, ObstacleSplit, removes vectors from Qdrant
+69. Add delete button to RaceCard — confirmation dialog, calls `DELETE /races/:id`, removes card from list on success
 
 ---
 
 ## Phase 5 — Polish + Cursor Engine
 
-66. Build `CursorProvider` context — tracks mouse position, exposes `hint` and `mode`
-67. Build `useCursor` hook — consumes `CursorProvider`, returns position and state
-68. Build `CursorDot` component — follows mouse, changes shape on mode change
-69. Build `data-cursor-hint` tooltip system — reads attribute, shows hint near cursor
-70. Build magnifier mode — `<canvas>` redraws zoomed DOM region around cursor
-71. Build Framer Motion parallax hero section on `/races` page
-72. Write README — project overview and architecture diagram, local setup instructions with Docker, example RAG queries and demo screenshots
+70. Build `CursorProvider` context — tracks mouse position, exposes `hint` and `mode`
+71. Build `useCursor` hook — consumes `CursorProvider`, returns position and state
+72. Build `CursorDot` component — follows mouse, changes shape on mode change
+73. Build `data-cursor-hint` tooltip system — reads attribute, shows hint near cursor
+74. Build magnifier mode — `<canvas>` redraws zoomed DOM region around cursor
+75. Build Framer Motion parallax hero section on `/races` page
+76. Write README — project overview and architecture diagram, local setup instructions with Docker, example RAG queries and demo screenshots
+77. Verify `.env.example` file.
