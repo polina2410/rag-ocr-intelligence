@@ -1059,3 +1059,23 @@ Moved embedding off the request path: `POST /ingest/csv` now saves the race in a
 Created `AthleteLeaderboard` following the `ObstacleSplitChart`/`PenaltyRateChart` idiom: named export, `Props` interface, co-located CSS Module, no data fetching. `COLUMNS` is a single array of `{ label, widthClass, sortKey? }` driving both header rendering and width classes — Position and Overall intentionally share the `overallPosition` sort key per spec (clicking either sorts the same value). `getDisplayRows` filters a copy of `results` then sorts via `compareResults`, which always pushes `null` sort values to the bottom regardless of direction. Reused `Badge` for category and the `SECONDS_PER_MINUTE`/`m:ss` formatting convention from `ObstacleSplitChart`. Two review-driven hardening changes from the `ui-reviewer`/`a11y` agents: fixed missing `<th>` padding on the non-sortable Category column (`:has(.sortBtn)` selector splits padding ownership), added a visible `:focus-visible` outline on sort buttons (previously `outline: none` with only a color change — failed WCAG 2.4.7), made the ▲/▼ glyph `aria-hidden` (redundant/inconsistent SR announcement), and added a visually-hidden `aria-live="polite"` paragraph announcing "Sorted by {column}, {direction}" on sort changes. Flagged but left as-is: `--color-text-muted`/`--color-accent` contrast ratios are borderline AA — these are pre-existing global tokens used elsewhere in the app, and the spec forbids adding new tokens. `pnpm --filter frontend lint`/`build` both pass with 0 errors.
 
 ---
+
+## Race Detail Dashboard Page (Step 59)
+
+**Branch:** race-detail-dashboard-page
+**Completed:** 2026-06-16
+
+### Goals
+
+- Rewrite `RaceDetailPage.tsx` as a `useQuery`-driven page composing `RaceHeader`, `ObstacleSplitChart`, `PenaltyRateChart`, `CategoryFilter`, and `AthleteLeaderboard`
+- Missing `id` → not-found state; `isPending` → skeleton placeholders; `isError` → visible failure message, no unhandled crash
+- Derive distinct, non-empty `categories: string[]` from `race.results` via `useMemo`, computed unconditionally to preserve hook ordering
+- Page-level `useState<string | null>` for selected category wired into `CategoryFilter` and `AthleteLeaderboard`
+- New co-located `RaceDetailPage.module.css` — charts side-by-side on wide viewports, stacked on narrow
+- `pnpm --filter frontend lint`/`build` pass; no backend/types/api files modified
+
+### Summary
+
+Replaced the step-40 placeholder with a full dashboard page following the `RacesPage.tsx` convention exactly: `useQuery` + `isPending`/`isError` branches inside a `renderBody()` helper, wrapped in `PageWrapper`. `categories` is memoized off `race?.results ?? []` via `[...new Set(...)].filter(Boolean)` — computed unconditionally before any early return so hook ordering stays stable across all four render branches (no-id, pending, error, success). Success branch passes `race.results` directly (unfiltered) to all three result-consuming children — filtering by category happens inside `AthleteLeaderboard` itself, not at the page level. New `.charts` CSS Module class uses `grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))` for the responsive side-by-side/stacked layout. Reviewed two `code-scanner` findings as false positives after verifying against the actual type system: TanStack Query v5's discriminated `UseQueryResult` union means `race` narrows to non-undefined once `isPending`/`isError` are both false (confirmed by a clean `tsc -b`), and `AthleteDto.category` is already typed as a non-nullable `string` so `.filter(Boolean)` needs no extra type predicate. `pnpm --filter frontend lint`/`build` both pass with 0 errors; no backend, `@ocr/types`, or `api/` files touched.
+
+---
