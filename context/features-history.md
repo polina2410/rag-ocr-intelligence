@@ -1119,3 +1119,23 @@ Created `ChatInput` as a standalone, controlled text-entry component for Phase 4
 While committing this feature, also caught and fixed an unrelated pre-existing test gap: `csv-rows-parser.service.spec.ts`'s DEKA fixture test asserted "all penaltyCount === 0" against a fixture with no penalty data — a vacuous assertion that could never fail even if the penalty-parser broke. Added real penalty data (`Rowing;Sled Push`, `Rowing`, `Burpee Broad Jump`) to `DEKA_FIT_Novi_Sad_2024.csv` and replaced the test with two real assertions against specific split indices, mirroring the existing Subotica fixture test pattern. Also added a "No penalties recorded" empty-state note to `PenaltyRateChart` and a minor `RaceHeader` padding tweak — both committed separately as unrelated, low-risk changes. `pnpm --filter backend test` (27/27 in the affected suite) and `pnpm --filter frontend lint` both pass.
 
 ---
+
+## ChatMessage Component (Step 62)
+
+**Branch:** chat-message
+**Completed:** 2026-06-16
+
+### Goals
+
+- `apps/frontend/src/components/ChatMessage.tsx` — named export `ChatMessage` + named `interface ChatMessageProps` (`role: 'user' | 'assistant'`, `content: string`, `isStreaming?: boolean`); no default export
+- Renders `content` with preserved line breaks
+- Bubble visually distinguishable by `role` (background + alignment)
+- Visible in-progress indicator when `isStreaming === true`; absent when falsy; still renders correctly when `content === ''` and streaming
+- `apps/frontend/src/components/ChatMessage.module.css` — colors/font-sizes only via `var(--token)`
+- `pnpm --filter frontend lint`/`build` pass; strict TypeScript, no `any`
+
+### Summary
+
+Created `ChatMessage` as a purely presentational chat bubble — second of Phase 4's chat UI components (steps 61–65), not yet wired into any page. User messages align right with `var(--color-accent)` background + `var(--color-surface)` text; assistant messages align left with a new `--color-bubble-assistant-bg` (#f3f4f6) token + `var(--color-text)`. A blinking `▍` cursor (`aria-hidden`, CSS `@keyframes blink`) renders after the content when `isStreaming` is true. Two review-driven fixes applied after `ui-reviewer`/`a11y` agent passes: (1) `.bubble` is a flex child of `.row` (display: flex) — added `min-width: 0` + `overflow-wrap: anywhere` (the original `word-wrap: break-word` alone wouldn't reliably break long unbroken strings inside a non-shrinking flex item) and an explicit `line-height: 1.4` plus `min-height: 1.4em` so an empty/streaming-only bubble doesn't collapse to zero height; (2) wrapped the cursor's blink animation in `@media (prefers-reduced-motion: reduce) { animation: none }`. Flagged but correctly deferred to step 64/65 (where the component is composed and wired to live data): `aria-busy`/live-region announcement of streaming state for screen reader users, since `ChatMessage` itself has no page to be wired into yet. `pnpm --filter frontend lint`/`build` pass; `pnpm --filter backend test` (150/150, unrelated) unaffected.
+
+---

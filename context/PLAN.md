@@ -84,7 +84,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 59. ✅ Build `/races/:id` dashboard page — composes all dashboard components
 60. ✅ Build `useSSE` hook — connects to SSE endpoint, streams tokens into state
 61. ✅ Build `ChatInput` component — text input and submit button
-62. Build `ChatMessage` component — message bubble, renders streaming tokens
+62. ✅ Build `ChatMessage` component — message bubble, renders streaming tokens
 63. Build `SourceCitations` component — expandable panel with retrieved chunks
 64. Build `ChatHistory` component — scrollable list of messages
 65. Build `/ask` page — composes chat components, wires `useSSE` hook
