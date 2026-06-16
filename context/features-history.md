@@ -1139,3 +1139,23 @@ While committing this feature, also caught and fixed an unrelated pre-existing t
 Created `ChatMessage` as a purely presentational chat bubble — second of Phase 4's chat UI components (steps 61–65), not yet wired into any page. User messages align right with `var(--color-accent)` background + `var(--color-surface)` text; assistant messages align left with a new `--color-bubble-assistant-bg` (#f3f4f6) token + `var(--color-text)`. A blinking `▍` cursor (`aria-hidden`, CSS `@keyframes blink`) renders after the content when `isStreaming` is true. Two review-driven fixes applied after `ui-reviewer`/`a11y` agent passes: (1) `.bubble` is a flex child of `.row` (display: flex) — added `min-width: 0` + `overflow-wrap: anywhere` (the original `word-wrap: break-word` alone wouldn't reliably break long unbroken strings inside a non-shrinking flex item) and an explicit `line-height: 1.4` plus `min-height: 1.4em` so an empty/streaming-only bubble doesn't collapse to zero height; (2) wrapped the cursor's blink animation in `@media (prefers-reduced-motion: reduce) { animation: none }`. Flagged but correctly deferred to step 64/65 (where the component is composed and wired to live data): `aria-busy`/live-region announcement of streaming state for screen reader users, since `ChatMessage` itself has no page to be wired into yet. `pnpm --filter frontend lint`/`build` pass; `pnpm --filter backend test` (150/150, unrelated) unaffected.
 
 ---
+
+## SourceCitations Component (Step 63)
+
+**Branch:** source-citations
+**Completed:** 2026-06-16
+
+### Goals
+
+- `apps/frontend/src/components/SourceCitations.tsx` — named `const SourceCitations`, no default export; named exported `Citation { id; text; label?; score? }` and `SourceCitationsProps { citations: Citation[] }`
+- Empty `citations` → renders `null`; non-empty → collapsed-by-default expandable panel ("Sources (N)")
+- Expanded content lists every citation (`label` if present, `text`, `score` to fixed decimals if present)
+- Keyboard-operable, correct expanded/collapsed semantics for assistive tech
+- `apps/frontend/src/components/SourceCitations.module.css` — colors/font-sizes only via `var(--token)`
+- `pnpm --filter frontend lint` passes; strict TypeScript, no `any`
+
+### Summary
+
+Created `SourceCitations` as a pure props-driven expandable panel — third of Phase 4's chat UI components (steps 61–65), not yet wired into any page or data source. Native `<details>/<summary>` used for the toggle (free keyboard/AT disclosure semantics, no manual `aria-expanded` needed). Citation list rendered as `<ul>/<li>`, each showing optional bold `label`, required `text`, and optional `score` formatted via a named `SCORE_DECIMALS = 2` constant as "Relevance: X.XX". Two review-driven fixes applied after `ui-reviewer`/`a11y` agent passes: (1) `.summary`'s text color changed from `--color-text-muted` to `--color-text` — the muted token gave the primary clickable trigger weak contrast/affordance — and `overflow-wrap: anywhere` added to `.label` (previously only `.text` was protected against long unbroken strings); (2) each `<li>` gained `aria-label={citation.label ?? citation.text}` since plain `<li>`s with no accessible name were indistinguishable to screen reader users navigating the list. Declined as over-engineering: restructuring `<p>` tags into `<dl>/<dt>/<dd>` (visual `.item` grouping already conveys the relationship; not a WCAG failure). **Known gap, explicitly flagged in the spec and carried forward:** the backend's `/ask` SSE stream only transmits text tokens — `RetrieveService.retrieve()` computes chunks server-side but never sends them to the frontend, so this component has no real data source yet; wiring an actual citations channel (SSE event or REST call) is unplanned and left as an open question for a future step before steps 64/65 can render live citations. `pnpm --filter frontend lint`/`build` pass; `Citation` deliberately kept as a frontend-local type, not added to `@ocr/types`, to avoid drift against an undefined wire format.
+
+---
