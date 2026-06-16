@@ -195,11 +195,27 @@ describe('CsvRowsParserService', () => {
       expect(row!.splits[0].penaltyCount).toBe(0); // Rolling Mud
     });
 
-    it('all splits have penaltyCount 0 for DEKA fixture', () => {
+    it('sets penaltyCount 1 on multiple penalised obstacles for one row', () => {
+      // Tamara Roberts: penalty_obstacles = "Rowing;Sled Push"
+      // Rowing = index 2, Sled Push = index 4
       const rows = service.parseRows(dekaNoviSad, dekaMeta);
-      rows.forEach((row) => {
-        row.splits.forEach((split) => expect(split.penaltyCount).toBe(0));
-      });
+      const row = rows.find(
+        (r) =>
+          r.athlete.firstName === 'Tamara' && r.athlete.lastName === 'Roberts',
+      );
+      expect(row!.splits[2].obstacleName).toBe('Rowing');
+      expect(row!.splits[2].penaltyCount).toBe(1);
+      expect(row!.splits[4].obstacleName).toBe('Sled Push');
+      expect(row!.splits[4].penaltyCount).toBe(1);
+    });
+
+    it('sets penaltyCount 0 for splits with no recorded penalty in DEKA fixture', () => {
+      const rows = service.parseRows(dekaNoviSad, dekaMeta);
+      const row = rows.find(
+        (r) =>
+          r.athlete.firstName === 'Chloe' && r.athlete.lastName === 'Thomas',
+      );
+      row!.splits.forEach((split) => expect(split.penaltyCount).toBe(0));
     });
   });
 
