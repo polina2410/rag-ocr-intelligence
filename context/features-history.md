@@ -1097,3 +1097,25 @@ Replaced the step-40 placeholder with a full dashboard page following the `Races
 First custom hook in the frontend. `streamAsk` reads `response.body` via `getReader()` + `TextDecoder`, buffers chunks, splits on `\n\n` frame separators, and parses each frame's `event:`/`data:` lines per the backend's fixed SSE wire format (`apps/backend/src/common/sse/sse-stream.ts`) — `data:` payloads are JSON-encoded strings requiring `JSON.parse`. `useSSE` holds an `AbortController` ref, resets state on `start`, aborts on `stop`/unmount, and appends tokens via a functional `setText` update. A `code-scanner` pass on the two new files surfaced one real critical bug (unvalidated `JSON.parse` cast to `string` on the `error` frame payload — now wrapped in a `parseStringPayload` helper with a `typeof` check and try/catch) and two real warnings (trailing buffer silently dropped when the stream closes without a final `\n\n`-terminated frame — now flushed after the read loop; a stale-callback race where a second rapid `start()` call's state updates could be clobbered by the first call's in-flight callbacks — now guarded by comparing the closure's controller against `controllerRef.current` before each `setState`). Declined the scanner's other suggestions (buffer size cap, SSE multi-line `data:` field accumulation, `id:`/`retry:` support) as over-engineering against a fixed, trusted, single-line backend wire format. `AskPage.tsx` and the chat UI components remain untouched (steps 61–65). `pnpm --filter frontend lint`/`build` and `pnpm --filter backend test` (150/150, unrelated) all pass.
 
 ---
+
+## ChatInput Component (Step 61)
+
+**Branch:** chat-input
+**Completed:** 2026-06-16
+
+### Goals
+
+- `apps/frontend/src/components/ChatInput.tsx` — named export `ChatInput` + named `interface ChatInputProps` (`onSubmit: (query: string) => void`, `disabled?: boolean`, optional `placeholder?: string`); no default export
+- Controlled text input wrapped in a `<form>` (Enter-to-submit works) with local `useState` for the draft text
+- Submit handler trims the draft, blocks empty/whitespace-only submissions, calls `onSubmit(trimmed)`, and clears the input on success
+- Submit button disabled when `disabled === true` OR draft is empty after trimming; input disabled when `disabled === true`
+- `apps/frontend/src/components/ChatInput.module.css` — colors/font-sizes only via `var(--token)`
+- `pnpm --filter frontend lint` passes; strict TypeScript, no `any`
+
+### Summary
+
+Created `ChatInput` as a standalone, controlled text-entry component for Phase 4's chat UI — first of steps 61–65, not wired into any page (`AskPage.tsx` wiring is step 65). Follows the `CategoryFilter.tsx` convention: named export, exported `Props` interface, co-located CSS Module, no default export. Local `useState<string>('')` holds the draft; submit handler trims, blocks whitespace-only submissions, calls `onSubmit(trimmed)`, and resets state. Button disabled when `disabled` prop is true or the trimmed draft is empty; input disabled when `disabled` is true. Added a visually-hidden `<label>` tied to the input via `id`/`htmlFor` for accessibility (beyond spec minimum). All existing tokens (`--color-accent`, `--color-border`, `--color-surface`, `--color-text`, `--color-text-muted`, `--font-size-sm`) sufficed — no new token needed. `maxLength={1000}` mirrors the backend's `@MaxLength(1000)` on `AskQueryDto`.
+
+While committing this feature, also caught and fixed an unrelated pre-existing test gap: `csv-rows-parser.service.spec.ts`'s DEKA fixture test asserted "all penaltyCount === 0" against a fixture with no penalty data — a vacuous assertion that could never fail even if the penalty-parser broke. Added real penalty data (`Rowing;Sled Push`, `Rowing`, `Burpee Broad Jump`) to `DEKA_FIT_Novi_Sad_2024.csv` and replaced the test with two real assertions against specific split indices, mirroring the existing Subotica fixture test pattern. Also added a "No penalties recorded" empty-state note to `PenaltyRateChart` and a minor `RaceHeader` padding tweak — both committed separately as unrelated, low-risk changes. `pnpm --filter backend test` (27/27 in the affected suite) and `pnpm --filter frontend lint` both pass.
+
+---
