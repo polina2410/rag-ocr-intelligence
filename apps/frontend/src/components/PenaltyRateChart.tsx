@@ -56,9 +56,12 @@ export const PenaltyRateChart = ({ results }: PenaltyRateChartProps) => {
     )
   }
 
+  const hasPenalties = data.some((entry) => entry.penaltyRate > 0)
+
   return (
     <div className={styles.wrapper}>
       <p className={styles.title}>Penalty Rate per Obstacle</p>
+      {!hasPenalties && <p className={styles.note}>No penalties recorded.</p>}
       <ResponsiveContainer width="100%" height={data.length * BAR_HEIGHT + 40}>
         <BarChart data={data} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" horizontal={false} />

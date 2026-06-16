@@ -10,3 +10,9 @@
   margin: 0;
   color: var(--color-text);
 }
+
+.note {
+  font-size: 0.875rem;
+  margin: 0;
+  color: var(--color-text-muted);
+}
