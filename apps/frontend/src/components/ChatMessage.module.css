@@ -1,0 +1,52 @@
+.row {
+  display: flex;
+  margin: 4px 0;
+}
+
+.rowUser {
+  justify-content: flex-end;
+}
+
+.rowAssistant {
+  justify-content: flex-start;
+}
+
+.bubble {
+  max-width: 70%;
+  min-width: 0;
+  min-height: 1.4em;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubbleUser {
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+}
+
+.bubbleAssistant {
+  background-color: var(--color-bubble-assistant-bg);
+  color: var(--color-text);
+}
+
+.cursor {
+  display: inline-block;
+  margin-left: 4px;
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    animation: none;
+  }
+}
