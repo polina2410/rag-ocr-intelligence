@@ -1039,3 +1039,23 @@ Added `getRaces(page = 1, limit = 20)` to `src/api/races.ts` calling `http.get('
 Moved embedding off the request path: `POST /ingest/csv` now saves the race in a transaction, then enqueues a BullMQ `EmbedJobData` job (`{ raceId }`) and returns immediately, instead of awaiting `EmbedService.batchEmbedRace` synchronously. The enqueue stays after the transaction and outside the DB try/catch — preserving the prior "error-after-successful-save propagates" semantics (a Redis-down enqueue failure is far rarer than the old synchronous-embed failure; mis-mapping it to a DB 500 would be wrong). `IngestionService` no longer depends on `EmbedService`, so `IngestionModule` swapped its `EmbedModule` import for `QueueModule` (which provides the injectable `Queue`); `EmbedModule` stays in the graph via `AppModule` (it hosts the `EmbedProcessor` consumer + `EmbedService`). Queue and job names are constants (`EMBED_QUEUE`/`EMBED_JOB`); `EmbedProcessor.process` handles all job names so `EMBED_JOB` is consumed fine. The spec's `add` mock is captured in a const to satisfy `unbound-method`; new test asserts no enqueue when the transaction fails. **Verified end-to-end with a real OpenAI key:** ingesting a fixture CSV returned `201 { raceId, rowsIngested: 19 }` immediately (async decoupling proven), the `EmbedProcessor` picked up the job, and called OpenAI — which returned **429 quota-exceeded** (an account billing limitation, not a code defect; auth succeeded — it was not a 401). The `onFailed` handler logged it correctly. The only unverified link is the final Qdrant upsert, blocked solely by the OpenAI account quota. 149/149 tests pass, build and lint clean. **Phase 3 (RAG pipeline, steps 26–39) is complete.**
 
 ---
+
+## AthleteLeaderboard Component (Step 58)
+
+**Branch:** athlete-leaderboard
+**Completed:** 2026-06-16
+
+### Goals
+
+- `AthleteLeaderboard.tsx` — named exports `const AthleteLeaderboard` and `interface AthleteLeaderboardProps { results: RaceResultDto[]; categoryFilter: string | null }`
+- `<table>` with 6 columns (Position, Name, Category, Finish Time, Overall, Category place) matching `SkeletonTable` widths exactly (24/140/64/72/32/32px)
+- Filters rows by `categoryFilter` (exact match, `null` = all); sorts on a copy, never mutates `results`
+- Sortable `<button>`-in-`<th>` headers (`aria-sort`, ▲/▼ indicator) with local `useState` sort state; default `overallPosition` ascending, null values always last
+- Empty state: single `<td colSpan={6}>No results.</td>` row
+- Lint and build pass with zero TypeScript errors
+
+### Summary
+
+Created `AthleteLeaderboard` following the `ObstacleSplitChart`/`PenaltyRateChart` idiom: named export, `Props` interface, co-located CSS Module, no data fetching. `COLUMNS` is a single array of `{ label, widthClass, sortKey? }` driving both header rendering and width classes — Position and Overall intentionally share the `overallPosition` sort key per spec (clicking either sorts the same value). `getDisplayRows` filters a copy of `results` then sorts via `compareResults`, which always pushes `null` sort values to the bottom regardless of direction. Reused `Badge` for category and the `SECONDS_PER_MINUTE`/`m:ss` formatting convention from `ObstacleSplitChart`. Two review-driven hardening changes from the `ui-reviewer`/`a11y` agents: fixed missing `<th>` padding on the non-sortable Category column (`:has(.sortBtn)` selector splits padding ownership), added a visible `:focus-visible` outline on sort buttons (previously `outline: none` with only a color change — failed WCAG 2.4.7), made the ▲/▼ glyph `aria-hidden` (redundant/inconsistent SR announcement), and added a visually-hidden `aria-live="polite"` paragraph announcing "Sorted by {column}, {direction}" on sort changes. Flagged but left as-is: `--color-text-muted`/`--color-accent` contrast ratios are borderline AA — these are pre-existing global tokens used elsewhere in the app, and the spec forbids adding new tokens. `pnpm --filter frontend lint`/`build` both pass with 0 errors.
+
+---
