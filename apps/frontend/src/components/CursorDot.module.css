@@ -1,0 +1,9 @@
+.dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border-style: solid;
+  z-index: 9999;
+}
