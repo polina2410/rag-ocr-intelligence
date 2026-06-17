@@ -1377,6 +1377,28 @@ Installed `html2canvas-pro` as a frontend dependency. Updated `CursorContext.tsx
 
 ---
 
+## Framer Motion Parallax Hero Section (Step 75)
+
+**Branch:** framer-motion-parallax-hero
+**Completed:** 2026-06-17
+
+### Goals
+
+- New `RacesHero` component (named export, `const` arrow function) with its own CSS Module
+- Scroll-driven parallax: at least two layers (background + foreground heading) moving at different speeds via `useScroll` + `useTransform`
+- `useScroll` targets the hero's own ref with named `offset` constants; all numeric values extracted as named constants
+- `RacesHero` absorbs the `<h1>Races</h1>` from `RacesPage` — exactly one h1 on the page at all times
+- `RacesPage.tsx` renders `<RacesHero />` first inside `<PageWrapper>`, before `renderBody()`
+- `useReducedMotion()` disables all transforms when OS prefers reduced motion
+- Existing loading / error / empty / grid states below the hero are unchanged
+- Lint and build pass with no TypeScript errors; no `any` types
+
+### Summary
+
+Created `RacesHero` as a new named-export component with two scroll-driven parallax layers. A `useRef<HTMLElement>` on the section is passed as `target` to `useScroll({ offset: ['start start', 'end start'] })`, mapping `scrollYProgress` 0→1 as the hero scrolls off screen. Background layer uses `useTransform(scrollYProgress, [0, 1], [0, 80])` — slides down 80px slower than scroll, simulating depth. Foreground heading uses `[0, -40]` — leads upward for a floating effect. `useReducedMotion()` clamps both to 0 when OS prefers reduced motion. Background element extends `−90px` beyond the top and bottom edges of the hero container (absolute, not percentage) to absorb the 80px travel without exposing gaps through the `overflow: hidden` rounded border. Four new design tokens added: `--color-hero-bg`, `--color-hero-glow`, `--color-hero-text`, `--font-size-hero`. The existing `<h1>Races</h1>` in `RacesPage.tsx` was removed and absorbed into the hero. The `renderBody()` grid/skeleton/error states are unchanged below the hero.
+
+---
+
 ## CursorHint Tooltip System
 
 **Branch:** cursor-hint
