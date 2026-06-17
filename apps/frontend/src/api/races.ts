@@ -6,3 +6,6 @@ export const getRaces = (page = 1, limit = 20): Promise<PaginatedResponse<RaceDt
 
 export const getRace = (id: string): Promise<RaceDetailDto> =>
   http.get<RaceDetailDto>(`/races/${id}`).then((res) => res.data)
+
+export const deleteRace = (id: string): Promise<void> =>
+  http.delete(`/races/${id}`).then(() => undefined)

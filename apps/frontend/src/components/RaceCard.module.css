@@ -17,7 +17,7 @@
 }
 
 .name {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   margin: 0;
 }
@@ -32,6 +32,33 @@
 }
 
 .detail {
-  font-size: 0.8rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+
+.deleteButton {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  background: transparent;
+  border: 1px solid var(--color-danger);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.deleteError {
+  margin: 4px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
 }
