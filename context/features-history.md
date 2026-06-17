@@ -1357,6 +1357,26 @@ Four-line hook file. `useCursor` wraps `useContext(CursorContext)` with an expli
 
 ---
 
+## Magnifier Mode (Step 74)
+
+**Branch:** magnifier-mode
+**Completed:** 2026-06-17
+
+### Goals
+
+- `CursorMagnifier` component renders a 200×200 `<canvas>` near the cursor showing a 2× zoomed crop of the page
+- Activated when cursor is over any element marked `data-cursor-magnifier="true"`
+- `CursorContext` sets `mode = 'hover'` (the previously unused mode) when over a magnifier element
+- One-time `html2canvas-pro` snapshot taken on hover-in; crop redrawn on each `{x,y}` change without recapturing
+- `RootLayout` mounts `<CursorMagnifier />` alongside `<CursorDot />` and `<CursorHint />`
+- `pnpm --filter frontend lint` passes, no TypeScript `any`
+
+### Summary
+
+Installed `html2canvas-pro` as a frontend dependency. Updated `CursorContext.tsx` to implement 3-tier mode priority: `[data-cursor-magnifier]` → `'hover'`, interactive (`a/button/[role=button]/[tabindex]`) → `'pointer'`, else `'default'` — finally activating the reserved `'hover'` mode. Created `CursorMagnifier.tsx`: on transition into `'hover'`, calls `html2canvas(document.body, { scale: 1, useCORS: true })` once; result stored in a ref with a `cancelled` guard against race conditions where mode leaves `'hover'` before the promise resolves. On each `{x, y}` change while hovering, crops a 100×100 region (with scroll-offset correction and clamped bounds) and draws it into the 200×200 canvas at 2× zoom. Canvas positioned 20px right and 20px above the cursor via inline `style`, styled `z-index: 9997` with `var(--color-border)` border and `pointer-events: none` in the CSS Module. Mounted `<CursorMagnifier />` in `RootLayout` inside `<CursorProvider>`. Lint passes clean, no `any`.
+
+---
+
 ## CursorHint Tooltip System
 
 **Branch:** cursor-hint

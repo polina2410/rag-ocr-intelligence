@@ -101,7 +101,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 71. ✅ Build `useCursor` hook — consumes `CursorProvider`, returns position and state
 72. ✅ Build `CursorDot` component — follows mouse, changes shape on mode change
 73. ✅ Build `data-cursor-hint` tooltip system — reads attribute, shows hint near cursor
-74. Build magnifier mode — `<canvas>` redraws zoomed DOM region around cursor
+74. ✅ Build magnifier mode — `<canvas>` redraws zoomed DOM region around cursor
 75. Build Framer Motion parallax hero section on `/races` page
 76. Write README — project overview and architecture diagram, local setup instructions with Docker, example RAG queries and demo screenshots
 77. Verify `.env.example` file, unit test for the text serializer (step 29), error handling step for OpenAI failures in the embedding pipeline, rate limiting on POST /ask — someone could spam OpenAI requests
