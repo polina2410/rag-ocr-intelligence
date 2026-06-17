@@ -105,7 +105,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 75. ✅ Build Framer Motion parallax hero section on `/races` page
 76. ✅ Write README — project overview and architecture diagram, local setup instructions with Docker, example RAG queries and demo screenshots
 77. ✅ Verify `.env.example` file, unit test for the text serializer (step 29), error handling step for OpenAI failures in the embedding pipeline, rate limiting on POST /ask — someone could spam OpenAI requests
-78. Verify `api.ts` or axios client setup, environment variable for the API base URL (VITE_API_URL)
+78. ✅ Verify `api.ts` or axios client setup, environment variable for the API base URL (VITE_API_URL)
 79. Add empty state components if there are no such
 80. Add EmbeddingStatus indicator on the race dashboard — user has no way to know if embedding is still running in the background 
 81. Add font-size globals and Fluid typography

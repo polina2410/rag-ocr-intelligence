@@ -1460,6 +1460,25 @@ Created a 300-line `README.md` with a `flowchart TB` Mermaid diagram (single-lin
 
 ---
 
+## API Client Audit — shared API_URL constant, VITE_API_URL types, frontend .env.example (Step 78)
+
+**Branch:** step-78-api-client-audit
+**Completed:** 2026-06-17
+
+### Goals
+
+- `http.ts` exports named constant `API_URL: string`; axios instance's `baseURL` references it; default URL literal in exactly one place
+- `ask.ts` imports `API_URL` from `./http`; local duplicate removed; SSE `fetch` logic unchanged
+- `src/vite-env.d.ts` (new) declares `ImportMetaEnv` with `readonly VITE_API_URL: string` — narrows type from `string | undefined` to `string`
+- `apps/frontend/.env.example` (new, committed) with descriptive comment
+- Lint and build pass
+
+### Summary
+
+`ask.ts` was duplicating `const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'` — the same expression already present in `http.ts`. Fixed by exporting `API_URL` from `http.ts` and importing it in `ask.ts`; the default URL literal now appears exactly once. Created `src/vite-env.d.ts` with a `vite/client` reference and an `ImportMetaEnv` / `ImportMeta` augmentation — `VITE_API_URL` now types as non-optional `string` rather than `string | undefined` from Vite's default index signature. Added `apps/frontend/.env.example` for onboarding. No behavior change; SSE in `ask.ts` still uses native `fetch`. Lint and build clean.
+
+---
+
 ## Backend Hardening — env example, OpenAI errors, BullMQ retries, /ask rate limiting (Step 77)
 
 **Branch:** step-77-hardening
