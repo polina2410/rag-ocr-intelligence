@@ -1206,3 +1206,30 @@ Created `ChatHistory` as the fourth of Phase 4's chat UI components (steps 61–
 Replaced the `AskPage` stub with a fully wired chat page. Message history is owned entirely by the page as `useState<ChatHistoryMessage[]>([])` — `useSSE` is responsible only for the live in-flight stream (`text`, `isStreaming`, `error`). `handleSubmit` appends both the user message and an assistant placeholder atomically before calling `start(query)`, so the UI shows the empty streaming bubble immediately. `currentAssistantIdRef` pins which assistant message is "current" across effects: the `[text]` effect maps only that id, and the `[isStreaming]` effect clears the ref and sets `isStreaming: false` when the stream ends — guarded so it does not fire spuriously on mount (`isStreaming` starts `false`). Errors surface below `ChatInput` as a `role="alert"` paragraph; they clear on the next submission because `useSSE.start()` resets `error` to `null`. Layout: `.page { flex: 1; display: flex; flex-direction: column; min-height: 0 }` makes the page a direct flex child of `RootLayout`'s flex-column wrapper, filling all remaining viewport height without any `calc()`; `.history { flex: 1; min-height: 0 }` gives `ChatHistory`'s existing `height: 100%; overflow-y: auto` scroll container the space it needs. `export default AskPage` preserved for the lazy route. Vite emits a separate `AskPage` chunk (5.06 kB gzip: 2.08 kB). Lint and TypeScript build pass with 0 errors; no existing files modified.
 
 ---
+
+## DropZone Component (Step 66)
+
+**Branch:** drop-zone
+**Completed:** 2026-06-17
+
+### Goals
+
+- New `DropZone.tsx` — named exports `DropZoneProps` + `DropZone`, no default export, no `any`
+- `DropZoneProps { onFile: (file: File) => void; disabled?: boolean }`
+- New `DropZone.module.css` — all styling via `var(--token)`, no inline styles
+- Idle: dashed `var(--color-border)` border, muted prompt text
+- Drag-over: `var(--color-accent)` border + 8% tint via `color-mix`; clears on leave/drop
+- Click-to-browse via hidden `<input type="file" accept=".csv">` triggered by `useRef`
+- Keyboard: `tabIndex={0}`, Enter/Space open picker (Space prevents scroll); no-op when disabled
+- File validation: `.csv` extension or `text/csv` MIME; `onFile` only on valid; inline error on invalid
+- Multi-file: only `files[0]`; `e.target.value = ''` reset for re-selection of same file
+- Error clears on drag-enter and on picker open
+- Disabled: opacity + `cursor: not-allowed`, `tabIndex={-1}`, `aria-disabled`, all interactions blocked
+- A11y: `role="button"`, `aria-label="Upload a CSV file"`, visually-hidden `<label>` for the input
+- `pnpm --filter frontend lint` and `build` pass
+
+### Summary
+
+Created `DropZone` as a purely presentational file-picker component — no Axios, no upload state, no backend knowledge. Internal state is limited to `dragOver: boolean` and `error: string | null`. A `validateAndEmit(file)` helper centralises the validation logic (`.csv` extension as primary gate, `text/csv` MIME as fallback, since some browsers report inconsistent MIME types for CSV). `onDragOver` calls `preventDefault()` (required to enable `drop`); `onDragEnter` toggles drag-over state and clears any error; `onDragLeave` resets it; `onDrop` reads `dataTransfer.files[0]` and validates. Click-to-browse triggers the hidden `<input>` via `inputRef.current?.click()`; `e.target.value` is reset after each `onChange` so re-selecting the same file fires the event again. Keyboard handler responds to Enter and Space (Space calls `preventDefault` to avoid page scroll). Disabled prop blocks all interaction paths (click, keyboard, drop) and sets `aria-disabled` + `tabIndex={-1}`. CSS Module uses `color-mix(in srgb, var(--color-accent) 8%, transparent)` for the drag-over tint — no hardcoded hex values. Lint and TypeScript build pass with 0 errors; no existing files modified.
+
+---
