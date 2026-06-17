@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ChatHistory } from '../components/ChatHistory'
 import type { ChatHistoryMessage } from '../components/ChatHistory'
 import { ChatInput } from '../components/ChatInput'
+import { EmptyState } from '../components/EmptyState'
 import { useSSE } from '../hooks/useSSE'
 import styles from './AskPage.module.css'
 
@@ -43,7 +44,14 @@ const AskPage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.history}>
-        <ChatHistory messages={messages} />
+        {messages.length === 0 && !isStreaming ? (
+          <EmptyState
+            title="Ask anything about the races"
+            description="Your answer will stream in below."
+          />
+        ) : (
+          <ChatHistory messages={messages} />
+        )}
       </div>
       <div className={styles.inputArea}>
         {error && (
