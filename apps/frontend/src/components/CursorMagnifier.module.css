@@ -1,0 +1,9 @@
+.canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 9997;
+}
