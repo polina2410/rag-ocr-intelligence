@@ -1,0 +1,39 @@
+.hero {
+  position: relative;
+  height: 50vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 48px;
+  border-radius: 16px;
+}
+
+/* Extends beyond the hero bounds so the parallax travel (80px max)
+   never exposes a gap at the top or bottom edge. */
+.background {
+  position: absolute;
+  top: -90px;
+  left: -5%;
+  right: -5%;
+  bottom: -90px;
+  background-color: var(--color-hero-bg);
+  background-image: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    var(--color-hero-glow) 0%,
+    transparent 70%
+  );
+}
+
+.foreground {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-hero);
+  color: var(--color-hero-text);
+  letter-spacing: -0.02em;
+}
