@@ -1297,3 +1297,23 @@ Added `DELETE /races/:id` as a 204 No Content endpoint. `RacesService.remove` pe
 Extended `RaceCard` with a hover-gated delete button that guards navigation with `e.preventDefault()` + `e.stopPropagation()` before the `window.confirm` dialog. Cache update via `setQueryData` removes the card immediately on success without a refetch; the updater guards the `undefined` case. `deleteRace` resolves `void` (no body parsing on 204). Also added the Upload nav link to `Navbar` and consolidated all hardcoded `font-size` literals across 8 CSS module files into 4 root tokens (`--font-size-xl: 2rem`, `--font-size-base: 1rem`, `--font-size-sm: 0.875rem`, `--font-size-xs: 0.75rem`). Lint and build pass.
 
 ---
+
+## CursorProvider Context
+
+**Branch:** cursor-provider
+**Completed:** 2026-06-17
+
+### Goals
+
+- NEW `apps/frontend/src/context/CursorContext.tsx` — exports `CursorMode`, `CursorContextValue`, `CursorContext`, `CursorProvider`
+- `type CursorMode = 'default' | 'hover' | 'pointer'`; `'hover'` reserved for downstream steps
+- `interface CursorContextValue { x: number; y: number; hint: string | null; mode: CursorMode }` — read-only, no setters
+- Single `mousemove` listener on `window`; derived state via `Element.closest()` for hint and mode
+- `CursorProvider` mounted in `RootLayout.tsx` wrapping `<Navbar />` + `<ErrorBoundary>`
+- Lint and build pass
+
+### Summary
+
+Created `CursorContext.tsx` with a read-only context exposing `x`, `y`, `hint`, and `mode` derived on every `mousemove`. The `mousemove` handler (stabilised with `useCallback`) narrows `event.target` to `Element`, then uses `closest()` once for `data-cursor-hint` attribute lookup and once for interactive-element detection — no manual DOM walk. All four fields are set in a single `setState` call per move. Module-level constants (`INTERACTIVE_SELECTOR`, `CURSOR_HINT_ATTR`) eliminate inline strings. Added `/* eslint-disable react-refresh/only-export-components */` following the same pattern as `router.tsx` since the file exports both a context object and a component. Mounted `CursorProvider` in `RootLayout` as the single correct wrap point (object-based routing prevents wrapping from `App.tsx`).
+
+---
