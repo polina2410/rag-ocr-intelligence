@@ -91,7 +91,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 66. ✅ Build `DropZone` component — drag and drop CSV, file type validation
 67. ✅ Build `/upload` page — composes DropZone, upload progress, error feedback, redirects to `/races/:id` on success
 68. ✅ Build `DELETE /races/:id` endpoint — deletes race, cascades to RaceResult, ObstacleSplit, removes vectors from Qdrant
-69. Add delete button to RaceCard — confirmation dialog, calls `DELETE /races/:id`, removes card from list on success
+69. ✅ Add delete button to RaceCard — confirmation dialog, calls `DELETE /races/:id`, removes card from list on success
 
 ---
 

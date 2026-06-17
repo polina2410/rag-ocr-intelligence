@@ -1275,3 +1275,25 @@ Built the `/upload` page completing Phase 4's CSV ingestion flow on the frontend
 Added `DELETE /races/:id` as a 204 No Content endpoint. `RacesService.remove` performs a 404 guard using `findOne`, then runs a `DataSource.transaction` that deletes in FK order: ObstacleSplit rows (only if results exist, guarding `IN ()` on empty array), then RaceResult rows, then the Race row. After the transaction commits, Qdrant vectors are cleaned up best-effort — any Qdrant failure is caught, logged at `error` level, and swallowed so that 204 is always returned when the DB delete succeeded. `deleteByRaceId` itself has no try/catch — the wrapping lives in `RacesService`. Three test suites updated: `vector-store.service.spec.ts` gained 3 `deleteByRaceId` tests verifying filter shape, error propagation, and debug log; `races.service.spec.ts` extended the constructor call (4 new injections) and added 4 `remove` tests (happy path, 404, Qdrant-failure-still-resolves, empty-results-skips-split-delete); new `races.controller.spec.ts` verifies that `remove` delegates and propagates `NotFoundException`. Total: 162 tests pass.
 
 ---
+
+## Delete Button on RaceCard
+
+**Branch:** delete-racecard-button
+**Completed:** 2026-06-17
+
+### Goals
+
+- NEW `deleteRace(id: string): Promise<void>` in `api/races.ts` — `http.delete`, resolves `void`
+- Delete button on `RaceCard` rendered only while hovered, inside the `<Link>` wrapper
+- Click: `stopPropagation` + `preventDefault` first, then `window.confirm` naming the race
+- On confirm: `useMutation` → `deleteRace`; on success: `queryClient.setQueryData` filters race from `data` and decrements `total`
+- Pending: button disabled + `aria-busy`; Error: inline `Failed to delete race.` message in card
+- `.deleteButton` / `.deleteError` CSS classes using `--color-danger` token
+- Upload link added to Navbar
+- Font-size scale consolidated from 7 literals → 4 tokens (`--font-size-xl/base/sm/xs`) across all CSS module files
+
+### Summary
+
+Extended `RaceCard` with a hover-gated delete button that guards navigation with `e.preventDefault()` + `e.stopPropagation()` before the `window.confirm` dialog. Cache update via `setQueryData` removes the card immediately on success without a refetch; the updater guards the `undefined` case. `deleteRace` resolves `void` (no body parsing on 204). Also added the Upload nav link to `Navbar` and consolidated all hardcoded `font-size` literals across 8 CSS module files into 4 root tokens (`--font-size-xl: 2rem`, `--font-size-base: 1rem`, `--font-size-sm: 0.875rem`, `--font-size-xs: 0.75rem`). Lint and build pass.
+
+---
