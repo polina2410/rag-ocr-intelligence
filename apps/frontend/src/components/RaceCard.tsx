@@ -53,6 +53,16 @@ export const RaceCard = ({ race }: RaceCardProps) => {
     >
       <span className={styles.name}>{race.name}</span>
       <Badge label={race.raceType} variant={race.raceType} />
+      {race.embeddingStatus === 'pending' && (
+        <span className={styles.statusPending} aria-label="Embedding in progress">
+          Indexing for AI…
+        </span>
+      )}
+      {race.embeddingStatus === 'failed' && (
+        <span className={styles.statusFailed} aria-label="Embedding failed">
+          AI indexing failed
+        </span>
+      )}
       <ul className={styles.details}>
         <li className={styles.detail}>{dateFormatter.format(new Date(race.date))}</li>
         <li className={styles.detail}>{race.location}</li>

@@ -6,4 +6,5 @@ export interface RaceDto {
   distanceKm: number
   totalObstacles: number
   raceType: 'Sprint' | 'Super' | 'DEKA' | 'Open'
+  embeddingStatus: 'pending' | 'complete' | 'failed'
 }
