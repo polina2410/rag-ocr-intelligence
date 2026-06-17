@@ -1255,3 +1255,23 @@ Created `DropZone` as a purely presentational file-picker component — no Axios
 Built the `/upload` page completing Phase 4's CSV ingestion flow on the frontend. `api/ingest.ts` is a new dedicated API layer file (not added to `races.ts`) — `uploadCsv` builds a `FormData` with field name `"file"` (matching the backend `FileInterceptor`), attaches `onUploadProgress` to compute and emit integer percent (guarded by `event.total` for environments that omit it), and returns `res.data` with errors propagating unwrapped to the caller. `UploadPage` owns a three-field state machine: `status` (`'idle' | 'uploading' | 'error'`), `progress`, and `errorMsg`. On `onFile` from `DropZone`, it resets all fields, sets `'uploading'`, calls `uploadCsv(file, setProgress)`, and on resolve navigates immediately to `/races/:raceId` (no intermediate success screen, `rowsIngested` not displayed). On reject, `extractErrorMessage` narrows with `axios.isAxiosError`, handles both `string` and `string[]` shapes from NestJS (class-validator returns arrays), and falls back gracefully. The progress bar uses `role="progressbar"` with full `aria-value*` attributes; its fill div uses a `--pct` CSS custom property set via `style` (the sole permitted dynamic-value exception — all other values use tokens). `UploadPage.module.css` uses `var(--color-accent)` for the fill, `var(--color-danger)` for errors, `var(--color-text-muted)` for the percent label. `router.tsx` gains a fourth lazy child route at `/upload` under `RootLayout`. Vite emits a separate `UploadPage` chunk (2.91 kB gzip: 1.33 kB). Lint and TypeScript build pass with 0 errors.
 
 ---
+## DELETE /races/:id Endpoint
+
+**Branch:** delete-races-endpoint
+**Completed:** 2026-06-17
+
+### Goals
+
+- NEW `VectorStoreService.deleteByRaceId(raceId)` — calls `client.delete` with `must` filter on `raceId`, debug log, errors propagate
+- EXTEND `RacesService` constructor with `DataSource`, `RaceResult`/`ObstacleSplit` repos, `VectorStoreService`, `Logger`
+- NEW `RacesService.remove(id)` — 404 pre-check, `dataSource.transaction` cascade delete (ObstacleSplit → RaceResult → Race), best-effort Qdrant cleanup after commit
+- `@Delete(':id')` on `RacesController` with `@HttpCode(HttpStatus.NO_CONTENT)`, `ParseUUIDPipe`, full Swagger decorators
+- `VectorStoreModule` added to `RacesModule` imports
+- 3 new `deleteByRaceId` tests, 4 new `remove` tests, new `races.controller.spec.ts` with 2 DELETE tests
+- 162 tests pass, lint pass, build pass
+
+### Summary
+
+Added `DELETE /races/:id` as a 204 No Content endpoint. `RacesService.remove` performs a 404 guard using `findOne`, then runs a `DataSource.transaction` that deletes in FK order: ObstacleSplit rows (only if results exist, guarding `IN ()` on empty array), then RaceResult rows, then the Race row. After the transaction commits, Qdrant vectors are cleaned up best-effort — any Qdrant failure is caught, logged at `error` level, and swallowed so that 204 is always returned when the DB delete succeeded. `deleteByRaceId` itself has no try/catch — the wrapping lives in `RacesService`. Three test suites updated: `vector-store.service.spec.ts` gained 3 `deleteByRaceId` tests verifying filter shape, error propagation, and debug log; `races.service.spec.ts` extended the constructor call (4 new injections) and added 4 `remove` tests (happy path, 404, Qdrant-failure-still-resolves, empty-results-skips-split-delete); new `races.controller.spec.ts` verifies that `remove` delegates and propagates `NotFoundException`. Total: 162 tests pass.
+
+---
