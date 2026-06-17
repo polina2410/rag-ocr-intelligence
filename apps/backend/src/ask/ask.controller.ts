@@ -1,5 +1,6 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { writeSse } from '../common/sse/sse-stream.js';
 import { GenerateService } from '../generate/generate.service.js';
@@ -8,6 +9,7 @@ import { RetrieveService } from '../retrieve/retrieve.service.js';
 import { AskQueryDto } from './dto/ask-query.dto.js';
 
 @ApiTags('ask')
+@UseGuards(ThrottlerGuard)
 @Controller('ask')
 export class AskController {
   constructor(

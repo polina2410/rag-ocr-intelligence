@@ -43,7 +43,15 @@ export class EmbedService {
     const points: QdrantPoint[] = [];
     for (const result of results) {
       const chunk = this.serializer.serialize(result);
-      const vector = await this.embed(chunk);
+      let vector: number[];
+      try {
+        vector = await this.embed(chunk);
+      } catch (error) {
+        throw new Error(
+          `Embedding failed for race ${raceId}, result ${result.id}: ${error instanceof Error ? error.message : String(error)}`,
+          { cause: error },
+        );
+      }
       const payload: RaceResultPayload = {
         raceResultId: result.id,
         raceId: result.raceId,

@@ -1,7 +1,11 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EMBED_QUEUE } from './queue.constants.js';
+import {
+  EMBED_BACKOFF_DELAY_MS,
+  EMBED_JOB_ATTEMPTS,
+  EMBED_QUEUE,
+} from './queue.constants.js';
 
 @Module({
   imports: [
@@ -15,7 +19,13 @@ import { EMBED_QUEUE } from './queue.constants.js';
         },
       }),
     }),
-    BullModule.registerQueue({ name: EMBED_QUEUE }),
+    BullModule.registerQueue({
+      name: EMBED_QUEUE,
+      defaultJobOptions: {
+        attempts: EMBED_JOB_ATTEMPTS,
+        backoff: { type: 'exponential', delay: EMBED_BACKOFF_DELAY_MS },
+      },
+    }),
   ],
   exports: [BullModule],
 })

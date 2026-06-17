@@ -135,14 +135,17 @@ describe('EmbedService', () => {
       expect(upsertFn).not.toHaveBeenCalled();
     });
 
-    it('propagates errors from embed without swallowing', async () => {
+    it('re-throws with raceId and resultId context when embed fails', async () => {
       const error = new Error('OpenAI down');
-      const { service } = setup({
+      const { service, upsertFn } = setup({
         results: [makeResult('rr-1')],
         embedError: error,
       });
 
-      await expect(service.batchEmbedRace('race-1')).rejects.toBe(error);
+      await expect(service.batchEmbedRace('race-1')).rejects.toThrow(
+        'Embedding failed for race race-1, result rr-1',
+      );
+      expect(upsertFn).not.toHaveBeenCalled();
     });
   });
 });
