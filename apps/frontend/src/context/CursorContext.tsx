@@ -13,6 +13,7 @@ export interface CursorContextValue {
 
 const INTERACTIVE_SELECTOR = 'a, button, [role="button"], [tabindex]'
 const CURSOR_HINT_ATTR = 'data-cursor-hint'
+const CURSOR_MAGNIFIER_ATTR = 'data-cursor-magnifier'
 
 const DEFAULT_VALUE: CursorContextValue = { x: 0, y: 0, hint: null, mode: 'default' }
 
@@ -28,7 +29,11 @@ export const CursorProvider = ({ children }: { children: ReactNode }) => {
       return
     }
     const hint = target.closest(`[${CURSOR_HINT_ATTR}]`)?.getAttribute(CURSOR_HINT_ATTR) ?? null
-    const mode: CursorMode = target.closest(INTERACTIVE_SELECTOR) ? 'pointer' : 'default'
+    const mode: CursorMode = target.closest(`[${CURSOR_MAGNIFIER_ATTR}]`)
+      ? 'hover'
+      : target.closest(INTERACTIVE_SELECTOR)
+        ? 'pointer'
+        : 'default'
     setState({ x: event.clientX, y: event.clientY, hint, mode })
   }, [])
 
