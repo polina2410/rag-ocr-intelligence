@@ -1356,3 +1356,23 @@ Four-line hook file. `useCursor` wraps `useContext(CursorContext)` with an expli
 `CursorDot` renders a Framer Motion `motion.div` fixed to the viewport. Position is set directly via inline `style={{ left, top }}` so the dot stays perfectly glued to the cursor with zero lag. Shape transitions (width, height, border-radius, background, border) are driven by a typed `Record<CursorMode, ShapeTarget>` lookup passed to Framer Motion's `animate` prop with `duration: 0.15, ease: 'easeOut'`. All dimension literals are named constants. `border-style: solid` in the CSS Module ensures the ring border renders when `borderWidth` animates above 0. `cursor: none` added globally to `body` in `index.css`; `<CursorDot />` mounted as the first child inside `<CursorProvider>` in `RootLayout`.
 
 ---
+
+## CursorHint Tooltip System
+
+**Branch:** cursor-hint
+**Completed:** 2026-06-17
+
+### Goals
+
+- NEW `CursorHint.tsx` — reads `{ x, y, hint }` from `useCursor()`; `AnimatePresence` + `motion.div` shown only when `hint !== null`
+- Position via `style={{ left: x + 16, top: y + 8 }}`; fade + `y: 4→0` enter/exit, `duration: 0.15`
+- Named constants: `HINT_OFFSET_X = 16`, `HINT_OFFSET_Y = 8`, `HINT_TRANSITION_DURATION = 0.15`
+- NEW `CursorHint.module.css` — `position: fixed`, surface bg, border, `border-radius: 4px`, `--font-size-xs`, `pointer-events: none`, `z-index: 9998`
+- EDIT `RootLayout.tsx` — `<CursorHint />` after `<CursorDot />`
+- Lint and build pass
+
+### Summary
+
+`CursorHint` consumes the `hint: string | null` already derived by `CursorProvider` from `data-cursor-hint` attribute lookups — no context changes needed. `AnimatePresence` directly wraps the conditional `motion.div` so exit animations fire correctly when `hint` transitions to null. Position tracked via `style` (not animated) at a fixed pixel offset from the cursor, matching the lag-free pattern of `CursorDot`. The tooltip pill floats at `z-index: 9998`, one layer below `CursorDot`'s 9999.
+
+---
