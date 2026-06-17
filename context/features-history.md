@@ -1460,6 +1460,25 @@ Created a 300-line `README.md` with a `flowchart TB` Mermaid diagram (single-lin
 
 ---
 
+## Empty State Components (Step 79)
+
+**Branch:** step-79-empty-state-components
+**Completed:** 2026-06-17
+
+### Goals
+
+- New `EmptyState` component with `title`, `description?`, `icon?`, `action?` props; CSS Module using only `var(--token)` for colors and font-sizes
+- `RacesPage` empty branch replaced with `<EmptyState title="No races found" description="Upload a CSV to get started." />`
+- `AskPage` shows empty prompt when `messages.length === 0 && !isStreaming`
+- `AthleteLeaderboard` "No results." text replaced with `<EmptyState title="No results" />` inside the existing `<td colSpan>`
+- Lint and build pass
+
+### Summary
+
+Created `EmptyState` as a named-export `const` arrow component with four optional props (`title` required, `description`, `icon`, `action`). All optional props render conditionally with no empty wrapper when absent. CSS Module references `var(--color-text)`, `var(--color-text-muted)`, `var(--font-size-base)`, `var(--font-size-sm)` — no hardcoded values. Applied in three places: `RacesPage` (list empty state), `AskPage` (initial chat prompt, guarded with `!isStreaming` so it vanishes immediately on first submit), `AthleteLeaderboard` (inside existing `<td colSpan={COLUMNS.length}>` to preserve valid table markup). Error and loading states left untouched.
+
+---
+
 ## API Client Audit — shared API_URL constant, VITE_API_URL types, frontend .env.example (Step 78)
 
 **Branch:** step-78-api-client-audit
