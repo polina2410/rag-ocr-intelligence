@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+import { API_URL } from './http'
 
 const DATA_PREFIX = 'data: '
 const EVENT_PREFIX = 'event: '
