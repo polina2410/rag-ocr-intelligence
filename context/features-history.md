@@ -1159,3 +1159,26 @@ Created `ChatMessage` as a purely presentational chat bubble — second of Phase
 Created `SourceCitations` as a pure props-driven expandable panel — third of Phase 4's chat UI components (steps 61–65), not yet wired into any page or data source. Native `<details>/<summary>` used for the toggle (free keyboard/AT disclosure semantics, no manual `aria-expanded` needed). Citation list rendered as `<ul>/<li>`, each showing optional bold `label`, required `text`, and optional `score` formatted via a named `SCORE_DECIMALS = 2` constant as "Relevance: X.XX". Two review-driven fixes applied after `ui-reviewer`/`a11y` agent passes: (1) `.summary`'s text color changed from `--color-text-muted` to `--color-text` — the muted token gave the primary clickable trigger weak contrast/affordance — and `overflow-wrap: anywhere` added to `.label` (previously only `.text` was protected against long unbroken strings); (2) each `<li>` gained `aria-label={citation.label ?? citation.text}` since plain `<li>`s with no accessible name were indistinguishable to screen reader users navigating the list. Declined as over-engineering: restructuring `<p>` tags into `<dl>/<dt>/<dd>` (visual `.item` grouping already conveys the relationship; not a WCAG failure). **Known gap, explicitly flagged in the spec and carried forward:** the backend's `/ask` SSE stream only transmits text tokens — `RetrieveService.retrieve()` computes chunks server-side but never sends them to the frontend, so this component has no real data source yet; wiring an actual citations channel (SSE event or REST call) is unplanned and left as an open question for a future step before steps 64/65 can render live citations. `pnpm --filter frontend lint`/`build` pass; `Citation` deliberately kept as a frontend-local type, not added to `@ocr/types`, to avoid drift against an undefined wire format.
 
 ---
+
+## ChatHistory Component (Step 64)
+
+**Branch:** chat-history
+**Completed:** 2026-06-17
+
+### Goals
+
+- `ChatHistory.tsx` — named `const ChatHistory`, named exported `ChatHistoryMessage` and `ChatHistoryProps` interfaces
+- `ChatHistoryMessage`: `{ id: string; role: 'user' | 'assistant'; content: string; isStreaming?: boolean; citations?: Citation[] }`
+- Scrollable container (`overflow-y: auto`) wrapping the message list
+- Each message renders one `<ChatMessage>` keyed by `message.id`; non-empty `citations` renders a sibling `<SourceCitations>`
+- Per-message wrapper div keyed by `message.id` to satisfy the sibling requirement
+- Auto-scroll to bottom via `useRef` + `useEffect` keyed on `messages.length`
+- Empty `messages` array renders empty container, no crash
+- `ChatHistory.module.css` — scroll container and entry styles using spacing values only; no hardcoded colors or font-sizes
+- `pnpm --filter frontend lint` passes; no `any` types; TypeScript build clean
+
+### Summary
+
+Created `ChatHistory` as the fourth of Phase 4's chat UI components (steps 61–65), not yet wired into any page. The component renders a `.scroll` div (`overflow-y: auto; height: 100%`) mapping each `ChatHistoryMessage` to a `.entry` wrapper keyed by `message.id`. Each entry contains one `<ChatMessage>` (passing `role`, `content`, `isStreaming`) and, when `citations` is non-empty, a sibling `<SourceCitations>` — the `.entry` wrapper satisfies the spec requirement that `SourceCitations` be a sibling of, not nested inside, `ChatMessage`. A sentinel `<div ref={bottomRef} />` at the end of the list receives `scrollIntoView({ block: 'end' })` from a `useEffect` keyed on `messages.length` — fires only when a new message is added, not on every streamed token. CSS Module uses only `gap` and `flex` — no hardcoded colors or font-sizes. Lint and TypeScript build both pass with 0 errors; no existing files modified.
+
+---

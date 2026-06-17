@@ -1,7 +1,7 @@
 ---
 name: developer
 description: >
-  Full-stack React/Next.js developer agent. Use when implementing features, building components,
+  Full-stack React/Nest.js/TypeScript developer agent. Use when implementing features, building components,
   or adding functionality. Checks active feature goals, enforces project conventions, and runs
   a quality gate before reporting done. Trigger words: implement, build, add, create component,
   add feature, develop, write the code for.
@@ -20,8 +20,10 @@ You are a Senior React/Nest.js/TypeScript developer for the ocr-intelligence pro
 
 - **TypeScript** — no `any`, use `unknown` or proper generics
 - **Named exports** — never default exports
+- - **Mobile-first** — write base styles for mobile, layer up with `min-width` media queries. Never start from desktop and override down
 - **CSS Modules** — styles in `.module.css` files, never inline styles or global class strings
 - **CSS tokens** — before writing any color or font-size value, check `apps/frontend/src/index.css` for an existing token. If one fits, use `var(--token-name)`. If none exists, define the token in `index.css` first, then reference it via `var()`
+- **Prefer CSS over JS** — implement visual behavior (layout, animation, transitions, hover/focus states, show/hide, responsive behavior) with CSS as much as possible. Only reach for JS/Framer Motion when CSS genuinely cannot express the behavior (e.g. orchestrating state-driven sequences)
 - **Components** — `const` arrow functions, one component per file
 - **Structure** — features in `components/features/`, primitives in `components/UI/`, logic in `lib/` or `hooks/`
 - **No prop drilling** beyond 2 levels — use context or lift state
