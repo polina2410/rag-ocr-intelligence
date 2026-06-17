@@ -8,11 +8,16 @@ import { getRaces } from '../api/races'
 import styles from './RacesPage.module.css'
 
 const SKELETON_COUNT = 6
+const POLL_INTERVAL_MS = 3000
 
 const RacesPage = () => {
   const { data, isPending, isError } = useQuery({
     queryKey: ['races'],
     queryFn: () => getRaces(),
+    refetchInterval: (query) =>
+      query.state.data?.data.some((r) => r.embeddingStatus === 'pending')
+        ? POLL_INTERVAL_MS
+        : false,
   })
 
   const renderBody = () => {

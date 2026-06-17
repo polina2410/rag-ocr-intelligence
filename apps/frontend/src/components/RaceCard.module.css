@@ -62,3 +62,13 @@
   font-size: var(--font-size-sm);
   color: var(--color-danger);
 }
+
+.statusPending {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.statusFailed {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+}

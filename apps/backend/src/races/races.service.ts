@@ -40,6 +40,7 @@ export class RacesService {
       distanceKm: Number(row.distanceKm),
       totalObstacles: row.totalObstacles,
       raceType: row.raceType,
+      embeddingStatus: row.embeddingStatus,
     }));
 
     return { data, total, page, limit };
