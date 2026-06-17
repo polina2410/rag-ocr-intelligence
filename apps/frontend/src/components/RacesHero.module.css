@@ -37,3 +37,9 @@
   color: var(--color-hero-text);
   letter-spacing: -0.02em;
 }
+
+@media (max-width: 480px) {
+  .hero {
+    margin-bottom: 24px;
+  }
+}

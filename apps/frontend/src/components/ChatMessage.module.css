@@ -50,3 +50,9 @@
     animation: none;
   }
 }
+
+@media (max-width: 480px) {
+  .bubble {
+    max-width: 88%;
+  }
+}
