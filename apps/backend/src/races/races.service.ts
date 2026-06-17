@@ -1,13 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { PaginatedResponse, RaceDetailDto, RaceDto } from '@ocr/types';
-import { Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
+import { ObstacleSplit } from '../entities/obstacle-split.entity';
 import { Race } from '../entities/race.entity';
+import { RaceResult } from '../entities/race-result.entity';
+import { VectorStoreService } from '../vector-store/vector-store.service';
 
 @Injectable()
 export class RacesService {
+  private readonly logger = new Logger(RacesService.name);
+
   constructor(
     @InjectRepository(Race) private readonly raceRepo: Repository<Race>,
+    @InjectRepository(RaceResult)
+    private readonly raceResultRepo: Repository<RaceResult>,
+    @InjectRepository(ObstacleSplit)
+    private readonly obstacleSplitRepo: Repository<ObstacleSplit>,
+    private readonly dataSource: DataSource,
+    private readonly vectorStoreService: VectorStoreService,
   ) {}
 
   async findAll(
@@ -83,5 +94,34 @@ export class RacesService {
           })),
       })),
     };
+  }
+
+  async remove(id: string): Promise<void> {
+    const race = await this.raceRepo.findOne({ where: { id } });
+    if (!race) {
+      throw new NotFoundException(`Race ${id} not found`);
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      const results = await manager
+        .getRepository(RaceResult)
+        .find({ where: { raceId: id }, select: ['id'] });
+
+      if (results.length > 0) {
+        const ids = results.map((r) => r.id);
+        await manager
+          .getRepository(ObstacleSplit)
+          .delete({ raceResultId: In(ids) });
+      }
+
+      await manager.getRepository(RaceResult).delete({ raceId: id });
+      await manager.getRepository(Race).delete(id);
+    });
+
+    try {
+      await this.vectorStoreService.deleteByRaceId(id);
+    } catch (err) {
+      this.logger.error(`Failed to delete Qdrant vectors for race ${id}`, err);
+    }
   }
 }

@@ -1,5 +1,15 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -33,5 +43,15 @@ export class RacesController {
   @ApiNotFoundResponse({ description: 'Race not found' })
   findOne(@Param('id', ParseUUIDPipe) id: string): Promise<RaceDetailDto> {
     return this.racesService.findOne(id);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a race and all its results and splits' })
+  @ApiParam({ name: 'id', description: 'Race UUID', format: 'uuid' })
+  @ApiNoContentResponse({ description: 'Race deleted' })
+  @ApiNotFoundResponse({ description: 'Race not found' })
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.racesService.remove(id);
   }
 }

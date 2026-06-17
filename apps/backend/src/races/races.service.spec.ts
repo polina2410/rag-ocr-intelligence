@@ -1,9 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
-import type { Repository } from 'typeorm';
+import { In } from 'typeorm';
+import type { DataSource, Repository } from 'typeorm';
 import type { Athlete } from '../entities/athlete.entity';
-import type { ObstacleSplit } from '../entities/obstacle-split.entity';
-import type { Race } from '../entities/race.entity';
-import type { RaceResult } from '../entities/race-result.entity';
+import { ObstacleSplit } from '../entities/obstacle-split.entity';
+import { Race } from '../entities/race.entity';
+import { RaceResult } from '../entities/race-result.entity';
+import type { VectorStoreService } from '../vector-store/vector-store.service';
 import { RacesService } from './races.service';
 
 const findAndCountMock = jest.fn();
@@ -12,6 +14,41 @@ const mockRaceRepo = {
   findAndCount: findAndCountMock,
   findOne: findOneMock,
 } as unknown as Repository<Race>;
+
+const raceResultFindMock = jest.fn();
+const raceResultDeleteMock = jest.fn();
+const obstacleSplitDeleteMock = jest.fn();
+const raceDeleteMock = jest.fn();
+
+const mockRaceResultRepo = {
+  find: raceResultFindMock,
+  delete: raceResultDeleteMock,
+};
+const mockObstacleSplitRepo = { delete: obstacleSplitDeleteMock };
+const mockRaceDeleteRepo = { delete: raceDeleteMock };
+
+const mockManager = {
+  getRepository: jest.fn((entity: unknown) => {
+    if (entity === RaceResult) return mockRaceResultRepo;
+    if (entity === ObstacleSplit) return mockObstacleSplitRepo;
+    if (entity === Race) return mockRaceDeleteRepo;
+    return {};
+  }),
+};
+
+const transactionMock = jest
+  .fn()
+  .mockImplementation((cb: (m: typeof mockManager) => Promise<void>) =>
+    cb(mockManager),
+  );
+const mockDataSource = {
+  transaction: transactionMock,
+} as unknown as DataSource;
+
+const deleteByRaceIdMock = jest.fn();
+const mockVectorStore = {
+  deleteByRaceId: deleteByRaceIdMock,
+} as unknown as VectorStoreService;
 
 const makeRace = (overrides: Partial<Race> = {}): Race => ({
   id: 'uuid-1',
@@ -65,7 +102,13 @@ describe('RacesService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new RacesService(mockRaceRepo);
+    service = new RacesService(
+      mockRaceRepo,
+      {} as never,
+      {} as never,
+      mockDataSource,
+      mockVectorStore,
+    );
   });
 
   describe('findAll', () => {
@@ -240,6 +283,53 @@ describe('RacesService', () => {
       await expect(service.findOne('no-such-uuid')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('remove', () => {
+    it('deletes splits, results, and race inside a transaction, then cleans up Qdrant', async () => {
+      findOneMock.mockResolvedValue(makeRace());
+      raceResultFindMock.mockResolvedValue([{ id: 'result-1' }]);
+
+      await service.remove('uuid-1');
+
+      expect(transactionMock).toHaveBeenCalledTimes(1);
+      expect(obstacleSplitDeleteMock).toHaveBeenCalledWith({
+        raceResultId: In(['result-1']),
+      });
+      expect(raceResultDeleteMock).toHaveBeenCalledWith({ raceId: 'uuid-1' });
+      expect(raceDeleteMock).toHaveBeenCalledWith('uuid-1');
+      expect(deleteByRaceIdMock).toHaveBeenCalledWith('uuid-1');
+    });
+
+    it('throws NotFoundException when race does not exist', async () => {
+      findOneMock.mockResolvedValue(null);
+
+      await expect(service.remove('no-such-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(transactionMock).not.toHaveBeenCalled();
+      expect(deleteByRaceIdMock).not.toHaveBeenCalled();
+    });
+
+    it('still resolves when Qdrant delete fails', async () => {
+      findOneMock.mockResolvedValue(makeRace());
+      raceResultFindMock.mockResolvedValue([{ id: 'result-1' }]);
+      deleteByRaceIdMock.mockRejectedValue(new Error('Qdrant down'));
+
+      await expect(service.remove('uuid-1')).resolves.toBeUndefined();
+      expect(raceDeleteMock).toHaveBeenCalled();
+    });
+
+    it('skips ObstacleSplit delete when race has no results', async () => {
+      findOneMock.mockResolvedValue(makeRace());
+      raceResultFindMock.mockResolvedValue([]);
+
+      await service.remove('uuid-1');
+
+      expect(obstacleSplitDeleteMock).not.toHaveBeenCalled();
+      expect(raceResultDeleteMock).toHaveBeenCalled();
+      expect(raceDeleteMock).toHaveBeenCalled();
     });
   });
 });

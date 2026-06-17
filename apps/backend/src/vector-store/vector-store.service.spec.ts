@@ -4,9 +4,11 @@ import { type QdrantPoint, VectorStoreService } from './vector-store.service';
 
 const upsertMock = jest.fn();
 const searchMock = jest.fn();
+const deleteMock = jest.fn();
 const mockClient = {
   upsert: upsertMock,
   search: searchMock,
+  delete: deleteMock,
 } as unknown as QdrantClient;
 
 const makePoint = (id: string): QdrantPoint => ({
@@ -128,5 +130,48 @@ describe('VectorStoreService.query', () => {
     await expect(service.query(queryVector, topK)).rejects.toThrow(
       'search failed',
     );
+  });
+});
+
+describe('VectorStoreService.deleteByRaceId', () => {
+  let service: VectorStoreService;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new VectorStoreService(mockClient);
+  });
+
+  it('calls client.delete with the correct collection and raceId filter', async () => {
+    deleteMock.mockResolvedValue({ status: 'acknowledged', operation_id: 1 });
+
+    await service.deleteByRaceId('race-abc');
+
+    expect(deleteMock).toHaveBeenCalledTimes(1);
+    expect(deleteMock).toHaveBeenCalledWith(RACE_RESULTS_COLLECTION, {
+      filter: {
+        must: [{ key: 'raceId', match: { value: 'race-abc' } }],
+      },
+    });
+  });
+
+  it('propagates errors thrown by the client', async () => {
+    const error = new Error('Qdrant unavailable');
+    deleteMock.mockRejectedValue(error);
+
+    await expect(service.deleteByRaceId('race-abc')).rejects.toThrow(
+      'Qdrant unavailable',
+    );
+  });
+
+  it('logs a debug message on success', async () => {
+    deleteMock.mockResolvedValue({ status: 'acknowledged', operation_id: 2 });
+    const debugSpy = jest
+      .spyOn(service['logger'], 'debug')
+      .mockImplementation(() => undefined);
+
+    await service.deleteByRaceId('race-xyz');
+
+    expect(debugSpy).toHaveBeenCalledTimes(1);
+    expect(debugSpy.mock.calls[0][0]).toContain('race-xyz');
   });
 });

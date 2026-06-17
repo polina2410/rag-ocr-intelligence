@@ -89,4 +89,13 @@ export class VectorStoreService implements OnModuleInit {
       payload: hit.payload ?? {},
     }));
   }
+
+  async deleteByRaceId(raceId: string): Promise<void> {
+    await this.client.delete(RACE_RESULTS_COLLECTION, {
+      filter: { must: [{ key: 'raceId', match: { value: raceId } }] },
+    });
+    this.logger.debug(
+      `Deleted vectors for race "${raceId}" from "${RACE_RESULTS_COLLECTION}"`,
+    );
+  }
 }
