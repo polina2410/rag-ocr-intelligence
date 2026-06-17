@@ -1377,6 +1377,29 @@ Installed `html2canvas-pro` as a frontend dependency. Updated `CursorContext.tsx
 
 ---
 
+## Project README (Step 76)
+
+**Branch:** project-readme
+**Completed:** 2026-06-17
+
+### Goals
+
+- New `README.md` at repo root — title + one-paragraph overview of the project
+- Tech-stack table with accurate versions (React 19, NestJS, Postgres 16, Qdrant v1.13.6, Redis 7 + BullMQ, OpenAI, pnpm 10.33.0 + Turborepo)
+- Mermaid architecture diagram covering ingestion flow and RAG query flow, with all three Docker services and frontend pages
+- Repository layout subsection (`apps/frontend`, `apps/backend`, `packages/types`)
+- Prerequisites list and numbered local setup instructions (clone → two env files → install → docker → start)
+- Service URLs table and environment-variables table for both `.env` files
+- Loading data section: `/upload` UI + `curl POST /ingest/csv` using a fixture CSV
+- Example RAG queries: 3 natural-language questions + `curl POST /ask` with SSE note
+- 3 demo screenshot embeds from `docs/` folder
+
+### Summary
+
+Created the first user-facing `README.md` at the repo root. Documentation-only — no source files were modified. Key decisions: Node.js ≥ 20.11 stated as prerequisite (Vite 8's binding constraint; no `.nvmrc` or `engines` field exists). The Mermaid diagram uses a `flowchart TB` layout with three subgraphs (Docker Compose, Frontend, Backend) and a standalone OpenAI node, covering both the ingestion pipeline and the RAG query flow. The env-var table is split into two sections (root `.env` for Docker Compose, `apps/backend/.env` for NestJS) with an explicit callout that root `.env.example` is missing the backend-only vars (`DB_HOST`, `DB_PORT`, `QDRANT_URL`, `OPENAI_API_KEY`, `CORS_ORIGIN`) — readers are instructed to create `apps/backend/.env` manually. Qdrant documented as loopback-bound (`127.0.0.1:6333`). Three 1×1 placeholder PNGs committed at `docs/screenshot-races.png`, `docs/screenshot-race-detail.png`, `docs/screenshot-ask.png` so screenshot links resolve; the README notes they should be replaced with live captures. No LICENSE file exists in the repo; license section omitted.
+
+---
+
 ## Framer Motion Parallax Hero Section (Step 75)
 
 **Branch:** framer-motion-parallax-hero
