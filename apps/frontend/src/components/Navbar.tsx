@@ -3,7 +3,7 @@ import styles from './Navbar.module.css'
 
 export const Navbar = () => (
   <nav className={styles.nav} aria-label="Main">
-    <span className={styles.brand}>ocr-intelligence</span>
+    <span className={styles.brand}>OCR Intelligence</span>
     <NavLink
       to="/races"
       className={({ isActive }) =>
@@ -19,6 +19,14 @@ export const Navbar = () => (
       }
     >
       Ask AI
+    </NavLink>
+    <NavLink
+      to="/upload"
+      className={({ isActive }) =>
+        isActive ? `${styles.link} ${styles.linkActive}` : styles.link
+      }
+    >
+      Upload
     </NavLink>
   </nav>
 )

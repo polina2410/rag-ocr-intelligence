@@ -15,7 +15,10 @@
   --color-badge-open-bg: #d1fae5;
   --color-badge-open-text: #065f46;
   --color-bubble-assistant-bg: #f3f4f6;
+  --font-size-xl: 2rem;
+  --font-size-base: 1rem;
   --font-size-sm: 0.875rem;
+  --font-size-xs: 0.75rem;
 }
 
 *, *::before, *::after {

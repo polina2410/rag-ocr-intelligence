@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { type RaceDto } from '@ocr/types'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { type PaginatedResponse, type RaceDto } from '@ocr/types'
+import { deleteRace } from '../api/races'
 import { Badge } from './Badge'
 import { RaceCardStats } from './RaceCardStats'
 import styles from './RaceCard.module.css'
@@ -8,6 +10,8 @@ import styles from './RaceCard.module.css'
 export interface RaceCardProps {
   race: RaceDto
 }
+
+const TOTAL_DECREMENT = 1
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   day: 'numeric',
@@ -17,6 +21,28 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 
 export const RaceCard = ({ race }: RaceCardProps) => {
   const [hovered, setHovered] = useState(false)
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: () => deleteRace(race.id),
+    onSuccess: () => {
+      queryClient.setQueryData<PaginatedResponse<RaceDto>>(['races'], (prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          data: prev.data.filter((r) => r.id !== race.id),
+          total: prev.total - TOTAL_DECREMENT,
+        }
+      })
+    },
+  })
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!window.confirm(`Delete "${race.name}"? This cannot be undone.`)) return
+    mutation.mutate()
+  }
 
   return (
     <Link
@@ -34,6 +60,20 @@ export const RaceCard = ({ race }: RaceCardProps) => {
         <li className={styles.detail}>{race.totalObstacles} obstacles</li>
       </ul>
       {hovered && <RaceCardStats raceId={race.id} />}
+      {hovered && (
+        <button
+          className={styles.deleteButton}
+          onClick={handleDelete}
+          disabled={mutation.isPending}
+          aria-busy={mutation.isPending}
+          aria-label={`Delete ${race.name}`}
+        >
+          {mutation.isPending ? 'Deleting…' : 'Delete'}
+        </button>
+      )}
+      {mutation.isError && (
+        <p className={styles.deleteError}>Failed to delete race.</p>
+      )}
     </Link>
   )
 }
