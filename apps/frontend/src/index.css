@@ -15,6 +15,10 @@
   --color-badge-open-bg: #d1fae5;
   --color-badge-open-text: #065f46;
   --color-bubble-assistant-bg: #f3f4f6;
+  --color-hero-bg: #0f0e17;
+  --color-hero-glow: rgba(99, 102, 241, 0.35);
+  --color-hero-text: #f9fafb;
+  --font-size-hero: 4rem;
   --font-size-xl: 2rem;
   --font-size-base: 1rem;
   --font-size-sm: 0.875rem;

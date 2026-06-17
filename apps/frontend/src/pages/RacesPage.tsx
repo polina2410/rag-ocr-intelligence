@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { PageWrapper } from '../components/PageWrapper'
 import { RaceCard } from '../components/RaceCard'
+import { RacesHero } from '../components/RacesHero'
 import { SkeletonCard } from '../components/SkeletonCard'
 import { getRaces } from '../api/races'
 import styles from './RacesPage.module.css'
@@ -43,7 +44,7 @@ const RacesPage = () => {
 
   return (
     <PageWrapper>
-      <h1>Races</h1>
+      <RacesHero />
       {renderBody()}
     </PageWrapper>
   )
