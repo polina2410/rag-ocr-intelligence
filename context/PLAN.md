@@ -98,7 +98,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 ## Phase 5 — Polish + Cursor Engine
 
 70. ✅ Build `CursorProvider` context — tracks mouse position, exposes `hint` and `mode`
-71. Build `useCursor` hook — consumes `CursorProvider`, returns position and state
+71. ✅ Build `useCursor` hook — consumes `CursorProvider`, returns position and state
 72. Build `CursorDot` component — follows mouse, changes shape on mode change
 73. Build `data-cursor-hint` tooltip system — reads attribute, shows hint near cursor
 74. Build magnifier mode — `<canvas>` redraws zoomed DOM region around cursor

@@ -1317,3 +1317,20 @@ Extended `RaceCard` with a hover-gated delete button that guards navigation with
 Created `CursorContext.tsx` with a read-only context exposing `x`, `y`, `hint`, and `mode` derived on every `mousemove`. The `mousemove` handler (stabilised with `useCallback`) narrows `event.target` to `Element`, then uses `closest()` once for `data-cursor-hint` attribute lookup and once for interactive-element detection — no manual DOM walk. All four fields are set in a single `setState` call per move. Module-level constants (`INTERACTIVE_SELECTOR`, `CURSOR_HINT_ATTR`) eliminate inline strings. Added `/* eslint-disable react-refresh/only-export-components */` following the same pattern as `router.tsx` since the file exports both a context object and a component. Mounted `CursorProvider` in `RootLayout` as the single correct wrap point (object-based routing prevents wrapping from `App.tsx`).
 
 ---
+
+## useCursor Hook
+
+**Branch:** use-cursor-hook
+**Completed:** 2026-06-17
+
+### Goals
+
+- NEW `apps/frontend/src/hooks/useCursor.ts` — `export const useCursor = (): CursorContextValue => useContext(CursorContext)`
+- Pure wrapper; returns context value unchanged; no re-exports of context symbols
+- Lint and build pass
+
+### Summary
+
+Four-line hook file. `useCursor` wraps `useContext(CursorContext)` with an explicit return type annotation so consumers get a typed `{ x, y, hint, mode }` without importing `useContext` or `CursorContext` directly. No "throw outside provider" guard — the context has a concrete default value so `useContext` can never return `undefined`. Steps 72 and 73 will consume this hook.
+
+---
