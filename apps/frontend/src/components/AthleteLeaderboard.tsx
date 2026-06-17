@@ -113,6 +113,7 @@ export const AthleteLeaderboard = ({ results, categoryFilter }: AthleteLeaderboa
       <p className={styles.visuallyHidden} aria-live="polite">
         {sortAnnouncement}
       </p>
+      <div className={styles.tableScroll}>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -173,6 +174,7 @@ export const AthleteLeaderboard = ({ results, categoryFilter }: AthleteLeaderboa
           )}
         </tbody>
       </table>
+      </div>
     </>
   )
 }
