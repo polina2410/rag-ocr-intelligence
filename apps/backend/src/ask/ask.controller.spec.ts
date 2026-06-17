@@ -1,5 +1,6 @@
 import type { Response } from 'express';
 import type OpenAI from 'openai';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { writeSse } from '../common/sse/sse-stream.js';
 import type { GenerateService } from '../generate/generate.service.js';
 import type { PromptBuilderService } from '../prompt/prompt-builder.service.js';
@@ -130,5 +131,13 @@ describe('AskController', () => {
 
     await expect(controller.ask({ query: 'q' }, res)).rejects.toBe(error);
     expect(writeSseMock).not.toHaveBeenCalled();
+  });
+
+  it('has ThrottlerGuard applied so the HTTP layer returns 429 when the limit is exceeded', () => {
+    const guards = Reflect.getMetadata(
+      '__guards__',
+      AskController,
+    ) as unknown[];
+    expect(guards).toContain(ThrottlerGuard);
   });
 });
