@@ -1441,3 +1441,42 @@ Created `RacesHero` as a new named-export component with two scroll-driven paral
 `CursorHint` consumes the `hint: string | null` already derived by `CursorProvider` from `data-cursor-hint` attribute lookups — no context changes needed. `AnimatePresence` directly wraps the conditional `motion.div` so exit animations fire correctly when `hint` transitions to null. Position tracked via `style` (not animated) at a fixed pixel offset from the cursor, matching the lag-free pattern of `CursorDot`. The tooltip pill floats at `z-index: 9998`, one layer below `CursorDot`'s 9999.
 
 ---
+
+## Project README with Architecture Diagram (Step 76)
+
+**Branch:** project-readme
+**Completed:** 2026-06-17
+
+### Goals
+
+- `README.md` at repo root: title, tech-stack table, Mermaid architecture diagram, repo layout, prerequisites, 7-step local setup, service URLs, env-var reference tables for both `.env` files, loading-data curl example, 3 RAG query examples, 3 screenshot embeds
+- Diagram covers both the ingestion flow (CSV → Postgres → BullMQ → OpenAI → Qdrant) and the RAG query flow (Client → POST /ask → SSE stream)
+- Placeholder PNG screenshots committed under `docs/` so the embeds resolve
+- Lint and build pass
+
+### Summary
+
+Created a 300-line `README.md` with a `flowchart TB` Mermaid diagram (single-line node labels for GitHub compatibility). Placeholder 1×1 PNGs generated via Node.js for `docs/screenshot-races.png`, `docs/screenshot-race-detail.png`, and `docs/screenshot-ask.png`. The diagram covers two sub-flows: ingestion (Upload CSV → `POST /ingest/csv` → Postgres → BullMQ → OpenAI → Qdrant) and RAG query (`POST /ask` → Retrieve → Prompt → OpenAI → SSE). Env-var tables cover both the root `.env` (Docker Compose) and `apps/backend/.env` (NestJS runtime).
+
+---
+
+## Backend Hardening — env example, OpenAI errors, BullMQ retries, /ask rate limiting (Step 77)
+
+**Branch:** step-77-hardening
+**Completed:** 2026-06-17
+
+### Goals
+
+- New `apps/backend/.env.example` with all 12 NestJS env vars (placeholder values, one-line comments, `DB_PORT=5433`)
+- Root `.env.example` gains a header comment clarifying it covers Docker Compose only
+- `EmbedService.batchEmbedRace` fail-fast on OpenAI error: re-throws with `raceId` and `resultId` context; new test in `embed.service.spec.ts`
+- BullMQ retry config: `registerQueue` adds `defaultJobOptions` with `attempts: 3`, exponential backoff `delay: 2000ms` — both as named constants
+- `@nestjs/throttler` installed; `ThrottlerModule` registered in `AskModule` (scoped, not global); `@UseGuards(ThrottlerGuard)` on `AskController`; 10 req / 60 s limit with named constants
+- `ask.controller.spec.ts` extended: new test asserting `ThrottlerGuard` is applied to the controller class
+- `pnpm --filter backend lint` and `pnpm --filter backend test` pass (163 total)
+
+### Summary
+
+Created `apps/backend/.env.example` listing all 12 NestJS env vars with placeholder values and a `# DB_PORT=5433` note explaining the Docker port mapping. Added a clarifying header comment to the root `.env.example` pointing readers to the backend-specific file. Wrapped `batchEmbedRace`'s per-result embed call in a `try/catch` that re-throws with `{ cause: error }` and a message including both `raceId` and `result.id` — the `preserve-caught-error` lint rule required `cause` chaining. Added `EMBED_JOB_ATTEMPTS = 3` and `EMBED_BACKOFF_DELAY_MS = 2000` constants; wired them into `defaultJobOptions` in `BullModule.registerQueue`. Installed `@nestjs/throttler@6.5.0`; TTL is in milliseconds in v5+. `ThrottlerModule.forRoot([{ ttl: ASK_THROTTLE_TTL_MS, limit: ASK_THROTTLE_LIMIT }])` registered in `AskModule` only. `@UseGuards(ThrottlerGuard)` applied at the class level on `AskController`. The 429 guard test uses `Reflect.getMetadata('__guards__', AskController)` — the guard fires at the HTTP layer, not inside the method body, so reflection-based verification is the appropriate unit-test approach. 163/163 tests pass.
+
+---
