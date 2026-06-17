@@ -1,15 +1,23 @@
-# Current Feature
+# Current Feature: useCursor Hook
 
 ## Status
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Goals will be added when a feature is loaded -->
+- NEW `apps/frontend/src/hooks/useCursor.ts` — single named export `const useCursor = (): CursorContextValue => useContext(CursorContext)`
+- Returns full `CursorContextValue` unchanged — no spread, no remap, same object reference
+- `CursorContext` imported as value; `CursorContextValue` imported via `import type` — both from `../context/CursorContext`
+- File exports nothing else — no re-exports of `CursorContext`, `CursorProvider`, `CursorMode`, or `CursorContextValue`
+- `pnpm --filter frontend lint` passes; build compiles with no `any` and no unused imports
 
 ## Notes
 
-<!-- Notes will be added when a feature is loaded -->
+- File extension `.ts` not `.tsx` (no JSX)
+- No "throw outside provider" guard — context has a concrete `DEFAULT_VALUE`, so `useContext` never returns `undefined`; a guard would be dead code
+- Do NOT modify `CursorContext.tsx`
+- Re-render behaviour (on every `mousemove`) is the provider's design — no throttle or `useMemo` here
+- Spec: `context/specs/step-71-use-cursor-hook.md`
 
 ## History
 
