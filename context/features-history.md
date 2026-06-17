@@ -1334,3 +1334,25 @@ Created `CursorContext.tsx` with a read-only context exposing `x`, `y`, `hint`, 
 Four-line hook file. `useCursor` wraps `useContext(CursorContext)` with an explicit return type annotation so consumers get a typed `{ x, y, hint, mode }` without importing `useContext` or `CursorContext` directly. No "throw outside provider" guard — the context has a concrete default value so `useContext` can never return `undefined`. Steps 72 and 73 will consume this hook.
 
 ---
+
+## CursorDot Component
+
+**Branch:** cursor-dot
+**Completed:** 2026-06-17
+
+### Goals
+
+- NEW `CursorDot.tsx` — Framer Motion `motion.div`, no props, reads `{ x, y, mode }` from `useCursor()`
+- Position via `style={{ left: x, top: y }}` — no lag; shape via `animate={SHAPES[mode]}` — smooth transition
+- `SHAPES` record: `default/hover` → 10px filled circle (`--color-accent`); `pointer` → 20px ring (2px border, transparent bg)
+- Named constants for all dimensions: `DOT_SIZE`, `RING_SIZE`, `RING_BORDER`, `TRANSITION_DURATION`, `FULL_RADIUS`
+- NEW `CursorDot.module.css` — `position: fixed`, `pointer-events: none`, `border-style: solid`, `z-index: 9999`
+- EDIT `index.css` — `cursor: none` on `body`
+- EDIT `RootLayout.tsx` — `<CursorDot />` first child inside `<CursorProvider>`
+- Lint and build pass
+
+### Summary
+
+`CursorDot` renders a Framer Motion `motion.div` fixed to the viewport. Position is set directly via inline `style={{ left, top }}` so the dot stays perfectly glued to the cursor with zero lag. Shape transitions (width, height, border-radius, background, border) are driven by a typed `Record<CursorMode, ShapeTarget>` lookup passed to Framer Motion's `animate` prop with `duration: 0.15, ease: 'easeOut'`. All dimension literals are named constants. `border-style: solid` in the CSS Module ensures the ring border renders when `borderWidth` animates above 0. `cursor: none` added globally to `body` in `index.css`; `<CursorDot />` mounted as the first child inside `<CursorProvider>` in `RootLayout`.
+
+---
