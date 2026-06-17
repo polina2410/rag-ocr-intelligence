@@ -5,11 +5,11 @@ Not Started
 
 ## Goals
 
-<!-- Add goals here when a feature is loaded -->
+<!-- List goals here -->
 
 ## Notes
 
-<!-- Add notes here when a feature is loaded -->
+<!-- Add notes here -->
 
 ## History
 

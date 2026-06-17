@@ -1518,3 +1518,26 @@ Created `EmptyState` as a named-export `const` arrow component with four optiona
 Created `apps/backend/.env.example` listing all 12 NestJS env vars with placeholder values and a `# DB_PORT=5433` note explaining the Docker port mapping. Added a clarifying header comment to the root `.env.example` pointing readers to the backend-specific file. Wrapped `batchEmbedRace`'s per-result embed call in a `try/catch` that re-throws with `{ cause: error }` and a message including both `raceId` and `result.id` — the `preserve-caught-error` lint rule required `cause` chaining. Added `EMBED_JOB_ATTEMPTS = 3` and `EMBED_BACKOFF_DELAY_MS = 2000` constants; wired them into `defaultJobOptions` in `BullModule.registerQueue`. Installed `@nestjs/throttler@6.5.0`; TTL is in milliseconds in v5+. `ThrottlerModule.forRoot([{ ttl: ASK_THROTTLE_TTL_MS, limit: ASK_THROTTLE_LIMIT }])` registered in `AskModule` only. `@UseGuards(ThrottlerGuard)` applied at the class level on `AskController`. The 429 guard test uses `Reflect.getMetadata('__guards__', AskController)` — the guard fires at the HTTP layer, not inside the method body, so reflection-based verification is the appropriate unit-test approach. 163/163 tests pass.
 
 ---
+
+## Step 80 — EmbeddingStatus Indicator
+
+**Branch:** step-80-embedding-status
+**Completed:** 2026-06-17
+
+### Goals
+- `RaceDto` gains `embeddingStatus: 'pending' | 'complete' | 'failed'`
+- `Race` entity has `embeddingStatus` property → `embedding_status` varchar(20) column with DB default `'pending'`
+- `EmbedModule` adds `Race` to `TypeOrmModule.forFeature([RaceResult, Race])`
+- `EmbedProcessor.process()` sets `'complete'` after `batchEmbedRace` resolves
+- `EmbedProcessor.onFailed()` sets `'failed'`; guarded so it cannot throw out of the event handler
+- `RacesService.findAll()` maps `embeddingStatus` into the returned `RaceDto`
+- `RaceCard` renders status badge only when `!== 'complete'`; distinct copy for `'pending'` vs `'failed'`
+- `RacesPage` polls every 3 s while any race is `'pending'`; stops polling otherwise
+- Two new processor tests: `process()` sets `'complete'`; `onFailed()` sets `'failed'`
+- All four quality gates pass
+
+### Summary
+
+Added `EMBED_STATUS = { PENDING, COMPLETE, FAILED } as const` and `EmbedStatus` type to `embed.constants.ts`. Extended `RaceDto` with `embeddingStatus` (literal union), added the TypeORM `@Column` to `Race` entity using `EMBED_STATUS.PENDING` as the column default. `EmbedModule` now registers both `Race` and `RaceResult` via `forFeature`. `EmbedProcessor` injects `@InjectRepository(Race)` and calls `raceRepo.update()` in both `process()` (→ `complete`) and `onFailed()` (→ `failed`); the `onFailed` write is fire-and-forget (`.catch` log only) so the event handler can never throw. `RacesService.findAll()` now maps `row.embeddingStatus` into each `RaceDto`. `RaceCard` renders `"Indexing for AI…"` (muted) or `"AI indexing failed"` (danger) as `<span>` badges with `aria-label` attributes. `RacesPage` uses a `refetchInterval` callback that returns `POLL_INTERVAL_MS = 3000` when any race is `'pending'` and `false` otherwise. Processor spec updated with mock `raceRepo: { update: jest.fn() }` and three new test cases. 166/166 tests pass.
+
+---
