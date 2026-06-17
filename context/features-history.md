@@ -1561,3 +1561,22 @@ Added `EMBED_STATUS = { PENDING, COMPLETE, FAILED } as const` and `EmbedStatus` 
 Replaced the five fixed `rem` font-size tokens in `index.css` with a seven-token fluid type scale using `clamp()`. Scale spans from min at 375px to max at 1280px via the formula `calc(min + (max - min) * (100vw - 23.4375rem) / 56.5625)`. All five pre-existing token names are unchanged so no consumer breakage; `--font-size-xl` max is now `1.5rem` (was `2rem`) with `RaceHeader .name` repointed to `--font-size-2xl` (max `2rem`) to preserve desktop appearance. Defined `--line-height-tight: 1.2`, `--line-height-snug: 1.4`, `--line-height-base: 1.5` and `--font-weight-regular/medium/semibold/bold` token groups — component migration of hardcoded values is deferred. Added `line-height: var(--line-height-base)` to `body`. Fixed the sole hardcoded font-size literal: `EmptyState.module.css` `.icon` now references `var(--font-size-2xl)`. Only three files changed; no JS, no behavior.
 
 ---
+
+## Step 82 — Mobile and Tablet Responsiveness
+
+**Branch:** step-82-mobile-responsiveness
+**Completed:** 2026-06-17
+
+### Goals
+- `PageWrapper.module.css` — `padding-inline` 24px → 16px at ≤ 480px
+- `AthleteLeaderboard.module.css` + `AthleteLeaderboard.tsx` — `overflow-x: auto` scroll wrapper div around `<table>`
+- `ChatMessage.module.css` — bubble `max-width` 70% → 88% at ≤ 480px
+- `RacesHero.module.css` — `margin-bottom` 48px → 24px at ≤ 480px
+- `RaceHeader.module.css` — `flex-wrap: wrap` on `.meta`
+- Frontend lint and build pass
+
+### Summary
+
+Added five targeted mobile fixes at the `480px` breakpoint (consistent with the existing Navbar query). `PageWrapper` reduces its horizontal padding from 24px to 16px on narrow screens. `AthleteLeaderboard` gets a `<div className={styles.tableScroll}>` wrapper with `overflow-x: auto` so the fixed-width table columns (total ~412px) can scroll horizontally on 375px viewports instead of clipping. Chat message bubbles widen from 70% to 88% on mobile so AI responses don't become too narrow. `RacesHero` halves its bottom margin from 48px to 24px. `RaceHeader .meta` gains `flex-wrap: wrap` unconditionally to prevent badge overflow. Grids (RacesPage, RaceDetailPage charts), AskPage, ChatInput, and Navbar were already responsive and required no changes.
+
+---

@@ -109,6 +109,6 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 79. ✅ Add empty state components if there are no such
 80. ✅ Add EmbeddingStatus indicator on the race dashboard — user has no way to know if embedding is still running in the background 
 81. ✅ Add font-size globals and Fluid typography
-82. mobile and tablet responsiveness
+82. ✅ mobile and tablet responsiveness
 83. Verify a11y across the project
 84. Create a 404 page
