@@ -1541,3 +1541,23 @@ Created `apps/backend/.env.example` listing all 12 NestJS env vars with placehol
 Added `EMBED_STATUS = { PENDING, COMPLETE, FAILED } as const` and `EmbedStatus` type to `embed.constants.ts`. Extended `RaceDto` with `embeddingStatus` (literal union), added the TypeORM `@Column` to `Race` entity using `EMBED_STATUS.PENDING` as the column default. `EmbedModule` now registers both `Race` and `RaceResult` via `forFeature`. `EmbedProcessor` injects `@InjectRepository(Race)` and calls `raceRepo.update()` in both `process()` (→ `complete`) and `onFailed()` (→ `failed`); the `onFailed` write is fire-and-forget (`.catch` log only) so the event handler can never throw. `RacesService.findAll()` now maps `row.embeddingStatus` into each `RaceDto`. `RaceCard` renders `"Indexing for AI…"` (muted) or `"AI indexing failed"` (danger) as `<span>` badges with `aria-label` attributes. `RacesPage` uses a `refetchInterval` callback that returns `POLL_INTERVAL_MS = 3000` when any race is `'pending'` and `false` otherwise. Processor spec updated with mock `raceRepo: { update: jest.fn() }` and three new test cases. 166/166 tests pass.
 
 ---
+
+## Step 81 — Fluid Typography
+
+**Branch:** step-81-fluid-typography
+**Completed:** 2026-06-17
+
+### Goals
+- Replace 5 fixed `rem` font-size tokens with a 7-token fluid `clamp()` scale
+- Add `--font-size-lg` and `--font-size-2xl` as new tokens
+- Add `--line-height-tight/snug/base` and `--font-weight-regular/medium/semibold/bold` token groups
+- Set `body { line-height: var(--line-height-base) }`
+- Migrate `EmptyState .icon` off hardcoded `2rem` → `var(--font-size-2xl)`
+- Repoint `RaceHeader .name` from `--font-size-xl` to `--font-size-2xl` (preserves 2rem desktop size)
+- Frontend lint and build pass
+
+### Summary
+
+Replaced the five fixed `rem` font-size tokens in `index.css` with a seven-token fluid type scale using `clamp()`. Scale spans from min at 375px to max at 1280px via the formula `calc(min + (max - min) * (100vw - 23.4375rem) / 56.5625)`. All five pre-existing token names are unchanged so no consumer breakage; `--font-size-xl` max is now `1.5rem` (was `2rem`) with `RaceHeader .name` repointed to `--font-size-2xl` (max `2rem`) to preserve desktop appearance. Defined `--line-height-tight: 1.2`, `--line-height-snug: 1.4`, `--line-height-base: 1.5` and `--font-weight-regular/medium/semibold/bold` token groups — component migration of hardcoded values is deferred. Added `line-height: var(--line-height-base)` to `body`. Fixed the sole hardcoded font-size literal: `EmptyState.module.css` `.icon` now references `var(--font-size-2xl)`. Only three files changed; no JS, no behavior.
+
+---
