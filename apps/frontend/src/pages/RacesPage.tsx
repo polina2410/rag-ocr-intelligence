@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { EmptyState } from '../components/EmptyState'
 import { PageWrapper } from '../components/PageWrapper'
 import { RaceCard } from '../components/RaceCard'
 import { RacesHero } from '../components/RacesHero'
@@ -30,7 +31,7 @@ const RacesPage = () => {
     }
 
     if (data.data.length === 0) {
-      return <p>No races found.</p>
+      return <EmptyState title="No races found" description="Upload a CSV to get started." />
     }
 
     return (

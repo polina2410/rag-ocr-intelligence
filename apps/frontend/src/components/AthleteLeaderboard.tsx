@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { type RaceResultDto } from '@ocr/types'
 import { Badge } from './Badge'
+import { EmptyState } from './EmptyState'
 import styles from './AthleteLeaderboard.module.css'
 
 export interface AthleteLeaderboardProps {
@@ -145,7 +146,7 @@ export const AthleteLeaderboard = ({ results, categoryFilter }: AthleteLeaderboa
           {rows.length === 0 ? (
             <tr>
               <td className={styles.emptyCell} colSpan={COLUMNS.length}>
-                No results.
+                <EmptyState title="No results" />
               </td>
             </tr>
           ) : (
