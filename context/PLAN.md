@@ -87,7 +87,7 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 62. ✅ Build `ChatMessage` component — message bubble, renders streaming tokens
 63. ✅ Build `SourceCitations` component — expandable panel with retrieved chunks
 64. ✅ Build `ChatHistory` component — scrollable list of messages
-65. Build `/ask` page — composes chat components, wires `useSSE` hook
+65. ✅ Build `/ask` page — composes chat components, wires `useSSE` hook
 66. Build `DropZone` component — drag and drop CSV, file type validation
 67. Build `/upload` page — composes DropZone, upload progress, error feedback, redirects to `/races/:id` on success
 68. Build `DELETE /races/:id` endpoint — deletes race, cascades to RaceResult, ObstacleSplit, removes vectors from Qdrant

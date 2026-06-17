@@ -1182,3 +1182,27 @@ Created `SourceCitations` as a pure props-driven expandable panel — third of P
 Created `ChatHistory` as the fourth of Phase 4's chat UI components (steps 61–65), not yet wired into any page. The component renders a `.scroll` div (`overflow-y: auto; height: 100%`) mapping each `ChatHistoryMessage` to a `.entry` wrapper keyed by `message.id`. Each entry contains one `<ChatMessage>` (passing `role`, `content`, `isStreaming`) and, when `citations` is non-empty, a sibling `<SourceCitations>` — the `.entry` wrapper satisfies the spec requirement that `SourceCitations` be a sibling of, not nested inside, `ChatMessage`. A sentinel `<div ref={bottomRef} />` at the end of the list receives `scrollIntoView({ block: 'end' })` from a `useEffect` keyed on `messages.length` — fires only when a new message is added, not on every streamed token. CSS Module uses only `gap` and `flex` — no hardcoded colors or font-sizes. Lint and TypeScript build both pass with 0 errors; no existing files modified.
 
 ---
+
+## /ask Page (Step 65)
+
+**Branch:** ask-page
+**Completed:** 2026-06-17
+
+### Goals
+
+- Rewrite `AskPage.tsx` placeholder into a full chat page owning message history
+- `messages: ChatHistoryMessage[]` state, initialised to `[]`
+- Submit appends a `user` message + blank `assistant` placeholder (`isStreaming: true`), then calls `useSSE.start(query)`
+- `useEffect([text])` syncs accumulated stream text to the current assistant message
+- `useEffect([isStreaming])` finalises the assistant message on done/error (guarded by ref)
+- Stream error surfaced via `role="alert"` element styled `var(--color-danger)`, clears on next submit
+- `ChatInput` receives `disabled={isStreaming}`
+- Full-height flex layout: `.page { flex: 1 }` fills below navbar; `.history { flex: 1; min-height: 0 }` lets `ChatHistory` scroll internally
+- New `AskPage.module.css`; no `PageWrapper`; no `calc(100vh - X)`
+- `pnpm --filter frontend lint` and `build` pass; zero `any`
+
+### Summary
+
+Replaced the `AskPage` stub with a fully wired chat page. Message history is owned entirely by the page as `useState<ChatHistoryMessage[]>([])` — `useSSE` is responsible only for the live in-flight stream (`text`, `isStreaming`, `error`). `handleSubmit` appends both the user message and an assistant placeholder atomically before calling `start(query)`, so the UI shows the empty streaming bubble immediately. `currentAssistantIdRef` pins which assistant message is "current" across effects: the `[text]` effect maps only that id, and the `[isStreaming]` effect clears the ref and sets `isStreaming: false` when the stream ends — guarded so it does not fire spuriously on mount (`isStreaming` starts `false`). Errors surface below `ChatInput` as a `role="alert"` paragraph; they clear on the next submission because `useSSE.start()` resets `error` to `null`. Layout: `.page { flex: 1; display: flex; flex-direction: column; min-height: 0 }` makes the page a direct flex child of `RootLayout`'s flex-column wrapper, filling all remaining viewport height without any `calc()`; `.history { flex: 1; min-height: 0 }` gives `ChatHistory`'s existing `height: 100%; overflow-y: auto` scroll container the space it needs. `export default AskPage` preserved for the lazy route. Vite emits a separate `AskPage` chunk (5.06 kB gzip: 2.08 kB). Lint and TypeScript build pass with 0 errors; no existing files modified.
+
+---
