@@ -1233,3 +1233,25 @@ Replaced the `AskPage` stub with a fully wired chat page. Message history is own
 Created `DropZone` as a purely presentational file-picker component — no Axios, no upload state, no backend knowledge. Internal state is limited to `dragOver: boolean` and `error: string | null`. A `validateAndEmit(file)` helper centralises the validation logic (`.csv` extension as primary gate, `text/csv` MIME as fallback, since some browsers report inconsistent MIME types for CSV). `onDragOver` calls `preventDefault()` (required to enable `drop`); `onDragEnter` toggles drag-over state and clears any error; `onDragLeave` resets it; `onDrop` reads `dataTransfer.files[0]` and validates. Click-to-browse triggers the hidden `<input>` via `inputRef.current?.click()`; `e.target.value` is reset after each `onChange` so re-selecting the same file fires the event again. Keyboard handler responds to Enter and Space (Space calls `preventDefault` to avoid page scroll). Disabled prop blocks all interaction paths (click, keyboard, drop) and sets `aria-disabled` + `tabIndex={-1}`. CSS Module uses `color-mix(in srgb, var(--color-accent) 8%, transparent)` for the drag-over tint — no hardcoded hex values. Lint and TypeScript build pass with 0 errors; no existing files modified.
 
 ---
+
+## /upload Page (Step 67)
+
+**Branch:** upload-page
+**Completed:** 2026-06-17
+
+### Goals
+
+- NEW `apps/frontend/src/api/ingest.ts` — `uploadCsv(file, onProgress?)` wraps `POST /ingest/csv` with `FormData { file }`, streams integer percent via `onUploadProgress`, returns `{ raceId, rowsIngested }`, no try/catch
+- NEW `apps/frontend/src/pages/UploadPage.tsx` — `idle → uploading → error` state machine, DropZone disabled while uploading, redirects to `/races/:raceId` on success
+- Progress bar with `role="progressbar"`, `aria-valuenow/min/max`, fill width via `--pct` CSS custom property, numeric percent label
+- Error message with `role="alert"`, `var(--color-danger)`, NestJS `message` string or `string[]` handled
+- Error extraction helper: `axios.isAxiosError` narrowing, joins array messages, fallback string
+- NEW `apps/frontend/src/pages/UploadPage.module.css` — tokens only, `--pct` drives fill width
+- EDIT `apps/frontend/src/router.tsx` — lazy `/upload` route added as child of `RootLayout`
+- `pnpm --filter frontend lint` and `build` pass; zero `any`
+
+### Summary
+
+Built the `/upload` page completing Phase 4's CSV ingestion flow on the frontend. `api/ingest.ts` is a new dedicated API layer file (not added to `races.ts`) — `uploadCsv` builds a `FormData` with field name `"file"` (matching the backend `FileInterceptor`), attaches `onUploadProgress` to compute and emit integer percent (guarded by `event.total` for environments that omit it), and returns `res.data` with errors propagating unwrapped to the caller. `UploadPage` owns a three-field state machine: `status` (`'idle' | 'uploading' | 'error'`), `progress`, and `errorMsg`. On `onFile` from `DropZone`, it resets all fields, sets `'uploading'`, calls `uploadCsv(file, setProgress)`, and on resolve navigates immediately to `/races/:raceId` (no intermediate success screen, `rowsIngested` not displayed). On reject, `extractErrorMessage` narrows with `axios.isAxiosError`, handles both `string` and `string[]` shapes from NestJS (class-validator returns arrays), and falls back gracefully. The progress bar uses `role="progressbar"` with full `aria-value*` attributes; its fill div uses a `--pct` CSS custom property set via `style` (the sole permitted dynamic-value exception — all other values use tokens). `UploadPage.module.css` uses `var(--color-accent)` for the fill, `var(--color-danger)` for errors, `var(--color-text-muted)` for the percent label. `router.tsx` gains a fourth lazy child route at `/upload` under `RootLayout`. Vite emits a separate `UploadPage` chunk (2.91 kB gzip: 1.33 kB). Lint and TypeScript build pass with 0 errors.
+
+---
