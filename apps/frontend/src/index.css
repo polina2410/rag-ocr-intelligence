@@ -18,11 +18,20 @@
   --color-hero-bg: #0f0e17;
   --color-hero-glow: rgba(99, 102, 241, 0.35);
   --color-hero-text: #f9fafb;
-  --font-size-hero: 4rem;
-  --font-size-xl: 2rem;
-  --font-size-base: 1rem;
-  --font-size-sm: 0.875rem;
-  --font-size-xs: 0.75rem;
+  --font-size-xs:   clamp(0.6875rem, calc(0.6875rem + 0.0625rem * (100vw - 23.4375rem) / 56.5625), 0.75rem);
+  --font-size-sm:   clamp(0.8125rem, calc(0.8125rem + 0.0625rem * (100vw - 23.4375rem) / 56.5625), 0.875rem);
+  --font-size-base: clamp(0.9375rem, calc(0.9375rem + 0.0625rem * (100vw - 23.4375rem) / 56.5625), 1rem);
+  --font-size-lg:   clamp(1rem,      calc(1rem      + 0.125rem  * (100vw - 23.4375rem) / 56.5625), 1.125rem);
+  --font-size-xl:   clamp(1.25rem,   calc(1.25rem   + 0.25rem   * (100vw - 23.4375rem) / 56.5625), 1.5rem);
+  --font-size-2xl:  clamp(1.5rem,    calc(1.5rem    + 0.5rem    * (100vw - 23.4375rem) / 56.5625), 2rem);
+  --font-size-hero: clamp(2rem,      calc(2rem      + 2rem      * (100vw - 23.4375rem) / 56.5625), 4rem);
+  --line-height-tight: 1.2;
+  --line-height-snug:  1.4;
+  --line-height-base:  1.5;
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
 }
 
 *, *::before, *::after {
@@ -32,5 +41,6 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  line-height: var(--line-height-base);
   cursor: none;
 }
