@@ -1,0 +1,35 @@
+.heading {
+  margin: 0 0 24px;
+  color: var(--color-text);
+}
+
+.dropZoneWrap {
+  margin-bottom: 20px;
+}
+
+.progressTrack {
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  width: var(--pct);
+  background: var(--color-accent);
+  border-radius: 4px;
+  transition: width 0.1s linear;
+}
+
+.progressLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.error {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  margin-top: 12px;
+}

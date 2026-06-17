@@ -6,6 +6,7 @@ import { RootLayout } from './components/RootLayout'
 const RacesPage = lazy(() => import('./pages/RacesPage'))
 const RaceDetailPage = lazy(() => import('./pages/RaceDetailPage'))
 const AskPage = lazy(() => import('./pages/AskPage'))
+const UploadPage = lazy(() => import('./pages/UploadPage'))
 
 export const router = createBrowserRouter([
   { path: '/', element: <Navigate to="/races" replace /> },
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
       { path: '/races', element: <RacesPage /> },
       { path: '/races/:id', element: <RaceDetailPage /> },
       { path: '/ask', element: <AskPage /> },
+      { path: '/upload', element: <UploadPage /> },
     ],
   },
 ])
