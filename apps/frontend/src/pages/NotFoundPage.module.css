@@ -1,0 +1,45 @@
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.backLink {
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 6px;
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+
+.backLink:hover {
+  opacity: 0.85;
+}
+
+.backLink:focus-visible {
+  outline: 2px solid var(--color-accent-dark);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding-inline: 16px;
+  }
+}

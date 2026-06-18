@@ -7,6 +7,7 @@ const RacesPage = lazy(() => import('./pages/RacesPage'))
 const RaceDetailPage = lazy(() => import('./pages/RaceDetailPage'))
 const AskPage = lazy(() => import('./pages/AskPage'))
 const UploadPage = lazy(() => import('./pages/UploadPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 export const router = createBrowserRouter([
   { path: '/', element: <Navigate to="/races" replace /> },
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
       { path: '/races/:id', element: <RaceDetailPage /> },
       { path: '/ask', element: <AskPage /> },
       { path: '/upload', element: <UploadPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])
