@@ -1,9 +1,9 @@
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import styles from './Navbar.module.css'
 
 export const Navbar = () => (
   <nav className={styles.nav} aria-label="Main">
-    <span className={styles.brand}>OCR Intelligence</span>
+    <Link to="/races" className={styles.brand}>OCR Intelligence</Link>
     <NavLink
       to="/races"
       className={({ isActive }) =>

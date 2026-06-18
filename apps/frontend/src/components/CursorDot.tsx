@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import type { CursorMode } from '../context/CursorContext'
 import { useCursor } from '../hooks/useCursor'
 import styles from './CursorDot.module.css'
@@ -51,13 +51,14 @@ const SHAPES: Record<CursorMode, ShapeTarget> = {
 
 export const CursorDot = () => {
   const { x, y, mode } = useCursor()
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <motion.div
       className={styles.dot}
       style={{ left: x, top: y }}
       animate={SHAPES[mode]}
-      transition={{ duration: TRANSITION_DURATION, ease: 'easeOut' }}
+      transition={{ duration: shouldReduceMotion ? 0 : TRANSITION_DURATION, ease: 'easeOut' }}
     />
   )
 }

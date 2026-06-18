@@ -26,7 +26,6 @@ export const SourceCitations = ({ citations }: SourceCitationsProps) => {
           <li
             key={citation.id}
             className={styles.item}
-            aria-label={citation.label ?? citation.text}
           >
             {citation.label && <p className={styles.label}>{citation.label}</p>}
             <p className={styles.text}>{citation.text}</p>

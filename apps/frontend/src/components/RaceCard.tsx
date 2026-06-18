@@ -50,6 +50,8 @@ export const RaceCard = ({ race }: RaceCardProps) => {
       className={styles.card}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
     >
       <span className={styles.name}>{race.name}</span>
       <Badge label={race.raceType} variant={race.raceType} />
@@ -82,7 +84,7 @@ export const RaceCard = ({ race }: RaceCardProps) => {
         </button>
       )}
       {mutation.isError && (
-        <p className={styles.deleteError}>Failed to delete race.</p>
+        <p role="alert" className={styles.deleteError}>Failed to delete race.</p>
       )}
     </Link>
   )

@@ -88,7 +88,7 @@ export const DropZone = ({ onFile, disabled = false }: DropZoneProps) => {
       onDrop={handleDrop}
     >
       <p className={styles.prompt}>Drag a CSV file here, or click to select</p>
-      {error && <p className={styles.error}>{error}</p>}
+      {error && <p role="alert" className={styles.error}>{error}</p>}
       <label htmlFor="drop-zone-input" className={styles.visuallyHidden}>
         Upload CSV file
       </label>

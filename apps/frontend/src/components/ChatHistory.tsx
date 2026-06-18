@@ -23,7 +23,7 @@ export const ChatHistory = ({ messages }: ChatHistoryProps) => {
   }, [messages.length])
 
   return (
-    <div className={styles.scroll}>
+    <div className={styles.scroll} aria-live="polite" aria-atomic="false">
       {messages.map((message) => (
         <div key={message.id} className={styles.entry}>
           <ChatMessage

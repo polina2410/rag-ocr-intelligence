@@ -20,6 +20,10 @@
   to   { background-position: -100% 0; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; }
+}
+
 .title {
   width: 60%;
   height: 20px;

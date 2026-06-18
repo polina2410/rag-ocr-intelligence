@@ -55,3 +55,7 @@
   from { background-position: 100% 0; }
   to   { background-position: -100% 0; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; }
+}

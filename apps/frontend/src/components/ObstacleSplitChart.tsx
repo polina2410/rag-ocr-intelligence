@@ -59,6 +59,7 @@ export const ObstacleSplitChart = ({ results }: ObstacleSplitChartProps) => {
   return (
     <div className={styles.wrapper}>
       <p className={styles.title}>Avg Time per Obstacle</p>
+      <div role="img" aria-label="Bar chart: average split time per obstacle in seconds">
       <ResponsiveContainer width="100%" height={data.length * BAR_HEIGHT + 40}>
         <BarChart data={data} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
@@ -68,6 +69,7 @@ export const ObstacleSplitChart = ({ results }: ObstacleSplitChartProps) => {
           <Bar dataKey="avgSeconds" fill={ACCENT_COLOR} radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }

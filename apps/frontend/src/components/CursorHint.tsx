@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useCursor } from '../hooks/useCursor'
 import styles from './CursorHint.module.css'
 
@@ -8,6 +8,7 @@ const HINT_TRANSITION_DURATION = 0.15
 
 export const CursorHint = () => {
   const { x, y, hint } = useCursor()
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <AnimatePresence>
@@ -15,9 +16,9 @@ export const CursorHint = () => {
         <motion.div
           className={styles.hint}
           style={{ left: x + HINT_OFFSET_X, top: y + HINT_OFFSET_Y }}
-          initial={{ opacity: 0, y: 4 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 4 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 4 }}
+          exit={{ opacity: 0, y: shouldReduceMotion ? 0 : 4 }}
           transition={{ duration: HINT_TRANSITION_DURATION }}
         >
           {hint}
