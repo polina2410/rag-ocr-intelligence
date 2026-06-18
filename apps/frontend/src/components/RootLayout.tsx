@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { Outlet } from 'react-router-dom'
 import { CursorProvider } from '../context/CursorContext'
+import { useFocusOnRouteChange } from '../hooks/useFocusOnRouteChange'
 import { CursorDot } from './CursorDot'
 import { CursorHint } from './CursorHint'
 import { CursorMagnifier } from './CursorMagnifier'
@@ -9,9 +10,10 @@ import { Navbar } from './Navbar'
 import { RouteFallback } from './RouteFallback'
 import styles from './RootLayout.module.css'
 
-export const RootLayout = () => (
-  <div className={styles.layout}>
-    <CursorProvider>
+const RootLayoutInner = () => {
+  useFocusOnRouteChange()
+  return (
+    <div className={styles.layout}>
       <CursorDot />
       <CursorHint />
       <CursorMagnifier />
@@ -21,6 +23,12 @@ export const RootLayout = () => (
           <Outlet />
         </Suspense>
       </ErrorBoundary>
-    </CursorProvider>
-  </div>
+    </div>
+  )
+}
+
+export const RootLayout = () => (
+  <CursorProvider>
+    <RootLayoutInner />
+  </CursorProvider>
 )

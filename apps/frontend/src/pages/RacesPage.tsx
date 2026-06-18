@@ -32,7 +32,7 @@ const RacesPage = () => {
     }
 
     if (isError) {
-      return <p>Failed to load races.</p>
+      return <p role="alert">Failed to load races.</p>
     }
 
     if (data.data.length === 0) {

@@ -44,14 +44,15 @@ const UploadPage = () => {
       </div>
       {status === 'uploading' && (
         <div>
-          <div
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Upload progress"
-          >
-            <div className={styles.progressTrack}>
+          <div>
+            <div
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Upload progress"
+              className={styles.progressTrack}
+            >
               <div
                 className={styles.progressFill}
                 style={{ '--pct': `${progress}%` } as React.CSSProperties}

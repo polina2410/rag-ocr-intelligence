@@ -62,6 +62,7 @@ export const PenaltyRateChart = ({ results }: PenaltyRateChartProps) => {
     <div className={styles.wrapper}>
       <p className={styles.title}>Penalty Rate per Obstacle</p>
       {!hasPenalties && <p className={styles.note}>No penalties recorded.</p>}
+      <div role="img" aria-label="Bar chart: penalty rate per obstacle">
       <ResponsiveContainer width="100%" height={data.length * BAR_HEIGHT + 40}>
         <BarChart data={data} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
@@ -71,6 +72,7 @@ export const PenaltyRateChart = ({ results }: PenaltyRateChartProps) => {
           <Bar dataKey="penaltyRate" fill={PENALTY_COLOR} radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }

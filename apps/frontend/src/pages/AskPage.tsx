@@ -42,7 +42,8 @@ const AskPage = () => {
   }, [isStreaming])
 
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
+      <h1 className={styles.visuallyHidden}>Ask AI</h1>
       <div className={styles.history}>
         {messages.length === 0 && !isStreaming ? (
           <EmptyState
@@ -61,7 +62,7 @@ const AskPage = () => {
         )}
         <ChatInput onSubmit={handleSubmit} disabled={isStreaming} />
       </div>
-    </div>
+    </main>
   )
 }
 

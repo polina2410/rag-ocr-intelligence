@@ -61,6 +61,7 @@ export const CursorMagnifier = () => {
       width={CANVAS_SIZE}
       height={CANVAS_SIZE}
       style={{ left: x + OFFSET, top: y - CANVAS_SIZE - OFFSET }}
+      aria-hidden="true"
     />
   )
 }

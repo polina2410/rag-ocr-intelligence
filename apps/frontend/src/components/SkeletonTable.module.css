@@ -22,6 +22,10 @@
   to   { background-position: -100% 0; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; }
+}
+
 .headerShimmer {
   height: 12px;
 }
