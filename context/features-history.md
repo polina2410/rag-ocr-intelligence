@@ -1581,6 +1581,24 @@ Added five targeted mobile fixes at the `480px` breakpoint (consistent with the 
 
 ---
 
+## Step 84 — 404 Not Found Page
+
+**Branch:** step-84-404-page
+**Completed:** 2026-06-18
+
+### Goals
+- `apps/frontend/src/pages/NotFoundPage.tsx` with a `default` export, one visually-hidden `<h1>`, and `EmptyState` with title, description, and a button-styled "Back to races" `Link`
+- Catch-all `{ path: '*', element: <NotFoundPage /> }` as the last child of `<RootLayout />` so navbar renders on 404
+- Lazy-imported via `lazy()` consistent with other page imports
+- `--color-accent-dark` token added to `index.css` for accessible focus ring (4.7:1 contrast on white)
+- Frontend lint and build pass
+
+### Summary
+
+Added a 404 Not Found page rendered inside `RootLayout` so the navbar and `CursorProvider` remain visible on any unmatched URL. `NotFoundPage` uses a custom `<main>` with `flex: 1` + center alignment to fill the viewport below the navbar. The body composes the existing `EmptyState` component (title/description/action) with a button-styled React Router `Link` back to `/races`. The catch-all `{ path: '*' }` route is the last entry in `RootLayout`'s children array so it only fires for genuinely unmatched paths — `/races/:id` continues to match any `/races/anything` shape. `--color-accent-dark: #4338ca` added to `index.css` as a new token for the focus ring (clears 4.7:1 on white, up from the borderline 3.04:1 of the accent color). The visually-hidden `<h1>` uses the modern `clip-path: inset(50%)` alongside the deprecated `clip: rect()` for forward-compatibility. `useFocusOnRouteChange` in `RootLayout` handles focus management automatically — no extra code in the page.
+
+---
+
 ## Step 83 — A11y Audit (WCAG AA fixes)
 
 **Branch:** step-83-a11y-audit
