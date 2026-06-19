@@ -52,12 +52,12 @@ export const ConfirmDialog = ({
     }
   }, [open])
 
-  // Move focus to the safe (Cancel) action when the dialog opens.
+  // Move focus to the safe (Cancel) action when the dialogue opens.
   useEffect(() => {
     if (open) cancelRef.current?.focus()
   }, [open])
 
-  // Lock background scroll while the dialog is open.
+  // Lock background scroll while the dialogue is open.
   useEffect(() => {
     if (!open) return
     const previousOverflow = document.body.style.overflow

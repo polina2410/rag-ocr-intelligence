@@ -5,6 +5,7 @@ import type { RaceResult } from './race-result.entity';
 
 const NAME_MAX_LENGTH = 255;
 const LOCATION_MAX_LENGTH = 255;
+const FILENAME_MAX_LENGTH = 255;
 const DISTANCE_PRECISION = 6;
 const DISTANCE_SCALE = 2;
 const RACE_TYPE_MAX_LENGTH = 20;
@@ -15,7 +16,16 @@ export class Race {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar', length: NAME_MAX_LENGTH })
+  @Column({
+    type: 'varchar',
+    length: FILENAME_MAX_LENGTH,
+    name: 'original_file_name',
+    nullable: true,
+    unique: true,
+  })
+  originalFileName!: string | null;
+
+  @Column({ type: 'varchar', length: NAME_MAX_LENGTH, unique: true })
   name!: string;
 
   @Column({ type: 'date' })

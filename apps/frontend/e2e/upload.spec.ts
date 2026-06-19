@@ -16,4 +16,13 @@ test.describe('Upload page', () => {
   test('drop zone is clickable', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'Upload a CSV file' })).toBeVisible();
   });
+
+  test('shows error when a non-CSV file is selected', async ({ page }) => {
+    await page.locator('#drop-zone-input').setInputFiles({
+      name: 'report.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('%PDF-1.4'),
+    });
+    await expect(page.getByRole('alert')).toHaveText('Please select a CSV file.');
+  });
 });

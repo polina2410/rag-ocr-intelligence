@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   InternalServerErrorException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -20,7 +21,9 @@ const mockRowsParser = {
   parseRows: jest.fn(),
 } as unknown as CsvRowsParserService;
 
-const mockRaceRepo = {} as Repository<Race>;
+const mockRaceRepo = {
+  findOneBy: jest.fn(),
+} as unknown as Repository<Race>;
 
 const mockAthleteRepo = {
   findOneBy: jest.fn(),
@@ -53,13 +56,38 @@ describe('IngestionService', () => {
 
   describe('ingestCsv', () => {
     const buffer = Buffer.from('csv content');
+    const fileName = 'race-2024.csv';
+
+    beforeEach(() => {
+      (mockRaceRepo.findOneBy as jest.Mock).mockResolvedValue(null);
+    });
+
+    it('throws ConflictException when a file with the same name was already uploaded', async () => {
+      (mockRaceRepo.findOneBy as jest.Mock).mockResolvedValueOnce({ id: 'existing-id' });
+
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('throws ConflictException when a race with the same name already exists', async () => {
+      (mockRaceRepo.findOneBy as jest.Mock)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ id: 'existing-id' });
+      (mockMetadataParser.parseMetadata as jest.Mock).mockReturnValue({ name: 'Duplicate Race' });
+      (mockRowsParser.parseRows as jest.Mock).mockReturnValue([]);
+
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toThrow(
+        ConflictException,
+      );
+    });
 
     it('throws UnprocessableEntityException when metadata parser throws', async () => {
       (mockMetadataParser.parseMetadata as jest.Mock).mockImplementation(() => {
         throw new Error('CSV metadata missing required field: "Race"');
       });
 
-      await expect(service.ingestCsv(buffer)).rejects.toThrow(
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toThrow(
         UnprocessableEntityException,
       );
     });
@@ -70,7 +98,7 @@ describe('IngestionService', () => {
         throw new Error(parserMessage);
       });
 
-      await expect(service.ingestCsv(buffer)).rejects.toMatchObject({
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toMatchObject({
         message: parserMessage,
       });
     });
@@ -81,7 +109,7 @@ describe('IngestionService', () => {
         throw new Error('CSV missing expected column: "first_name"');
       });
 
-      await expect(service.ingestCsv(buffer)).rejects.toThrow(
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toThrow(
         UnprocessableEntityException,
       );
     });
@@ -93,7 +121,7 @@ describe('IngestionService', () => {
         new Error('DB connection lost'),
       );
 
-      await expect(service.ingestCsv(buffer)).rejects.toThrow(
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toThrow(
         InternalServerErrorException,
       );
     });
@@ -105,7 +133,7 @@ describe('IngestionService', () => {
         new Error('violates foreign key constraint "fk_race_id"'),
       );
 
-      await expect(service.ingestCsv(buffer)).rejects.toMatchObject({
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toMatchObject({
         message: 'Failed to save race data',
       });
     });
@@ -117,7 +145,7 @@ describe('IngestionService', () => {
         'race-uuid-123',
       );
 
-      const result = await service.ingestCsv(buffer);
+      const result = await service.ingestCsv(buffer, fileName);
 
       expect(result).toEqual({ raceId: 'race-uuid-123', rowsIngested: 2 });
       expect(embedQueueAdd).toHaveBeenCalledWith(EMBED_JOB, {
@@ -132,7 +160,7 @@ describe('IngestionService', () => {
         new Error('DB connection lost'),
       );
 
-      await expect(service.ingestCsv(buffer)).rejects.toThrow(
+      await expect(service.ingestCsv(buffer, fileName)).rejects.toThrow(
         InternalServerErrorException,
       );
       expect(embedQueueAdd).not.toHaveBeenCalled();

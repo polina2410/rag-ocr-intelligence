@@ -17,6 +17,7 @@
 }
 
 .progressFill {
+  --pct: 0%;
   height: 100%;
   width: var(--pct);
   background: var(--color-accent);

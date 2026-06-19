@@ -56,6 +56,6 @@ export class IngestionController {
         'CSV file is required (field name: "file")',
       );
     }
-    return this.ingestionService.ingestCsv(file.buffer);
+    return this.ingestionService.ingestCsv(file.buffer, file.originalname);
   }
 }

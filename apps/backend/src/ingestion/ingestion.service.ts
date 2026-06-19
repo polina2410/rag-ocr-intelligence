@@ -1,5 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -35,7 +36,15 @@ export class IngestionService {
 
   async ingestCsv(
     fileBuffer: Buffer,
+    originalFileName: string,
   ): Promise<{ raceId: string; rowsIngested: number }> {
+    const existing = await this.raceRepo.findOneBy({ originalFileName });
+    if (existing) {
+      throw new ConflictException(
+        `A file named "${originalFileName}" has already been uploaded`,
+      );
+    }
+
     const csv = fileBuffer.toString('utf-8');
 
     let metadata: RaceMetadata;
@@ -49,10 +58,18 @@ export class IngestionService {
       throw new UnprocessableEntityException(message);
     }
 
+    const existingByName = await this.raceRepo.findOneBy({ name: metadata.name });
+    if (existingByName) {
+      throw new ConflictException(
+        `A race named "${metadata.name}" has already been uploaded`,
+      );
+    }
+
     let raceId: string;
     try {
       raceId = await this.dataSource.transaction(async (manager) => {
         const race = manager.create(Race, {
+          originalFileName,
           name: metadata.name,
           date: metadata.date,
           location: metadata.location,

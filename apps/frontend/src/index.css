@@ -25,6 +25,10 @@
   --font-weight-medium:   500;
   --font-weight-semibold: 600;
   --font-weight-bold:     700;
+  --z-dialog:             1000;
+  --z-cursor-magnifier:   9997;
+  --z-cursor-hint:        9998;
+  --z-cursor-dot:         9999;
 }
 
 *, *::before, *::after {

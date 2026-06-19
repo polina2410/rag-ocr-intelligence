@@ -10,5 +10,5 @@
   color: var(--color-text);
   white-space: nowrap;
   pointer-events: none;
-  z-index: 9998;
+  z-index: var(--z-cursor-hint);
 }
