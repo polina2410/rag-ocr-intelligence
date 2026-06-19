@@ -277,16 +277,12 @@ The full API reference is available in the Swagger UI at **http://localhost:3000
 
 ## Demo Screenshots
 
-Upload page
 ![Upload page for ingesting a CSV race file](docs/screenshot-upload-race.png)
-
-Races
+***
 ![Races list page](docs/screenshot-races.png)
-
-Race detail page
+***
 ![Race detail dashboard with obstacle split chart and leaderboard](docs/screenshot-race-detail.png)
-
-Chat answer
+***
 ![Ask chat page showing a streamed RAG answer](docs/screenshot-ask.png)
 
 ---

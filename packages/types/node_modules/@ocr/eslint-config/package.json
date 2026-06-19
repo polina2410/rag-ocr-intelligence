@@ -1,0 +1,15 @@
+{
+  "name": "@ocr/eslint-config",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "peerDependencies": {
+    "@eslint/js": ">=10",
+    "eslint": ">=10",
+    "typescript-eslint": ">=8",
+    "globals": ">=14"
+  }
+}
