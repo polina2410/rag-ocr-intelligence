@@ -9,3 +9,6 @@ export const getRace = (id: string): Promise<RaceDetailDto> =>
 
 export const deleteRace = (id: string): Promise<void> =>
   http.delete(`/races/${id}`).then(() => undefined)
+
+export const triggerEmbed = (id: string): Promise<void> =>
+  http.post(`/races/${id}/embed`).then(() => undefined)

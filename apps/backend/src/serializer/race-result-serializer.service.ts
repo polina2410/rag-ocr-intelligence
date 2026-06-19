@@ -33,8 +33,12 @@ export class RaceResultSerializerService {
         positions.push(`category ${result.categoryPosition}`);
       if (result.genderPosition !== null)
         positions.push(`gender ${result.genderPosition}`);
+      const winnerLabel =
+        result.overallPosition === 1 ? ' (race winner)' : '';
       const posClause =
-        positions.length > 0 ? `, placed ${positions.join(', ')}` : '';
+        positions.length > 0
+          ? `, placed ${positions.join(', ')}${winnerLabel}`
+          : '';
       resultClause = `finished${time}${posClause}`;
     } else {
       resultClause = STATUS_LABELS[status];

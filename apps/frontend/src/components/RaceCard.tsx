@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { type PaginatedResponse, type RaceDto } from '@ocr/types'
 import { deleteRace } from '../api/races'
 import { Badge } from './Badge'
+import { ConfirmDialog } from './ConfirmDialog'
 import { RaceCardStats } from './RaceCardStats'
 import styles from './RaceCard.module.css'
 
@@ -21,6 +22,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 
 export const RaceCard = ({ race }: RaceCardProps) => {
   const [hovered, setHovered] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -34,58 +36,80 @@ export const RaceCard = ({ race }: RaceCardProps) => {
           total: prev.total - TOTAL_DECREMENT,
         }
       })
+      setConfirmOpen(false)
     },
   })
 
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const openConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    if (!window.confirm(`Delete "${race.name}"? This cannot be undone.`)) return
-    mutation.mutate()
+    setConfirmOpen(true)
+  }
+
+  const closeConfirm = () => {
+    if (mutation.isPending) return
+    setConfirmOpen(false)
+    mutation.reset()
   }
 
   return (
-    <Link
-      to={`/races/${race.id}`}
-      className={styles.card}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setHovered(true)}
-      onBlur={() => setHovered(false)}
-    >
-      <span className={styles.name}>{race.name}</span>
-      <Badge label={race.raceType} variant={race.raceType} />
-      {race.embeddingStatus === 'pending' && (
-        <span className={styles.statusPending} aria-label="Embedding in progress">
-          Indexing for AI…
-        </span>
-      )}
-      {race.embeddingStatus === 'failed' && (
-        <span className={styles.statusFailed} aria-label="Embedding failed">
-          AI indexing failed
-        </span>
-      )}
-      <ul className={styles.details}>
-        <li className={styles.detail}>{dateFormatter.format(new Date(race.date))}</li>
-        <li className={styles.detail}>{race.location}</li>
-        <li className={styles.detail}>{race.distanceKm} km</li>
-        <li className={styles.detail}>{race.totalObstacles} obstacles</li>
-      </ul>
-      {hovered && <RaceCardStats raceId={race.id} />}
-      {hovered && (
-        <button
-          className={styles.deleteButton}
-          onClick={handleDelete}
-          disabled={mutation.isPending}
-          aria-busy={mutation.isPending}
-          aria-label={`Delete ${race.name}`}
-        >
-          {mutation.isPending ? 'Deleting…' : 'Delete'}
-        </button>
-      )}
-      {mutation.isError && (
-        <p role="alert" className={styles.deleteError}>Failed to delete race.</p>
-      )}
-    </Link>
+    <>
+      <Link
+        to={`/races/${race.id}`}
+        className={styles.card}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
+      >
+        <span className={styles.name}>{race.name}</span>
+        <Badge label={race.raceType} variant={race.raceType} />
+        {race.embeddingStatus === 'pending' && (
+          <span className={styles.statusPending} aria-label="Embedding in progress">
+            Indexing for AI…
+          </span>
+        )}
+        {race.embeddingStatus === 'failed' && (
+          <span className={styles.statusFailed} aria-label="Embedding failed">
+            AI indexing failed
+          </span>
+        )}
+        <ul className={styles.details}>
+          <li className={styles.detail}>{dateFormatter.format(new Date(race.date))}</li>
+          <li className={styles.detail}>{race.location}</li>
+          <li className={styles.detail}>{race.distanceKm} km</li>
+          <li className={styles.detail}>{race.totalObstacles} obstacles</li>
+        </ul>
+        {hovered && <RaceCardStats raceId={race.id} />}
+        {hovered && (
+          <button
+            className={styles.deleteButton}
+            onClick={openConfirm}
+            disabled={mutation.isPending}
+            aria-busy={mutation.isPending}
+            aria-label={`Delete ${race.name}`}
+          >
+            {mutation.isPending ? 'Deleting…' : 'Delete'}
+          </button>
+        )}
+      </Link>
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete this race?"
+        message={
+          <>
+            <strong>{race.name}</strong> and all of its results will be permanently
+            removed. This action cannot be undone.
+          </>
+        }
+        confirmLabel={mutation.isPending ? 'Deleting' : 'Delete race'}
+        cancelLabel="Keep race"
+        tone="danger"
+        isPending={mutation.isPending}
+        errorMessage={mutation.isError ? 'Failed to delete race. Please try again.' : null}
+        onConfirm={() => mutation.mutate()}
+        onCancel={closeConfirm}
+      />
+    </>
   )
 }

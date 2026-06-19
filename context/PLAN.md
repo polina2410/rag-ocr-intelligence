@@ -112,3 +112,4 @@ A full-stack developer portfolio project built with React + TypeScript, NestJS, 
 82. ✅ mobile and tablet responsiveness
 83. ✅ Verify a11y across the project
 84. ✅ Create a 404 page
+85. ✅ Add Playwright tests

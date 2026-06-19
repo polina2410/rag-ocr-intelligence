@@ -9,14 +9,14 @@
 
 .icon {
   font-size: var(--font-size-2xl);
-  line-height: 1;
+  line-height: var(--line-height-tight);
   color: var(--color-text-muted);
 }
 
 .title {
   margin: 0;
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text);
 }
 

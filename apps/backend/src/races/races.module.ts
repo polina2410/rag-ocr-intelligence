@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { QueueModule } from '../queue/queue.module';
 import { Athlete } from '../entities/athlete.entity';
 import { ObstacleSplit } from '../entities/obstacle-split.entity';
 import { Race } from '../entities/race.entity';
@@ -12,6 +13,7 @@ import { RacesService } from './races.service';
   imports: [
     TypeOrmModule.forFeature([Race, RaceResult, ObstacleSplit, Athlete]),
     VectorStoreModule,
+    QueueModule,
   ],
   controllers: [RacesController],
   providers: [RacesService],
