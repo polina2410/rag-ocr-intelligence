@@ -163,21 +163,13 @@ docker compose up -d
 
 This starts PostgreSQL (`:5433`), Qdrant (`:6333`), and Redis (`:6379`).
 
-### 6. Start the backend
+### 6. Start the dev servers
 
 ```bash
-pnpm --filter backend start:dev
+pnpm dev
 ```
 
-NestJS will start on `http://localhost:3000`. On first boot it connects to Postgres and initialises the Qdrant collection.
-
-### 7. Start the frontend
-
-```bash
-pnpm --filter frontend dev
-```
-
-Vite will start on `http://localhost:5173`.
+Turbo starts both apps concurrently. NestJS will be on `http://localhost:3000` and Vite on `http://localhost:5173`. On first boot the backend connects to Postgres and initialises the Qdrant collection.
 
 ---
 
