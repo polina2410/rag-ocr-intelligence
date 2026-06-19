@@ -40,9 +40,7 @@ export const RaceCard = ({ race }: RaceCardProps) => {
     },
   })
 
-  const openConfirm = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const openConfirm = () => {
     setConfirmOpen(true)
   }
 
@@ -54,33 +52,38 @@ export const RaceCard = ({ race }: RaceCardProps) => {
 
   return (
     <>
-      <Link
-        to={`/races/${race.id}`}
-        className={styles.card}
+      <div
+        className={styles.root}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onFocus={() => setHovered(true)}
-        onBlur={() => setHovered(false)}
+        onBlur={(e) => {
+          if (!confirmOpen && !e.currentTarget.contains(e.relatedTarget as Node)) {
+            setHovered(false)
+          }
+        }}
       >
-        <span className={styles.name}>{race.name}</span>
-        <Badge label={race.raceType} variant={race.raceType} />
-        {race.embeddingStatus === 'pending' && (
-          <span className={styles.statusPending} aria-label="Embedding in progress">
-            Indexing for AI…
-          </span>
-        )}
-        {race.embeddingStatus === 'failed' && (
-          <span className={styles.statusFailed} aria-label="Embedding failed">
-            AI indexing failed
-          </span>
-        )}
-        <ul className={styles.details}>
-          <li className={styles.detail}>{dateFormatter.format(new Date(race.date))}</li>
-          <li className={styles.detail}>{race.location}</li>
-          <li className={styles.detail}>{race.distanceKm} km</li>
-          <li className={styles.detail}>{race.totalObstacles} obstacles</li>
-        </ul>
-        {hovered && <RaceCardStats raceId={race.id} />}
+        <Link to={`/races/${race.id}`} className={styles.card}>
+          <span className={styles.name}>{race.name}</span>
+          <Badge label={race.raceType} variant={race.raceType} />
+          {race.embeddingStatus === 'pending' && (
+            <span className={styles.statusPending} aria-label="Embedding in progress">
+              Indexing for AI…
+            </span>
+          )}
+          {race.embeddingStatus === 'failed' && (
+            <span className={styles.statusFailed} aria-label="Embedding failed">
+              AI indexing failed
+            </span>
+          )}
+          <ul className={styles.details}>
+            <li className={styles.detail}>{dateFormatter.format(new Date(race.date))}</li>
+            <li className={styles.detail}>{race.location}</li>
+            <li className={styles.detail}>{race.distanceKm} km</li>
+            <li className={styles.detail}>{race.totalObstacles} obstacles</li>
+          </ul>
+          {hovered && <RaceCardStats raceId={race.id} />}
+        </Link>
         {hovered && (
           <button
             className={styles.deleteButton}
@@ -92,7 +95,7 @@ export const RaceCard = ({ race }: RaceCardProps) => {
             {mutation.isPending ? 'Deleting…' : 'Delete'}
           </button>
         )}
-      </Link>
+      </div>
       <ConfirmDialog
         open={confirmOpen}
         title="Delete this race?"
@@ -102,7 +105,7 @@ export const RaceCard = ({ race }: RaceCardProps) => {
             removed. This action cannot be undone.
           </>
         }
-        confirmLabel={mutation.isPending ? 'Deleting' : 'Delete race'}
+        confirmLabel={mutation.isPending ? 'Deleting…' : 'Delete race'}
         cancelLabel="Keep race"
         tone="danger"
         isPending={mutation.isPending}

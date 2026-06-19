@@ -138,7 +138,7 @@ export const ConfirmDialog = ({
             transition={{ duration: PANEL_DURATION, ease: 'easeOut' }}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className={styles[`icon_${tone}`]} aria-hidden="true">
+            <div className={tone === 'danger' ? styles.icon_danger : styles.icon_default} aria-hidden="true">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18" />
                 <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -173,12 +173,12 @@ export const ConfirmDialog = ({
               </button>
               <button
                 type="button"
-                className={styles[`confirm_${tone}`]}
+                className={tone === 'danger' ? styles.confirm_danger : styles.confirm_default}
                 onClick={onConfirm}
                 disabled={isPending}
                 aria-busy={isPending}
               >
-                {isPending ? `${confirmLabel}…` : confirmLabel}
+                {confirmLabel}
               </button>
             </div>
           </motion.div>

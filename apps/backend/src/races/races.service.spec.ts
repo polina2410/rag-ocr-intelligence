@@ -6,6 +6,7 @@ import { ObstacleSplit } from '../entities/obstacle-split.entity';
 import { Race } from '../entities/race.entity';
 import { RaceResult } from '../entities/race-result.entity';
 import type { VectorStoreService } from '../vector-store/vector-store.service';
+import { EMBED_JOB } from '../queue/queue.constants';
 import { RacesService } from './races.service';
 
 const findAndCountMock = jest.fn();
@@ -49,6 +50,9 @@ const deleteByRaceIdMock = jest.fn();
 const mockVectorStore = {
   deleteByRaceId: deleteByRaceIdMock,
 } as unknown as VectorStoreService;
+
+const addMock = jest.fn();
+const mockEmbedQueue = { add: addMock };
 
 const makeRace = (overrides: Partial<Race> = {}): Race => ({
   id: 'uuid-1',
@@ -108,6 +112,7 @@ describe('RacesService', () => {
       {} as never,
       mockDataSource,
       mockVectorStore,
+      mockEmbedQueue as never,
     );
   });
 
@@ -330,6 +335,24 @@ describe('RacesService', () => {
       expect(obstacleSplitDeleteMock).not.toHaveBeenCalled();
       expect(raceResultDeleteMock).toHaveBeenCalled();
       expect(raceDeleteMock).toHaveBeenCalled();
+    });
+  });
+
+  describe('triggerEmbed', () => {
+    it('enqueues an embed job when race exists', async () => {
+      findOneMock.mockResolvedValue(makeRace());
+      addMock.mockResolvedValue(undefined);
+
+      await service.triggerEmbed('uuid-1');
+
+      expect(addMock).toHaveBeenCalledWith(EMBED_JOB, { raceId: 'uuid-1' });
+    });
+
+    it('throws NotFoundException when race does not exist', async () => {
+      findOneMock.mockResolvedValue(null);
+
+      await expect(service.triggerEmbed('no-such-uuid')).rejects.toThrow(NotFoundException);
+      expect(addMock).not.toHaveBeenCalled();
     });
   });
 });

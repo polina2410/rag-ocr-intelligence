@@ -72,7 +72,7 @@ const RaceDetailPage = () => {
         <RaceHeader race={race} />
         {race.embeddingStatus !== 'complete' && (
           <div className={styles.embedBanner}>
-            <span className={styles[`embedStatus_${race.embeddingStatus}`]}>
+            <span className={race.embeddingStatus === 'failed' ? styles.embedStatus_failed : styles.embedStatus_pending}>
               AI search: {race.embeddingStatus}
             </span>
             <button
