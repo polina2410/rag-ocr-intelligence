@@ -95,9 +95,20 @@ describe('RaceResultSerializerService', () => {
       expect(text).toContain('overall 1');
       expect(text).toContain('category 1');
       expect(text).toContain('gender 1');
+      expect(text).toContain('(race winner)');
       expect(text).toContain('Rope Climb');
       expect(text).toContain('Wall');
       expect(text).toContain('1 penalty');
+    });
+  });
+
+  describe('race winner label', () => {
+    it('adds (race winner) label only for overall position 1', () => {
+      const winner = makeResult({ overallPosition: 1, splits: [] });
+      const second = makeResult({ overallPosition: 2, splits: [] });
+
+      expect(service.serialize(winner)).toContain('(race winner)');
+      expect(service.serialize(second)).not.toContain('(race winner)');
     });
   });
 

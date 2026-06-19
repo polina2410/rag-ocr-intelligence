@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PageWrapper } from '../components/PageWrapper'
 import { RaceHeader } from '../components/RaceHeader'
 import { ObstacleSplitChart } from '../components/ObstacleSplitChart'
@@ -9,17 +9,25 @@ import { CategoryFilter } from '../components/CategoryFilter'
 import { AthleteLeaderboard } from '../components/AthleteLeaderboard'
 import { SkeletonChart } from '../components/SkeletonChart'
 import { SkeletonTable } from '../components/SkeletonTable'
-import { getRace } from '../api/races'
+import { getRace, triggerEmbed } from '../api/races'
 import styles from './RaceDetailPage.module.css'
 
 const RaceDetailPage = () => {
   const { id } = useParams<{ id: string }>()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
   const { data: race, isPending, isError } = useQuery({
     queryKey: ['race', id],
     queryFn: () => getRace(id as string),
     enabled: Boolean(id),
+  })
+
+  const embedMutation = useMutation({
+    mutationFn: () => triggerEmbed(id as string),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['race', id] })
+    },
   })
 
   const categories = useMemo(
@@ -62,6 +70,23 @@ const RaceDetailPage = () => {
     return (
       <>
         <RaceHeader race={race} />
+        {race.embeddingStatus !== 'complete' && (
+          <div className={styles.embedBanner}>
+            <span className={styles[`embedStatus_${race.embeddingStatus}`]}>
+              AI search: {race.embeddingStatus}
+            </span>
+            <button
+              className={styles.embedButton}
+              onClick={() => embedMutation.mutate()}
+              disabled={embedMutation.isPending}
+            >
+              {embedMutation.isPending ? 'Queuing…' : 'Run embedding'}
+            </button>
+            {embedMutation.isError && (
+              <span className={styles.embedError} role="alert">Failed to enqueue</span>
+            )}
+          </div>
+        )}
         <div className={styles.charts}>
           <ObstacleSplitChart results={race.results} />
           <PenaltyRateChart results={race.results} />

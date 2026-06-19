@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<
   }
 
   reset = () => {
-    this.setState({ hasError: false, error: null })
+    window.location.reload()
   }
 
   render() {

@@ -287,7 +287,6 @@ The full API reference is available in the Swagger UI at **http://localhost:3000
 
 > **Note:** Replace the placeholder images below with live screenshots once the app is running with seeded data.
 
-![Races grid showing the parallax hero and race cards](docs/screenshot-races.png)
 
 ![Race detail dashboard with obstacle split chart and leaderboard](docs/screenshot-race-detail.png)
 

@@ -67,6 +67,7 @@ export class AthletesService {
           distanceKm: Number(result.race.distanceKm),
           totalObstacles: result.race.totalObstacles,
           raceType: result.race.raceType,
+          embeddingStatus: result.race.embeddingStatus,
         },
         overallPosition: result.overallPosition,
         finishTimeSeconds: result.finishTimeSeconds,

@@ -18,7 +18,7 @@
 
 .name {
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   margin: 0;
 }
 
@@ -64,11 +64,11 @@
 }
 
 .statusPending {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 
 .statusFailed {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-danger);
 }

@@ -1,6 +1,7 @@
 .heading {
-  margin: 0 0 24px;
+  margin: 24px 0 24px;
   color: var(--color-text);
+  text-align: center;
 }
 
 .dropZoneWrap {

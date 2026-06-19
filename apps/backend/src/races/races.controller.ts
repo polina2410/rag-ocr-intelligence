@@ -6,9 +6,11 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Post,
   Query,
 } from '@nestjs/common';
 import {
+  ApiAcceptedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -43,6 +45,16 @@ export class RacesController {
   @ApiNotFoundResponse({ description: 'Race not found' })
   findOne(@Param('id', ParseUUIDPipe) id: string): Promise<RaceDetailDto> {
     return this.racesService.findOne(id);
+  }
+
+  @Post(':id/embed')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Enqueue embedding job for a race' })
+  @ApiParam({ name: 'id', description: 'Race UUID', format: 'uuid' })
+  @ApiAcceptedResponse({ description: 'Embedding job enqueued' })
+  @ApiNotFoundResponse({ description: 'Race not found' })
+  triggerEmbed(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.racesService.triggerEmbed(id);
   }
 
   @Delete(':id')

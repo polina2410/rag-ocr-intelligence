@@ -7,3 +7,4 @@ export const MAX_LIMIT = 100;
 
 export const RACE_TYPES = ['Sprint', 'Super', 'DEKA', 'Open'] as const;
 export const RESULT_STATUSES = ['FINISHED', 'DNF', 'DNS', 'DSQ'] as const;
+export const EMBED_STATUSES = ['pending', 'complete', 'failed'] as const;

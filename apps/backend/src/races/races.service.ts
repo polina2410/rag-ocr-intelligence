@@ -1,10 +1,14 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { PaginatedResponse, RaceDetailDto, RaceDto } from '@ocr/types';
+import type { Queue } from 'bullmq';
 import { DataSource, In, Repository } from 'typeorm';
 import { ObstacleSplit } from '../entities/obstacle-split.entity';
 import { Race } from '../entities/race.entity';
 import { RaceResult } from '../entities/race-result.entity';
+import type { EmbedJobData } from '../queue/embed-job.types';
+import { EMBED_JOB, EMBED_QUEUE } from '../queue/queue.constants';
 import { VectorStoreService } from '../vector-store/vector-store.service';
 
 @Injectable()
@@ -19,6 +23,8 @@ export class RacesService {
     private readonly obstacleSplitRepo: Repository<ObstacleSplit>,
     private readonly dataSource: DataSource,
     private readonly vectorStoreService: VectorStoreService,
+    @InjectQueue(EMBED_QUEUE)
+    private readonly embedQueue: Queue<EmbedJobData>,
   ) {}
 
   async findAll(
@@ -71,6 +77,7 @@ export class RacesService {
       distanceKm: Number(race.distanceKm),
       totalObstacles: race.totalObstacles,
       raceType: race.raceType,
+      embeddingStatus: race.embeddingStatus,
       results: sortedResults.map((result) => ({
         id: result.id,
         athlete: {
@@ -95,6 +102,14 @@ export class RacesService {
           })),
       })),
     };
+  }
+
+  async triggerEmbed(id: string): Promise<void> {
+    const race = await this.raceRepo.findOne({ where: { id } });
+    if (!race) {
+      throw new NotFoundException(`Race ${id} not found`);
+    }
+    await this.embedQueue.add(EMBED_JOB, { raceId: id });
   }
 
   async remove(id: string): Promise<void> {
