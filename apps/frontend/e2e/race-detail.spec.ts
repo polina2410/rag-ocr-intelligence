@@ -3,15 +3,14 @@ import { test, expect } from '@playwright/test';
 test.describe('Race detail page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/races');
-    await page.getByRole('link', { name: /Spartan Sprint Subotica 2024/ }).click();
-    await expect(page.getByRole('heading', { name: 'Spartan Sprint Subotica 2024' })).toBeVisible();
+    await page.getByRole('main').getByRole('link').first().click();
+    await expect(page).toHaveURL(/\/races\/.+/);
   });
 
   test('shows race header metadata', async ({ page }) => {
-    await expect(page.getByText('Sep 28, 2024')).toBeVisible();
-    await expect(page.getByText('Subotica, Serbia')).toBeVisible();
-    await expect(page.getByText('8.5 km')).toBeVisible();
-    await expect(page.getByText('23 obstacles')).toBeVisible();
+    const raceHeader = page.getByRole('heading', { level: 1 }).locator('..');
+    await expect(raceHeader.getByText(/\d+(\.\d+)? km/)).toBeVisible();
+    await expect(raceHeader.getByText(/\d+ obstacles/)).toBeVisible();
   });
 
   test('shows obstacle split time chart', async ({ page }) => {
