@@ -11,6 +11,10 @@ dist/
 .turbo/
 *.tsbuildinfo
 
+# Playwright
+playwright-report/
+test-results/
+
 # Debug logs
 .pnpm-debug.log*
 *.log

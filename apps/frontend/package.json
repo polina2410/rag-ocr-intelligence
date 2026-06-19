@@ -9,7 +9,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@ocr/types": "workspace:*",
@@ -26,6 +28,7 @@
     "@eslint/js": "^10.0.1",
     "@ocr/eslint-config": "workspace:*",
     "@ocr/prettier-config": "workspace:*",
+    "@playwright/test": "^1.61.0",
     "@tanstack/react-query-devtools": "^5.101.0",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
