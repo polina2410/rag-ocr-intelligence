@@ -15,6 +15,9 @@ dist/
 playwright-report/
 test-results/
 
+# Test coverage
+coverage/
+
 # Debug logs
 .pnpm-debug.log*
 *.log

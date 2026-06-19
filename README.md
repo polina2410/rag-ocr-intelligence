@@ -1,4 +1,4 @@
-# ocr-intelligence
+# OCR Intelligence
 
 A full-stack portfolio project for analysing obstacle course race (OCR) data. Upload race results as CSV files, explore per-race dashboards with charts and leaderboards, and ask natural-language questions about the data — answered in real time by a retrieval-augmented generation (RAG) pipeline backed by OpenAI and Qdrant.
 
@@ -285,13 +285,17 @@ The full API reference is available in the Swagger UI at **http://localhost:3000
 
 ## Demo Screenshots
 
+Upload page
+![Upload page for ingesting a CSV race file](docs/screenshot-upload-race.png)
+
+Races
 ![Races list page](docs/screenshot-races.png)
 
+Race detail page
 ![Race detail dashboard with obstacle split chart and leaderboard](docs/screenshot-race-detail.png)
 
+Chat answer
 ![Ask chat page showing a streamed RAG answer](docs/screenshot-ask.png)
-
-![Upload page for ingesting a CSV race file](docs/screenshot-upload-race.png)
 
 ---
 
